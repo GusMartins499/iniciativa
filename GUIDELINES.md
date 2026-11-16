@@ -33,6 +33,8 @@ src/
 - `src/shared/**` nunca importa de `src/modules/**`.
 - Server Action é fina: autentica, valida a entrada com Zod, chama o caso de uso do módulo e devolve o `Result`. Regra de negócio fica no módulo.
 - A operação que cruza módulos (excluir conta cancela encontros e presenças) é orquestrada pelo módulo dono do caso de uso, no caso `users`. Ela chama as funções públicas dos outros módulos dentro da **mesma transação**, que é passada como parâmetro.
+- Componente de cliente (`"use client"`) **nunca** importa o `index.ts` de um módulo, porque isso leva código de servidor (banco, auth) para o bundle do navegador e quebra o build. Textos (`copy`) e dados chegam por props, passados pela página (server component). Para tipar a prop, use `import type`, que é apagado na compilação.
+- A checagem otimista de sessão (só verifica se existe o cookie) fica em `src/proxy.ts`, a convenção do Next 16 que substitui o `middleware.ts`. Ela nunca decide acesso: quem decide é sempre o `requireOnboardedUser()` no servidor.
 
 ## Best practices
 
