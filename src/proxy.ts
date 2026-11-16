@@ -11,5 +11,8 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!entrar|api/auth|_next/static|_next/image|favicon.ico).*)"],
+  // Os ícones do app ficam de fora: a aba e o atalho do iOS os pedem também sem login.
+  matcher: [
+    "/((?!entrar|api/auth|_next/static|_next/image|favicon.ico|icon\\.svg|apple-icon\\.png).*)",
+  ],
 };
