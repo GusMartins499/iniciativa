@@ -68,6 +68,13 @@ O `.env.local` nunca é commitado. O repositório é público.
 
 Os testes de módulo usam um Postgres em memória (PGlite) e não precisam de banco configurado.
 
+O teste de concorrência das presenças (duas pessoas disputando a última vaga) precisa de várias conexões, o que o PGlite não oferece. Ele roda numa branch `test` do Neon e é pulado quando `TEST_DATABASE_URL` não existe. Para habilitar:
+
+1. No Neon, crie a branch `test` a partir da `dev`, com **Branch schema only**.
+2. Copie a connection string **pooled** da branch `test` para `TEST_DATABASE_URL` no `.env.local`.
+
+A cada execução, o schema da branch `test` é apagado e recriado com todas as migrações. Por segurança, o `vitest.config.ts` ignora a variável se ela apontar para o mesmo host da `DATABASE_URL`.
+
 ## Variáveis de ambiente
 
 Todas estão listadas em [`.env.example`](.env.example). Na Vercel, cadastre-as em **Settings → Environment Variables**.
@@ -79,5 +86,6 @@ Todas estão listadas em [`.env.example`](.env.example). Na Vercel, cadastre-as 
 | `BETTER_AUTH_URL` | URL pública do app (`http://localhost:3000` localmente; a URL de produção `*.vercel.app` na Vercel) |
 | `GOOGLE_CLIENT_ID` | ID do cliente OAuth do Google |
 | `GOOGLE_CLIENT_SECRET` | Chave secreta do cliente OAuth do Google |
+| `TEST_DATABASE_URL` | Opcional, só para testes. Connection string pooled da branch `test` do Neon (ver abaixo) |
 
 Na Vercel, `BETTER_AUTH_URL` precisa ser a URL de **produção**. Os deploys de preview têm outra URL, e o login com Google não funciona neles.

@@ -42,7 +42,7 @@ src/
 - Valide toda entrada no servidor com Zod, mesmo que o formulário já tenha validado.
 - Verifique a sessão **e** a autodeclaração com consentimento aceito em toda Server Action e em toda rota protegida. Sem isso, redirecione para o onboarding.
 - Mantenha as regras de negócio só no servidor: vagas, acompanhante, prazo até o início, permissão do criador.
-- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; a exceção é o `drizzle.config.ts`, que roda fora do app. Variável nova entra no schema do `env.ts`, no `.env.example` e no README.
+- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts` e o `vitest.config.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`). Variável nova entra no schema do `env.ts`, no `.env.example` e no README.
 - Grave datas em **UTC** no banco (`timestamp with time zone`). Exiba e interprete as datas no fuso `America/Sao_Paulo`.
 
 **Nunca:**

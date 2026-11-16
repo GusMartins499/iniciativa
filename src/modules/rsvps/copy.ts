@@ -1,0 +1,30 @@
+export const rsvpsCopy = {
+  creatorNote: "Você criou este encontro e já está com presença confirmada.",
+  confirmedNote: "Você confirmou presença.",
+  confirmedWithCompanionNote: "Você confirmou presença com 1 acompanhante.",
+  startedNote: "Este encontro já começou. Não é mais possível confirmar ou cancelar presença.",
+  fullNote: "Este encontro está lotado.",
+  withCompanionLabel: "Vou levar 1 acompanhante",
+  confirmButton: "Confirmar minha presença",
+  confirmDialogTitle: "Confirmar minha presença",
+  confirmDialogDescription: "O seu nome fica visível só para quem criou o encontro.",
+  cancelButton: "Cancelar minha presença",
+  cancelDialogTitle: "Cancelar minha presença",
+  cancelDialogDescription: "A sua vaga fica livre para outra pessoa.",
+  back: "Voltar",
+  attendeesTitle: "Quem confirmou presença",
+  attendeesEmpty: "Ninguém confirmou presença ainda.",
+  attendee: (firstName: string, withCompanion: boolean) =>
+    withCompanion ? `${firstName} (com 1 acompanhante)` : firstName,
+  errors: {
+    MEETUP_FULL: "Este encontro está lotado.",
+    MEETUP_STARTED: "Este encontro já começou.",
+    NOT_FOUND: "Este encontro não existe.",
+    CREATOR_CANNOT_LEAVE:
+      "Quem criou o encontro não pode cancelar a presença. Para sair, cancele o encontro.",
+    VALIDATION_FAILED: "Algo deu errado. Tente de novo.",
+    ONBOARDING_REQUIRED: "Conclua o seu cadastro antes de continuar.",
+    UNAUTHENTICATED: "Entre com o Google antes de continuar.",
+    UNEXPECTED: "Algo deu errado. Tente de novo.",
+  },
+} as const;
