@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Tokens da identidade visual (docs/product/iniciativa-mvp.md). */
+@theme {
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-foreground: #0f172a;
+  --color-muted-foreground: #475569;
+  --color-primary: #334155;
+  --color-primary-hover: #1e293b;
+  --color-primary-foreground: #ffffff;
+  --color-tag: #e2e8f0;
+  --color-tag-foreground: #334155;
+  --color-honey: #f59e0b;
+  --color-honey-light: #fef3c7;
+  --color-honey-light-foreground: #92400e;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* O produto proíbe animação e transição (GUIDELINES.md § Accessibility). */
+*,
+*::before,
+*::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-honey);
+  outline-offset: 2px;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
