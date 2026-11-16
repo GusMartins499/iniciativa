@@ -1,95 +1,24 @@
 # iniciativa
 
-Webapp para jovens autistas proporem encontros presenciais e confirmarem presença. É um MVP de um programa do SIGMA PARK, com piloto em Tubarão-SC.
+Webapp para jovens autistas proporem encontros presenciais e confirmarem presença. É como um meetup, feito só para esse público.
 
-- Documento de produto: [`docs/product/iniciativa-mvp.md`](docs/product/iniciativa-mvp.md)
-- Regras de engenharia: [`GUIDELINES.md`](GUIDELINES.md)
+O projeto faz parte de um programa do SIGMA PARK, com piloto em Tubarão-SC.
 
-## Stack
+## O problema
 
-Next.js (App Router) + TypeScript, Postgres no Neon, Drizzle ORM, Tailwind CSS + shadcn/ui, pino e Vitest. O deploy é na Vercel.
+O isolamento social aparece com frequência em diagnósticos e terapias de jovens autistas. Faltam meios simples e seguros para esses jovens combinarem encontros presenciais entre si.
 
-## Pré-requisitos
+## A proposta
 
-- Node 22 ou mais novo.
-- pnpm, na versão fixada em `packageManager` no `package.json`. Rode `corepack enable` para usá-la.
+O iniciativa dá a esses jovens um lugar para tomar a iniciativa de encontrar outras pessoas:
 
-## Setup local
+- **Qualquer pessoa cadastrada pode propor um encontro** em um local público, como praça, café ou biblioteca, com data, horário e número de vagas.
+- **Quem quiser ir confirma presença** e pode levar um acompanhante, que também ocupa uma vaga.
+- **A privacidade vem primeiro.** Todo mundo vê só a ocupação, por exemplo "7 de 10 vagas". Apenas quem organizou vê os primeiros nomes de quem vai.
+- **A interface é pensada para o público autista**: previsível, direta e sem surpresas. Toda ação que muda algo pede confirmação antes.
 
-1. Instale as dependências:
+O acesso é para maiores de 18 anos, com nível de suporte 1 ou autonomia para ir sozinhos a um encontro, por meio de autodeclaração e consentimento de acordo com a LGPD.
 
-   ```bash
-   pnpm install
-   ```
+## Objetivo do piloto
 
-2. Crie o banco no Neon:
-   1. No [painel do Neon](https://console.neon.tech), crie um projeto no plano gratuito.
-   2. Crie uma branch para desenvolvimento, por exemplo `dev`, e use essa branch localmente. Nunca use a branch de produção.
-   3. Copie a connection string **pooled** da branch.
-3. Crie o login com Google no [Google Cloud Console](https://console.cloud.google.com):
-   1. Crie um projeto e configure a **tela de consentimento OAuth** com o tipo de usuário **Externo**.
-   2. Deixe o app em **modo de teste** e cadastre os e-mails do piloto em **Usuários de teste**. Só esses e-mails conseguem entrar, até 100 pessoas, o que combina com o público controlado do MVP.
-   3. Em **Credenciais**, crie um **ID do cliente OAuth** do tipo **Aplicativo da Web**, com estas URIs de redirecionamento autorizadas:
-      - `http://localhost:3000/api/auth/callback/google`
-      - `https://<seu-projeto>.vercel.app/api/auth/callback/google`
-   4. Copie o ID e a chave secreta do cliente.
-4. Crie o arquivo `.env.local` a partir do `.env.example` e preencha os valores:
-
-   ```bash
-   cp .env.example .env.local
-   ```
-
-5. Aplique as migrações no banco da branch de desenvolvimento:
-
-   ```bash
-   pnpm db:migrate
-   ```
-
-6. Suba o app:
-
-   ```bash
-   pnpm dev
-   ```
-
-O `.env.local` nunca é commitado. O repositório é público.
-
-## Exclusão de conta e cópias de segurança
-
-A exclusão de conta (`/conta`) apaga de verdade, no banco, o perfil, a autodeclaração, o consentimento, as sessões e as presenças da pessoa. O Neon, porém, guarda um histórico curto do banco para restauração (*history retention*). Até esse período passar, os dados excluídos ainda existem nesse histórico. Confira e ajuste o período no painel do Neon, em **Settings → Storage**. Esse comportamento está mencionado no termo de consentimento.
-
-## Comandos
-
-| Comando | O que faz |
-|---|---|
-| `pnpm dev` | Sobe o app em modo de desenvolvimento |
-| `pnpm build` | Gera o build de produção |
-| `pnpm lint` | Lint com Oxlint |
-| `pnpm format` / `pnpm format:check` | Formata ou confere a formatação com Oxfmt |
-| `pnpm typecheck` | Checagem de tipos (`tsc --noEmit`) |
-| `pnpm test` | Testes com Vitest |
-| `pnpm db:generate` | Gera a migração SQL a partir do schema do Drizzle |
-| `pnpm db:migrate` | Aplica as migrações no banco do `DATABASE_URL` |
-
-Os testes de módulo usam um Postgres em memória (PGlite) e não precisam de banco configurado.
-
-O teste de concorrência das presenças (duas pessoas disputando a última vaga) precisa de várias conexões, o que o PGlite não oferece. Ele roda numa branch `test` do Neon e é pulado quando `TEST_DATABASE_URL` não existe. Para habilitar:
-
-1. No Neon, crie a branch `test` a partir da `dev`, com **Branch schema only**.
-2. Copie a connection string **pooled** da branch `test` para `TEST_DATABASE_URL` no `.env.local`.
-
-A cada execução, o schema da branch `test` é apagado e recriado com todas as migrações. Por segurança, o `vitest.config.ts` ignora a variável se ela apontar para o mesmo host da `DATABASE_URL`.
-
-## Variáveis de ambiente
-
-Todas estão listadas em [`.env.example`](.env.example). Na Vercel, cadastre-as em **Settings → Environment Variables**.
-
-| Variável | Uso |
-|---|---|
-| `DATABASE_URL` | Connection string pooled do Neon |
-| `BETTER_AUTH_SECRET` | Segredo da sessão. Gere com `openssl rand -base64 32` |
-| `BETTER_AUTH_URL` | URL pública do app (`http://localhost:3000` localmente; a URL de produção `*.vercel.app` na Vercel) |
-| `GOOGLE_CLIENT_ID` | ID do cliente OAuth do Google |
-| `GOOGLE_CLIENT_SECRET` | Chave secreta do cliente OAuth do Google |
-| `TEST_DATABASE_URL` | Opcional, só para testes. Connection string pooled da branch `test` do Neon (ver abaixo) |
-
-Na Vercel, `BETTER_AUTH_URL` precisa ser a URL de **produção**. Os deploys de preview têm outra URL, e o login com Google não funciona neles.
+Realizar pelo menos 3 encontros, cada um com 5 ou mais participantes, em 8 semanas, com um público controlado em Tubarão-SC.
