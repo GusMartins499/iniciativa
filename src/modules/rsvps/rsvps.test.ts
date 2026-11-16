@@ -165,8 +165,8 @@ describe("rsvps.cancelRsvp", () => {
 describe("rsvps.listAttendeesForCreator", () => {
   it("devolve primeiro nome e acompanhante para o criador", async () => {
     const { creatorId, meetupId } = await setupMeetup(db, 10);
-    const ana = await insertTestUser(db, "ana", "Ana Souza");
-    await confirmRsvp(db, ana, meetupId, { withCompanion: true }, NOW);
+    const attendeeId = await insertTestUser(db, "ana", "Ana Souza");
+    await confirmRsvp(db, attendeeId, meetupId, { withCompanion: true }, NOW);
 
     const r = await listAttendeesForCreator(db, creatorId, meetupId);
 
