@@ -3,7 +3,7 @@ import type { Database } from "@/shared/db";
 import { createTestDb } from "@/shared/db/test-db";
 import { completeOnboarding } from "./complete-onboarding";
 import { requireOnboardedUser } from "./require-onboarded-user";
-import { insertTestUser } from "./test-helpers";
+import { insertTestUser } from "@/shared/auth/test-helpers";
 
 let db: Database;
 let userId: string;

@@ -5,7 +5,7 @@ import { createTestDb } from "@/shared/db/test-db";
 import { CONSENT_VERSION } from "./copy";
 import { completeOnboarding } from "./complete-onboarding";
 import { userOnboardings } from "./schema";
-import { insertTestUser } from "./test-helpers";
+import { insertTestUser } from "@/shared/auth/test-helpers";
 
 let db: Database;
 let userId: string;

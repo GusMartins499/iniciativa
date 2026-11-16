@@ -16,6 +16,9 @@ export default defineConfig({
         test: {
           name: "node",
           environment: "node",
+          // Cada suíte de módulo sobe um PGlite e aplica as migrações; com os testes em paralelo, 5s não basta.
+          testTimeout: 20_000,
+          hookTimeout: 20_000,
           include: ["src/**/*.test.ts"],
         },
       },
