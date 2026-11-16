@@ -1,7 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useState } from "react";
-import { rsvpsCopy as copy } from "@/modules/rsvps/client";
+import { useForm } from "react-hook-form";
+import {
+  type ConfirmRsvpInput,
+  confirmRsvpSchema,
+  rsvpsCopy as copy,
+} from "@/modules/rsvps/client";
 import { Button } from "@/shared/ui";
 import {
   Dialog,
@@ -58,7 +64,10 @@ function ConfirmDialog({ trigger, title, description, disabled, onConfirm }: Con
 export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProps) {
   const [confirmState, confirm, confirming] = useActionState(confirmAction, { code: null });
   const [cancelState, cancel, cancelling] = useActionState(cancelAction, { code: null });
-  const [withCompanion, setWithCompanion] = useState(false);
+  const { register, handleSubmit } = useForm<ConfirmRsvpInput>({
+    resolver: zodResolver(confirmRsvpSchema),
+    defaultValues: { withCompanion: false },
+  });
   const code = confirmState.code ?? cancelState.code;
   const pending = confirming || cancelling;
 
@@ -84,8 +93,7 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
           <label className="flex min-h-11 items-start gap-3">
             <input
               type="checkbox"
-              checked={withCompanion}
-              onChange={(event) => setWithCompanion(event.target.checked)}
+              {...register("withCompanion")}
               disabled={status.full}
               className="mt-1 size-5 shrink-0"
             />
@@ -96,7 +104,7 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
             title={copy.confirmDialogTitle}
             description={copy.confirmDialogDescription}
             disabled={status.full || pending}
-            onConfirm={() => startTransition(() => confirm({ withCompanion }))}
+            onConfirm={handleSubmit((values) => startTransition(() => confirm(values)))}
           />
         </>
       ) : null}

@@ -1,13 +1,11 @@
 import { and, asc, eq } from "drizzle-orm";
-import { z } from "zod";
 import { getCreatorId, lockMeetupForUpdate, releaseSeats, reserveSeats } from "@/modules/meetups";
 import { getFirstNames } from "@/shared/auth";
 import type { Database } from "@/shared/db";
 import { logger } from "@/shared/logger";
 import { err, ok, type Result } from "@/shared/result";
+import { confirmRsvpSchema } from "./confirm-schema";
 import { rsvps } from "./schema";
-
-const confirmInput = z.object({ withCompanion: z.boolean() });
 
 type ConfirmError = "VALIDATION_FAILED" | "NOT_FOUND" | "MEETUP_STARTED" | "MEETUP_FULL";
 type CancelError = "NOT_FOUND" | "MEETUP_STARTED" | "CREATOR_CANNOT_LEAVE";
@@ -29,7 +27,7 @@ export async function confirmRsvp(
   input: unknown,
   now: Date = new Date(),
 ): Promise<Result<{ rsvpId: string | null }, ConfirmError>> {
-  const parsed = confirmInput.safeParse(input);
+  const parsed = confirmRsvpSchema.safeParse(input);
   if (!parsed.success) return rejected("VALIDATION_FAILED", userId, meetupId);
   const { withCompanion } = parsed.data;
 
