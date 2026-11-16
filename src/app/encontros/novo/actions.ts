@@ -5,12 +5,12 @@ import { createMeetup } from "@/modules/meetups";
 import { requireOnboardedUser } from "@/modules/users";
 import { getDb } from "@/shared/db";
 import { logger } from "@/shared/logger";
-import type { CreateMeetupState } from "./state";
+import type { MeetupFormState } from "../meetup-form-state";
 
 export async function createMeetupAction(
-  _state: CreateMeetupState,
+  _state: MeetupFormState,
   input: unknown,
-): Promise<CreateMeetupState> {
+): Promise<MeetupFormState> {
   let meetupId: string;
   try {
     const guard = await requireOnboardedUser();

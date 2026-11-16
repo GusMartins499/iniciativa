@@ -55,6 +55,20 @@ describe("tela /encontros/novo", () => {
     );
   });
 
+  it("no modo de edição vem preenchido, sem o campo de acompanhante", () => {
+    render(
+      <MeetupForm
+        mode="edit"
+        action={async () => ({ code: null })}
+        defaultValues={{ title: "Café no centro", capacity: 10, publicPlace: true }}
+      />,
+    );
+
+    expect(screen.getByLabelText("Título")).toHaveValue("Café no centro");
+    expect(screen.queryByLabelText("Vou levar 1 acompanhante")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Salvar alterações" })).toBeInTheDocument();
+  });
+
   it("não tem violações de acessibilidade", async () => {
     const { container } = render(<MeetupForm action={async () => ({ code: null })} />);
     expect(await axe(container)).toHaveNoViolations();

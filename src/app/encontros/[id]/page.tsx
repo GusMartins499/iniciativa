@@ -5,6 +5,9 @@ import { getDb } from "@/shared/db";
 import { requirePageUser } from "../../require-page-user";
 import { MeetupSummary } from "../meetup-summary";
 import { cancelRsvpAction, confirmRsvpAction } from "./actions";
+import { CreatorActions } from "./creator-actions";
+import { cancelMeetupAction } from "./meetup-actions";
+import { MeetupNotices } from "./meetup-notices";
 import { RsvpPanel } from "./rsvp-panel";
 import type { RsvpStatus } from "./rsvp-state";
 
@@ -38,9 +41,11 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
   // Os nomes só são lidos depois de o servidor conferir que quem pede é o criador.
   const attendees = isCreator ? await listAttendeesForCreator(db, currentUser.id, id) : null;
 
+  const started = meetup.startsAt <= new Date();
+  const active = meetup.status === "active";
   let status: RsvpStatus;
   if (isCreator) status = { kind: "creator" };
-  else if (meetup.startsAt <= new Date()) status = { kind: "started" };
+  else if (started) status = { kind: "started" };
   else if (rsvp) status = { kind: "confirmed", withCompanion: rsvp.withCompanion };
   else status = { kind: "open", full: meetup.isFull };
 
@@ -52,11 +57,17 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
         <MeetupSummary meetup={meetup} />
         {meetup.placeDescription ? <p>{meetup.placeDescription}</p> : null}
       </article>
-      <RsvpPanel
-        status={status}
-        confirmAction={confirmRsvpAction.bind(null, id)}
-        cancelAction={cancelRsvpAction.bind(null, id)}
-      />
+      <MeetupNotices status={meetup.status} edited={meetup.editedAt !== null} />
+      {active ? (
+        <RsvpPanel
+          status={status}
+          confirmAction={confirmRsvpAction.bind(null, id)}
+          cancelAction={cancelRsvpAction.bind(null, id)}
+        />
+      ) : null}
+      {isCreator && active && !started ? (
+        <CreatorActions meetupId={id} cancelMeetupAction={cancelMeetupAction.bind(null, id)} />
+      ) : null}
       {attendees?.ok ? (
         <section className="flex flex-col gap-2">
           <h2 className="text-lg font-bold">{rsvpsCopy.attendeesTitle}</h2>
