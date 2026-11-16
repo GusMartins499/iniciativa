@@ -14,7 +14,7 @@ function memoryDestination() {
 describe("shared/logger", () => {
   it("oculta campos de PII no log", () => {
     const destino = memoryDestination();
-    const logger = createLogger(destino);
+    const logger = createLogger(destino, "info");
 
     logger.info({ event: "x", userId: "u1", email: "a@b.c", name: "Ana" });
 
@@ -26,7 +26,7 @@ describe("shared/logger", () => {
 
   it("oculta PII aninhada e dados da autodeclaração", () => {
     const destino = memoryDestination();
-    const logger = createLogger(destino);
+    const logger = createLogger(destino, "info");
 
     logger.info({
       event: "y",

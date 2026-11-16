@@ -33,6 +33,8 @@ src/
 - `src/shared/**` nunca importa de `src/modules/**`.
 - Server Action é fina: autentica, valida a entrada com Zod, chama o caso de uso do módulo e devolve o `Result`. Regra de negócio fica no módulo.
 - A operação que cruza módulos (excluir conta cancela encontros e presenças) é orquestrada pelo módulo dono do caso de uso, no caso `users`. Ela chama as funções públicas dos outros módulos dentro da **mesma transação**, que é passada como parâmetro.
+- Componente de cliente (`"use client"`) **nunca** importa o `index.ts` de um módulo, porque isso leva código de servidor (banco, auth) para o bundle do navegador e quebra o build. Ele importa o `client.ts` do módulo, a entrada pública que só reexporta código sem dependência de servidor: textos (`copy`), schemas Zod e tipos. Dados chegam por props, passados pela página (server component).
+- A checagem otimista de sessão (só verifica se existe o cookie) fica em `src/proxy.ts`, a convenção do Next 16 que substitui o `middleware.ts`. Ela nunca decide acesso: quem decide é sempre o `requireOnboardedUser()` no servidor.
 
 ## Best practices
 
@@ -40,6 +42,7 @@ src/
 - Valide toda entrada no servidor com Zod, mesmo que o formulário já tenha validado.
 - Verifique a sessão **e** a autodeclaração com consentimento aceito em toda Server Action e em toda rota protegida. Sem isso, redirecione para o onboarding.
 - Mantenha as regras de negócio só no servidor: vagas, acompanhante, prazo até o início, permissão do criador.
+- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; a exceção é o `drizzle.config.ts`, que roda fora do app. Variável nova entra no schema do `env.ts`, no `.env.example` e no README.
 - Grave datas em **UTC** no banco (`timestamp with time zone`). Exiba e interprete as datas no fuso `America/Sao_Paulo`.
 
 **Nunca:**
@@ -97,11 +100,12 @@ src/
 | Assunto | Use | Não use |
 |---|---|---|
 | UI / estilo | Tailwind CSS + shadcn/ui (Radix), com `clsx` + `tailwind-merge` + `class-variance-authority` (base do `cn` do shadcn) | bibliotecas de animação (framer-motion etc.) |
-| Formulários | react-hook-form + Zod (`@hookform/resolvers`) | — |
+| Formulários | react-hook-form + Zod (`@hookform/resolvers`), com o schema Zod compartilhado entre cliente e servidor | estado manual com `useState` por campo |
 | Validação | Zod | — |
 | Datas | date-fns + date-fns-tz | moment, dayjs |
 | Ícones | lucide-react | — |
 | HTTP | `fetch` nativo | axios |
+| Estado de ação assíncrona | `useActionState` / `useTransition` do React | `useState` manual para pending/erro; TanStack Query (sem cache de dados no cliente no MVP) |
 | Banco | drizzle-orm + drizzle-kit + `@neondatabase/serverless` | outro ORM, SQL cru |
 | Auth | better-auth (adapter Drizzle, provider Google) | next-auth |
 | Logger | pino | — |

@@ -8,6 +8,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: { alias },
   test: {
+    // Logs de teste não poluem a saída; o logger tem testes próprios com destino em memória.
+    env: { LOG_LEVEL: "silent" },
     projects: [
       {
         extends: true,

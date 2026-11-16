@@ -26,13 +26,26 @@ Next.js (App Router) + TypeScript, Postgres no Neon, Drizzle ORM, Tailwind CSS +
    1. No [painel do Neon](https://console.neon.tech), crie um projeto no plano gratuito.
    2. Crie uma branch para desenvolvimento, por exemplo `dev`, e use essa branch localmente. Nunca use a branch de produção.
    3. Copie a connection string **pooled** da branch.
-3. Crie o arquivo `.env.local` a partir do `.env.example` e preencha os valores:
+3. Crie o login com Google no [Google Cloud Console](https://console.cloud.google.com):
+   1. Crie um projeto e configure a **tela de consentimento OAuth** com o tipo de usuário **Externo**.
+   2. Deixe o app em **modo de teste** e cadastre os e-mails do piloto em **Usuários de teste**. Só esses e-mails conseguem entrar, até 100 pessoas, o que combina com o público controlado do MVP.
+   3. Em **Credenciais**, crie um **ID do cliente OAuth** do tipo **Aplicativo da Web**, com estas URIs de redirecionamento autorizadas:
+      - `http://localhost:3000/api/auth/callback/google`
+      - `https://<seu-projeto>.vercel.app/api/auth/callback/google`
+   4. Copie o ID e a chave secreta do cliente.
+4. Crie o arquivo `.env.local` a partir do `.env.example` e preencha os valores:
 
    ```bash
    cp .env.example .env.local
    ```
 
-4. Suba o app:
+5. Aplique as migrações no banco da branch de desenvolvimento:
+
+   ```bash
+   pnpm db:migrate
+   ```
+
+6. Suba o app:
 
    ```bash
    pnpm dev
@@ -62,3 +75,9 @@ Todas estão listadas em [`.env.example`](.env.example). Na Vercel, cadastre-as 
 | Variável | Uso |
 |---|---|
 | `DATABASE_URL` | Connection string pooled do Neon |
+| `BETTER_AUTH_SECRET` | Segredo da sessão. Gere com `openssl rand -base64 32` |
+| `BETTER_AUTH_URL` | URL pública do app (`http://localhost:3000` localmente; a URL de produção `*.vercel.app` na Vercel) |
+| `GOOGLE_CLIENT_ID` | ID do cliente OAuth do Google |
+| `GOOGLE_CLIENT_SECRET` | Chave secreta do cliente OAuth do Google |
+
+Na Vercel, `BETTER_AUTH_URL` precisa ser a URL de **produção**. Os deploys de preview têm outra URL, e o login com Google não funciona neles.
