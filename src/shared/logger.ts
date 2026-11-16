@@ -14,10 +14,13 @@ const SENSITIVE_KEYS = [
 
 const REDACT_PATHS = SENSITIVE_KEYS.flatMap((key) => [key, `*.${key}`]);
 
-export function createLogger(destination?: DestinationStream): Logger {
+export function createLogger(
+  destination?: DestinationStream,
+  level: string = process.env.LOG_LEVEL ?? "info",
+): Logger {
   return pino(
     {
-      level: process.env.LOG_LEVEL ?? "info",
+      level,
       redact: { paths: REDACT_PATHS, remove: true },
       base: undefined,
     },
