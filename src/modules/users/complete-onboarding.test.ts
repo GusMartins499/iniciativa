@@ -24,11 +24,11 @@ describe("users.completeOnboarding", () => {
     const r = await completeOnboarding(db, userId, { declaration: true, consent: true });
 
     expect(r.ok).toBe(true);
-    const [registro] = await findOnboardings();
-    expect(registro?.consentedAt).not.toBeNull();
-    expect(registro?.consentVersion).toBe(CONSENT_VERSION);
-    expect(registro?.declaredAutismLevel1OrAutonomous).toBe(true);
-    expect(registro?.declaredAdult).toBe(true);
+    const [record] = await findOnboardings();
+    expect(record?.consentedAt).not.toBeNull();
+    expect(record?.consentVersion).toBe(CONSENT_VERSION);
+    expect(record?.declaredAutismLevel1OrAutonomous).toBe(true);
+    expect(record?.declaredAdult).toBe(true);
   });
 
   it("recusa quando a autodeclaração não foi marcada", async () => {
@@ -53,13 +53,13 @@ describe("users.completeOnboarding", () => {
 
   it("é idempotente para quem já concluiu o onboarding", async () => {
     await completeOnboarding(db, userId, { declaration: true, consent: true });
-    const [primeiro] = await findOnboardings();
+    const [first] = await findOnboardings();
 
     const r = await completeOnboarding(db, userId, { declaration: true, consent: true });
 
     expect(r.ok).toBe(true);
-    const registros = await findOnboardings();
-    expect(registros).toHaveLength(1);
-    expect(registros[0]?.consentedAt).toEqual(primeiro?.consentedAt);
+    const records = await findOnboardings();
+    expect(records).toHaveLength(1);
+    expect(records[0]?.consentedAt).toEqual(first?.consentedAt);
   });
 });

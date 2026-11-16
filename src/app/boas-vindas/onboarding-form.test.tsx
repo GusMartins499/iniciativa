@@ -10,13 +10,13 @@ async function noopAction() {
 describe("tela /boas-vindas", () => {
   it("só habilita o envio com as duas caixas marcadas", () => {
     render(<OnboardingForm action={noopAction} />);
-    const botaoContinuar = screen.getByRole("button", { name: "Continuar" });
+    const continueButton = screen.getByRole("button", { name: "Continuar" });
 
     fireEvent.click(screen.getByRole("checkbox", { name: /sou autista/i }));
-    expect(botaoContinuar).toBeDisabled();
+    expect(continueButton).toBeDisabled();
 
     fireEvent.click(screen.getByRole("checkbox", { name: /aceito o termo/i }));
-    expect(botaoContinuar).toBeEnabled();
+    expect(continueButton).toBeEnabled();
   });
 
   it("pede confirmação explícita antes de enviar", () => {

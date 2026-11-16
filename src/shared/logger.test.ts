@@ -13,20 +13,20 @@ function memoryDestination() {
 
 describe("shared/logger", () => {
   it("oculta campos de PII no log", () => {
-    const destino = memoryDestination();
-    const logger = createLogger(destino, "info");
+    const destination = memoryDestination();
+    const logger = createLogger(destination, "info");
 
     logger.info({ event: "x", userId: "u1", email: "a@b.c", name: "Ana" });
 
-    const saida = destino.lines.join("");
-    expect(saida).toContain('"userId":"u1"');
-    expect(saida).not.toContain("a@b.c");
-    expect(saida).not.toContain("Ana");
+    const output = destination.lines.join("");
+    expect(output).toContain('"userId":"u1"');
+    expect(output).not.toContain("a@b.c");
+    expect(output).not.toContain("Ana");
   });
 
   it("oculta PII aninhada e dados da autodeclaração", () => {
-    const destino = memoryDestination();
-    const logger = createLogger(destino, "info");
+    const destination = memoryDestination();
+    const logger = createLogger(destination, "info");
 
     logger.info({
       event: "y",
@@ -35,11 +35,11 @@ describe("shared/logger", () => {
       consent: { version: "v1" },
     });
 
-    const saida = destino.lines.join("");
-    expect(saida).toContain('"event":"y"');
-    expect(saida).not.toContain("z@y.x");
-    expect(saida).not.toContain("https://foto");
-    expect(saida).not.toContain("autism");
-    expect(saida).not.toContain('"v1"');
+    const output = destination.lines.join("");
+    expect(output).toContain('"event":"y"');
+    expect(output).not.toContain("z@y.x");
+    expect(output).not.toContain("https://foto");
+    expect(output).not.toContain("autism");
+    expect(output).not.toContain('"v1"');
   });
 });
