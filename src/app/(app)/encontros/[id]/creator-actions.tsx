@@ -14,10 +14,10 @@ type CreatorActionsProps = {
 export function CreatorActions({ meetupId, cancelMeetupAction }: CreatorActionsProps) {
   const [state, cancel, pending] = useActionState(cancelMeetupAction, { code: null });
   return (
-    <section className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-3">
       <Link
         href={`/encontros/${meetupId}/editar`}
-        className="inline-flex min-h-11 items-center justify-center rounded-md border border-border bg-surface px-4 font-semibold"
+        className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 font-semibold text-primary-foreground hover:bg-primary-hover"
       >
         {copy.editLink}
       </Link>
@@ -27,6 +27,7 @@ export function CreatorActions({ meetupId, cancelMeetupAction }: CreatorActionsP
         description={copy.cancelMeetupDescription}
         backLabel={copy.back}
         disabled={pending}
+        triggerVariant="secondary"
         onConfirm={() => startTransition(() => cancel())}
       />
       {state.code ? (
@@ -34,6 +35,6 @@ export function CreatorActions({ meetupId, cancelMeetupAction }: CreatorActionsP
           {copy.errors[state.code]}
         </p>
       ) : null}
-    </section>
+    </div>
   );
 }

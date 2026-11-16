@@ -18,6 +18,8 @@ type ConfirmDialogProps = {
   backLabel: string;
   disabled: boolean;
   onConfirm: () => void;
+  triggerVariant?: "primary" | "secondary";
+  triggerClassName?: string;
 };
 
 // Ação que muda dados: o botão abre o diálogo, e o título repete o verbo literal.
@@ -28,12 +30,16 @@ export function ConfirmDialog({
   backLabel,
   disabled,
   onConfirm,
+  triggerVariant = "primary",
+  triggerClassName,
 }: ConfirmDialogProps) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button disabled={disabled}>{trigger}</Button>
+        <Button disabled={disabled} variant={triggerVariant} className={triggerClassName}>
+          {trigger}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>{title}</DialogTitle>

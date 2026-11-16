@@ -14,6 +14,7 @@ export const rsvpsCopy = {
   back: "Voltar",
   attendeesTitle: "Quem confirmou presença",
   attendeesEmpty: "Ninguém confirmou presença ainda.",
+  attendeesHint: "Esta lista aparece só para quem criou o encontro.",
   attendee: (firstName: string, withCompanion: boolean) =>
     withCompanion ? `${firstName} (com 1 acompanhante)` : firstName,
   errors: {

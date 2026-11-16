@@ -28,7 +28,7 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
   const pending = confirming || cancelling;
 
   return (
-    <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
+    <div className="flex flex-col gap-3">
       {status.kind === "creator" ? <p>{copy.creatorNote}</p> : null}
       {status.kind === "started" ? <p>{copy.startedNote}</p> : null}
       {status.kind === "confirmed" ? (
@@ -40,6 +40,8 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
             description={copy.cancelDialogDescription}
             backLabel={copy.back}
             disabled={pending}
+            triggerVariant="secondary"
+            triggerClassName="w-full"
             onConfirm={() => startTransition(() => cancel())}
           />
         </>
@@ -62,8 +64,10 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
             description={copy.confirmDialogDescription}
             backLabel={copy.back}
             disabled={status.full || pending}
+            triggerClassName="w-full"
             onConfirm={handleSubmit((values) => startTransition(() => confirm(values)))}
           />
+          <p className="text-sm text-muted-foreground">{copy.confirmDialogDescription}</p>
         </>
       ) : null}
       {code ? (
@@ -71,6 +75,6 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
           {copy.errors[code]}
         </p>
       ) : null}
-    </section>
+    </div>
   );
 }
