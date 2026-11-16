@@ -6,6 +6,8 @@ import { meetups } from "./schema";
 export type LockedMeetup = {
   creatorId: string | null;
   startsAt: Date;
+  status: "active" | "cancelled";
+  occupiedSeats: number;
 };
 
 // Trava a linha do encontro até o fim da transação: confirmações e cancelamentos
@@ -15,14 +17,19 @@ export async function lockMeetupForUpdate(
   meetupId: string,
 ): Promise<Result<LockedMeetup, "NOT_FOUND">> {
   const [row] = await tx
-    .select({ creatorId: meetups.creatorId, startsAt: meetups.startsAt })
+    .select({
+      creatorId: meetups.creatorId,
+      startsAt: meetups.startsAt,
+      status: meetups.status,
+      occupiedSeats: meetups.occupiedSeats,
+    })
     .from(meetups)
     .where(eq(meetups.id, meetupId))
     .for("update");
   return row ? ok(row) : err("NOT_FOUND");
 }
 
-// Incrementa só se couber e se o encontro ainda não começou; a checagem e a escrita
+// Incrementa só se couber e se o encontro está ativo e ainda não começou; a checagem e a escrita
 // são a mesma instrução, dentro da transação que já trava a linha.
 export async function reserveSeats(
   tx: Database,
@@ -36,6 +43,7 @@ export async function reserveSeats(
     .where(
       and(
         eq(meetups.id, meetupId),
+        eq(meetups.status, "active"),
         gt(meetups.startsAt, now),
         sql`${meetups.occupiedSeats} + ${seats} <= ${meetups.capacity}`,
       ),

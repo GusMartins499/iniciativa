@@ -1,6 +1,17 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  check,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { user } from "@/shared/auth/schema";
+
+export const meetupStatus = pgEnum("meetup_status", ["active", "cancelled"]);
 
 export const meetups = pgTable(
   "meetups",
@@ -17,6 +28,8 @@ export const meetups = pgTable(
     // Fonte única da ocupação; só muda com a linha travada (rsvps, card #4).
     occupiedSeats: integer("occupied_seats").notNull(),
     creatorWithCompanion: boolean("creator_with_companion").notNull(),
+    status: meetupStatus("status").notNull().default("active"),
+    editedAt: timestamp("edited_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
