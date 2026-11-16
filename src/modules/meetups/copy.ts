@@ -1,5 +1,15 @@
 export const meetupsCopy = {
   listTitle: "Próximos encontros",
+  listLead: "Encontros presenciais em Tubarão-SC. Escolha um e confirme a sua presença.",
+  seatsTaken: (occupied: number, capacity: number) => `${occupied} de ${capacity} vagas ocupadas`,
+  seatsFree: (free: number) => (free === 1 ? "1 livre" : `${free} livres`),
+  tags: {
+    going: "Você vai",
+    created: "Você criou",
+    full: "Lotado",
+    edited: "Alterado",
+    cancelled: "Cancelado",
+  },
   newMeetupLink: "Criar encontro",
   emptyList: "Ainda não há encontros marcados.",
   occupancy: (occupied: number, capacity: number) => `${occupied} de ${capacity} vagas`,

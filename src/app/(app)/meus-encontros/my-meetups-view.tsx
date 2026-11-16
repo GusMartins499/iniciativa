@@ -1,28 +1,28 @@
-import Link from "next/link";
 import type { PublicMeetup } from "@/modules/meetups/client";
-import { MeetupNotices } from "../encontros/[id]/meetup-notices";
-import { MeetupSummary } from "../encontros/meetup-summary";
+import { MeetupCard } from "../encontros/meetup-card";
 import { myMeetupsCopy as copy } from "./copy";
 import type { MyMeetups } from "./load-my-meetups";
 
-function MeetupList({ meetups, empty }: { meetups: PublicMeetup[]; empty: string }) {
+type MeetupListProps = {
+  meetups: PublicMeetup[];
+  empty: string;
+  relation: "created" | "going";
+};
+
+function MeetupList({ meetups, empty, relation }: MeetupListProps) {
   if (meetups.length === 0) {
     return <p className="text-muted-foreground">{empty}</p>;
   }
   return (
-    <ul className="flex flex-col gap-4">
+    <ul className="flex flex-col gap-3">
       {meetups.map((meetup) => (
-        <li
-          key={meetup.id}
-          className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-4"
-        >
-          <h3 className="text-lg font-bold">
-            <Link href={`/encontros/${meetup.id}`} className="underline">
-              {meetup.title}
-            </Link>
-          </h3>
-          <MeetupNotices status={meetup.status} edited={meetup.editedAt !== null} />
-          <MeetupSummary meetup={meetup} />
+        <li key={meetup.id}>
+          <MeetupCard
+            meetup={meetup}
+            created={relation === "created"}
+            going={relation === "going"}
+            longNotices
+          />
         </li>
       ))}
     </ul>
@@ -37,13 +37,13 @@ export function MyMeetupsView({ created, confirmed }: MyMeetups) {
         <h2 id="created-title" className="text-xl font-bold">
           {copy.createdTitle}
         </h2>
-        <MeetupList meetups={created} empty={copy.createdEmpty} />
+        <MeetupList meetups={created} empty={copy.createdEmpty} relation="created" />
       </section>
       <section aria-labelledby="confirmed-title" className="flex flex-col gap-3">
         <h2 id="confirmed-title" className="text-xl font-bold">
           {copy.confirmedTitle}
         </h2>
-        <MeetupList meetups={confirmed} empty={copy.confirmedEmpty} />
+        <MeetupList meetups={confirmed} empty={copy.confirmedEmpty} relation="going" />
       </section>
     </div>
   );
