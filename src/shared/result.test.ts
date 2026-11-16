@@ -3,8 +3,8 @@ import { err, ok } from "./result";
 
 describe("shared/result", () => {
   it("ok() devolve sucesso com os dados", () => {
-    const dado = { id: "m1" };
-    const r = ok(dado);
+    const data = { id: "m1" };
+    const r = ok(data);
     expect(r).toEqual({ ok: true, data: { id: "m1" } });
   });
 

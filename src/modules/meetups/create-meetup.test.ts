@@ -45,9 +45,9 @@ describe("meetups.createMeetup", () => {
 
   it.each(["title", "startsAt", "endsAt", "address", "capacity"])(
     "recusa sem o campo obrigatório %s",
-    async (campo) => {
+    async (field) => {
       const input: Record<string, unknown> = { ...validInput };
-      delete input[campo];
+      delete input[field];
 
       const r = await createMeetup(db, userId, input, NOW);
 

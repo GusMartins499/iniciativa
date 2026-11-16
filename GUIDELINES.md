@@ -6,7 +6,7 @@ Stack: Next.js (App Router) + TypeScript, Postgres no Neon, Drizzle ORM, Better 
 
 ## Code style
 
-- Todo identificador em **inglês**: pastas, arquivos, variáveis, funções, tipos, tabelas e colunas. Só os **textos de tela** ficam em português (pt-BR).
+- Todo identificador em **inglês**: pastas, arquivos, variáveis, funções, tipos, tabelas, colunas e ids de DOM, **inclusive nos testes**. Só os **textos de tela** e as **descrições de teste** (`describe`/`it`) ficam em português (pt-BR).
 - Nomes de arquivo e pasta em `kebab-case` (`confirm-rsvp.ts`, `meetup-card.tsx`). As exceções são os arquivos com nome fixo do Next (`page.tsx`, `layout.tsx`, `route.ts`, `[...all]`).
 - TypeScript em `strict`. É proibido `any`, inclusive implícito. Para dado desconhecido, use `unknown` e valide com Zod.
 - Não use `export default`, exceto onde o Next exige (`page`, `layout`, `route`, `not-found`, `error`). Todo o resto usa export nomeado.
