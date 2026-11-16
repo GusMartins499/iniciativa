@@ -1,15 +1,12 @@
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { getServerEnv } from "@/shared/env";
 import type { Database } from "./types";
 
 // neon-serverless (Pool/WebSocket) é o driver que aceita transação interativa;
 // neon-http não serve para as escritas com trava de linha.
 function createDb(): Database {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    throw new Error("DATABASE_URL não configurada");
-  }
-  return drizzle({ client: new Pool({ connectionString }) });
+  return drizzle({ client: new Pool({ connectionString: getServerEnv().DATABASE_URL }) });
 }
 
 let instance: Database | undefined;

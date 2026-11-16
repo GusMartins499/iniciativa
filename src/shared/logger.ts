@@ -1,4 +1,5 @@
 import pino, { type DestinationStream, type Logger } from "pino";
+import { logLevel } from "./env";
 
 // PII e dado de saúde (autodeclaração) nunca podem chegar ao log — GUIDELINES.md § Logging.
 const SENSITIVE_KEYS = [
@@ -14,10 +15,7 @@ const SENSITIVE_KEYS = [
 
 const REDACT_PATHS = SENSITIVE_KEYS.flatMap((key) => [key, `*.${key}`]);
 
-export function createLogger(
-  destination?: DestinationStream,
-  level: string = process.env.LOG_LEVEL ?? "info",
-): Logger {
+export function createLogger(destination?: DestinationStream, level: string = logLevel): Logger {
   return pino(
     {
       level,
