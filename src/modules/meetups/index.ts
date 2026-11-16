@@ -4,5 +4,5 @@ export { createMeetup } from "./create-meetup";
 export type { MeetupsErrorCode } from "./errors";
 export { cancelMeetup, updateMeetup } from "./manage-meetup";
 export { type MeetupInput, meetupInputSchema } from "./meetup-input";
-export { getMeetup, listUpcoming, type PublicMeetup } from "./queries";
+export { getByIds, getMeetup, listByCreator, listUpcoming, type PublicMeetup } from "./queries";
 export { getCreatorId, lockMeetupForUpdate, releaseSeats, reserveSeats } from "./seats";

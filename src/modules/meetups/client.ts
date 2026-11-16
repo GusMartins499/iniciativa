@@ -6,3 +6,4 @@ export {
   meetupFormSchema,
   toMeetupInput,
 } from "./meetup-input";
+export type { PublicMeetup } from "./queries";

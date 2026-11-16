@@ -1,4 +1,4 @@
-import { and, asc, eq, gt } from "drizzle-orm";
+import { and, asc, eq, gt, inArray } from "drizzle-orm";
 import type { Database } from "@/shared/db";
 import { err, ok, type Result } from "@/shared/result";
 import { meetups } from "./schema";
@@ -49,4 +49,33 @@ export async function getMeetup(
   }
   const [row] = await db.select(publicColumns).from(meetups).where(eq(meetups.id, id)).limit(1);
   return row ? ok(toPublic(row)) : err("NOT_FOUND");
+}
+
+// "Meus encontros": futuros, ativos e cancelados — o cancelado aparece com o aviso.
+export async function listByCreator(
+  db: Database,
+  userId: string,
+  now: Date = new Date(),
+): Promise<PublicMeetup[]> {
+  const rows = await db
+    .select(publicColumns)
+    .from(meetups)
+    .where(and(eq(meetups.creatorId, userId), gt(meetups.startsAt, now)))
+    .orderBy(asc(meetups.startsAt));
+  return rows.map(toPublic);
+}
+
+// Uma consulta só para vários encontros (evita N+1): futuros, ativos e cancelados.
+export async function getByIds(
+  db: Database,
+  ids: string[],
+  now: Date = new Date(),
+): Promise<PublicMeetup[]> {
+  if (ids.length === 0) return [];
+  const rows = await db
+    .select(publicColumns)
+    .from(meetups)
+    .where(and(inArray(meetups.id, ids), gt(meetups.startsAt, now)))
+    .orderBy(asc(meetups.startsAt));
+  return rows.map(toPublic);
 }
