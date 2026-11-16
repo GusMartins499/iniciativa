@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startTransition, useActionState } from "react";
+import { startTransition, useActionState, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
   onboardingCopy as copy,
@@ -19,8 +19,6 @@ import {
 } from "@/shared/ui/dialog";
 import type { OnboardingState } from "./state";
 
-const FORM_ID = "onboarding-form";
-
 export type OnboardingFormProps = {
   action: (state: OnboardingState, input: OnboardingInput) => Promise<OnboardingState>;
 };
@@ -33,14 +31,24 @@ export function OnboardingForm({ action }: OnboardingFormProps) {
   });
   const [declaration, consent] = useWatch({ control, name: ["declaration", "consent"] });
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
   const canContinue = declaration && consent && !pending;
+
+  // O envio acontece antes de fechar o diálogo: se o botão de envio sair do DOM
+  // durante o clique, o navegador cancela a submissão.
+  function confirm() {
+    formRef.current?.requestSubmit();
+    setConfirmOpen(false);
+  }
 
   const onSubmit = handleSubmit((values) => {
     startTransition(() => dispatch(values));
   });
 
   return (
-    <form id={FORM_ID} onSubmit={onSubmit} className="flex flex-col gap-6">
+    <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-6">
       <section
         aria-labelledby="termo-titulo"
         className="rounded-lg border border-border bg-surface p-4"
@@ -71,7 +79,7 @@ export function OnboardingForm({ action }: OnboardingFormProps) {
         </p>
       ) : null}
 
-      <Dialog>
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogTrigger asChild>
           <Button disabled={!canContinue}>{copy.continueButton}</Button>
         </DialogTrigger>
@@ -79,12 +87,7 @@ export function OnboardingForm({ action }: OnboardingFormProps) {
           <DialogTitle>{copy.dialogTitle}</DialogTitle>
           <DialogDescription>{copy.dialogDescription}</DialogDescription>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row-reverse">
-            {/* O diálogo é renderizado fora do <form>; o atributo form liga o envio a ele. */}
-            <DialogClose asChild>
-              <Button type="submit" form={FORM_ID}>
-                {copy.dialogConfirm}
-              </Button>
-            </DialogClose>
+            <Button onClick={confirm}>{copy.dialogConfirm}</Button>
             <DialogClose asChild>
               <Button variant="secondary">{copy.dialogCancel}</Button>
             </DialogClose>
