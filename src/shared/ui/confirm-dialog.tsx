@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/shared/ui";
+import { Button } from "./button";
 import {
   Dialog,
   DialogClose,
@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-} from "@/shared/ui/dialog";
+} from "./dialog";
 
 type ConfirmDialogProps = {
   trigger: string;

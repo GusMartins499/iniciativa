@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getAuth } from "./auth";
 
 export type SessionUser = {
@@ -14,4 +14,13 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     return null;
   }
   return { id: session.user.id, name: session.user.name };
+}
+
+// Depois da exclusão a sessão já não existe no banco; os cookies do Better Auth
+// também saem, para o navegador não guardar um token inútil.
+export async function clearAuthCookies(): Promise<void> {
+  const store = await cookies();
+  for (const cookie of store.getAll()) {
+    if (cookie.name.includes("better-auth.")) store.delete(cookie.name);
+  }
 }
