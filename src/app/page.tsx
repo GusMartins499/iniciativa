@@ -1,7 +1,15 @@
-export default function HomePage() {
+import { redirect } from "next/navigation";
+import { requireOnboardedUser } from "@/modules/users";
+
+export default async function HomePage() {
+  const guard = await requireOnboardedUser();
+  if (!guard.ok) {
+    redirect(guard.error.code === "UNAUTHENTICATED" ? "/entrar" : "/boas-vindas");
+  }
+
   return (
     <p className="text-muted-foreground">
-      Em breve: encontros presenciais para jovens autistas em Tubarão-SC.
+      Olá, {guard.data.name.split(" ")[0]}. Em breve: encontros presenciais em Tubarão-SC.
     </p>
   );
 }
