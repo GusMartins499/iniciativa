@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listUpcoming, meetupsCopy as copy } from "@/modules/meetups";
 import { accountCopy } from "@/modules/users";
 import { getDb } from "@/shared/db";
+import { myMeetupsCopy } from "../meus-encontros/copy";
 import { requirePageUser } from "../require-page-user";
 import { MeetupSummary } from "./meetup-summary";
 
@@ -14,6 +15,9 @@ export default async function MeetupsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{copy.listTitle}</h1>
+        <Link href="/meus-encontros" className="underline">
+          {myMeetupsCopy.link}
+        </Link>
         <Link href="/conta" className="underline">
           {accountCopy.link}
         </Link>
