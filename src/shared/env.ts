@@ -34,3 +34,6 @@ const logLevelSchema = z
   .default("info");
 
 export const logLevel = logLevelSchema.parse(process.env.LOG_LEVEL);
+
+// Só nos testes: branch "test" do Neon para o teste de concorrência (opcional).
+export const testDatabaseUrl = z.url().optional().parse(process.env.TEST_DATABASE_URL);

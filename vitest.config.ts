@@ -1,6 +1,12 @@
 import react from "@vitejs/plugin-react";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { parseEnv } from "node:util";
 import { defineConfig } from "vitest/config";
+
+// Do .env.local, só a branch de teste do Neon chega aos testes; nunca o banco de desenvolvimento.
+const localEnv = existsSync(".env.local") ? parseEnv(readFileSync(".env.local", "utf8")) : {};
+const testDatabaseUrl = localEnv.TEST_DATABASE_URL;
 
 const alias = { "@": fileURLToPath(new URL("./src", import.meta.url)) };
 
@@ -9,7 +15,10 @@ export default defineConfig({
   resolve: { alias },
   test: {
     // Logs de teste não poluem a saída; o logger tem testes próprios com destino em memória.
-    env: { LOG_LEVEL: "silent" },
+    env: {
+      LOG_LEVEL: "silent",
+      ...(testDatabaseUrl ? { TEST_DATABASE_URL: testDatabaseUrl } : {}),
+    },
     projects: [
       {
         extends: true,
