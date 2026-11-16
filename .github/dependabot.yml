@@ -1,0 +1,31 @@
+version: 2
+
+updates:
+  # As actions do CI são fixadas por SHA: sem isto ninguém as atualiza.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # Dependências do pnpm (o Dependabot trata pnpm pelo ecossistema npm).
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # Espera a versão "assentar" antes de propor, contra pacote comprometido recém-publicado.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
+    open-pull-requests-limit: 5
+    groups:
+      minor-e-patch:
+        update-types: [minor, patch]
