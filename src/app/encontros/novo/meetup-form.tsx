@@ -31,7 +31,7 @@ export type MeetupFormProps = {
 function FieldError({ errors, name }: { errors: FieldErrors<MeetupFormValues>; name: FieldName }) {
   if (!errors[name]) return null;
   return (
-    <p id={`${name}-erro`} className="text-sm font-semibold text-honey-light-foreground">
+    <p id={`${name}-error`} className="text-sm font-semibold text-honey-light-foreground">
       {copy.fieldErrors[name]}
     </p>
   );
@@ -69,7 +69,7 @@ export function MeetupForm({ action }: MeetupFormProps) {
   const field = (name: FieldName) => ({
     id: name,
     "aria-invalid": Boolean(errors[name]),
-    "aria-describedby": errors[name] ? `${name}-erro` : undefined,
+    "aria-describedby": errors[name] ? `${name}-error` : undefined,
   });
 
   return (
