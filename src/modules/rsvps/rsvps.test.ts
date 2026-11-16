@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
-import { getMeetup } from "@/modules/meetups";
+import { cancelMeetup, getMeetup } from "@/modules/meetups";
 import { insertTestUser } from "@/shared/auth/test-helpers";
 import type { Database } from "@/shared/db";
 import { createTestDb } from "@/shared/db/test-db";
@@ -112,6 +112,43 @@ describe("rsvps.confirmRsvp", () => {
 
     expect(r).toEqual({ ok: true, data: { rsvpId: null } });
     expect(await occupied(meetupId)).toBe(1);
+  });
+
+  it("bloqueia confirmar presença em encontro cancelado", async () => {
+    const { creatorId, meetupId } = await setupMeetup(db, 10);
+    await cancelMeetup(db, creatorId, meetupId, NOW);
+
+    const r = await confirmRsvp(
+      db,
+      await insertTestUser(db, "user-b"),
+      meetupId,
+      { withCompanion: false },
+      NOW,
+    );
+
+    expect(r).toEqual({ ok: false, error: { code: "MEETUP_CANCELLED" } });
+  });
+
+  it("mantém os RSVPs quando o encontro é cancelado", async () => {
+    const { creatorId, meetupId } = await setupMeetup(db, 10);
+    await confirmRsvp(
+      db,
+      await insertTestUser(db, "user-a"),
+      meetupId,
+      { withCompanion: false },
+      NOW,
+    );
+    await confirmRsvp(
+      db,
+      await insertTestUser(db, "user-b"),
+      meetupId,
+      { withCompanion: false },
+      NOW,
+    );
+
+    await cancelMeetup(db, creatorId, meetupId, NOW);
+
+    expect(await db.select().from(rsvps).where(eq(rsvps.meetupId, meetupId))).toHaveLength(2);
   });
 
   it("devolve NOT_FOUND para encontro inexistente", async () => {

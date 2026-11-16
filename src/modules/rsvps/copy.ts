@@ -19,6 +19,7 @@ export const rsvpsCopy = {
   errors: {
     MEETUP_FULL: "Este encontro está lotado.",
     MEETUP_STARTED: "Este encontro já começou.",
+    MEETUP_CANCELLED: "Este encontro foi cancelado.",
     NOT_FOUND: "Este encontro não existe.",
     CREATOR_CANNOT_LEAVE:
       "Quem criou o encontro não pode cancelar a presença. Para sair, cancele o encontro.",

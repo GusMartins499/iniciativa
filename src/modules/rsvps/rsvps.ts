@@ -7,7 +7,12 @@ import { err, ok, type Result } from "@/shared/result";
 import { confirmRsvpSchema } from "./confirm-schema";
 import { rsvps } from "./schema";
 
-type ConfirmError = "VALIDATION_FAILED" | "NOT_FOUND" | "MEETUP_STARTED" | "MEETUP_FULL";
+type ConfirmError =
+  | "VALIDATION_FAILED"
+  | "NOT_FOUND"
+  | "MEETUP_STARTED"
+  | "MEETUP_CANCELLED"
+  | "MEETUP_FULL";
 type CancelError = "NOT_FOUND" | "MEETUP_STARTED" | "CREATOR_CANNOT_LEAVE";
 
 function seatsFor(withCompanion: boolean): number {
@@ -35,6 +40,7 @@ export async function confirmRsvp(
     async (tx): Promise<Result<{ rsvpId: string | null; created: boolean }, ConfirmError>> => {
       const locked = await lockMeetupForUpdate(tx, meetupId);
       if (!locked.ok) return locked;
+      if (locked.data.status === "cancelled") return err("MEETUP_CANCELLED");
       if (locked.data.creatorId === userId) return ok({ rsvpId: null, created: false });
       if (locked.data.startsAt <= now) return err("MEETUP_STARTED");
 
