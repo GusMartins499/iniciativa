@@ -53,6 +53,10 @@ Next.js (App Router) + TypeScript, Postgres no Neon, Drizzle ORM, Tailwind CSS +
 
 O `.env.local` nunca é commitado. O repositório é público.
 
+## Exclusão de conta e cópias de segurança
+
+A exclusão de conta (`/conta`) apaga de verdade, no banco, o perfil, a autodeclaração, o consentimento, as sessões e as presenças da pessoa. O Neon, porém, guarda um histórico curto do banco para restauração (*history retention*). Até esse período passar, os dados excluídos ainda existem nesse histórico. Confira e ajuste o período no painel do Neon, em **Settings → Storage**. Esse comportamento está mencionado no termo de consentimento.
+
 ## Comandos
 
 | Comando | O que faz |

@@ -141,3 +141,22 @@ export async function listAttendeesForCreator(
     })),
   );
 }
+
+// Exclusão de conta (orquestrada por users, na mesma transação): libera as vagas
+// das presenças futuras e apaga todos os RSVPs da pessoa, inclusive os passados.
+export async function removeAllByUser(tx: Database, userId: string, now: Date): Promise<number> {
+  const rows = await tx
+    .select({ meetupId: rsvps.meetupId, withCompanion: rsvps.withCompanion })
+    .from(rsvps)
+    .where(eq(rsvps.userId, userId));
+  let released = 0;
+  for (const row of rows) {
+    const locked = await lockMeetupForUpdate(tx, row.meetupId);
+    if (locked.ok && locked.data.startsAt > now) {
+      await releaseSeats(tx, row.meetupId, seatsFor(row.withCompanion));
+      released += 1;
+    }
+  }
+  await tx.delete(rsvps).where(eq(rsvps.userId, userId));
+  return released;
+}

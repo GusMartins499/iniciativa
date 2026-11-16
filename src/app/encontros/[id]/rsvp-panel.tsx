@@ -8,7 +8,7 @@ import {
   confirmRsvpSchema,
   rsvpsCopy as copy,
 } from "@/modules/rsvps/client";
-import { ConfirmDialog } from "./confirm-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import type { RsvpActionState, RsvpStatus } from "./rsvp-state";
 
 export type RsvpPanelProps = {

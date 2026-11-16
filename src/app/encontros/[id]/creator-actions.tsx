@@ -4,7 +4,7 @@ import Link from "next/link";
 import { startTransition, useActionState } from "react";
 import { meetupsCopy as copy } from "@/modules/meetups/client";
 import type { MeetupFormState } from "../meetup-form-state";
-import { ConfirmDialog } from "./confirm-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 
 type CreatorActionsProps = {
   meetupId: string;

@@ -1,2 +1,8 @@
 export { rsvpsCopy } from "./copy";
-export { cancelRsvp, confirmRsvp, getUserRsvp, listAttendeesForCreator } from "./rsvps";
+export {
+  cancelRsvp,
+  confirmRsvp,
+  getUserRsvp,
+  listAttendeesForCreator,
+  removeAllByUser,
+} from "./rsvps";
