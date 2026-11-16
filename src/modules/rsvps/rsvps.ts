@@ -160,3 +160,11 @@ export async function removeAllByUser(tx: Database, userId: string, now: Date): 
   await tx.delete(rsvps).where(eq(rsvps.userId, userId));
   return released;
 }
+
+export async function listMeetupIdsByUser(db: Database, userId: string): Promise<string[]> {
+  const rows = await db
+    .select({ meetupId: rsvps.meetupId })
+    .from(rsvps)
+    .where(eq(rsvps.userId, userId));
+  return rows.map((row) => row.meetupId);
+}

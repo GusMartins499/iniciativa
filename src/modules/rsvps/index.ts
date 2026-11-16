@@ -4,5 +4,6 @@ export {
   confirmRsvp,
   getUserRsvp,
   listAttendeesForCreator,
+  listMeetupIdsByUser,
   removeAllByUser,
 } from "./rsvps";
