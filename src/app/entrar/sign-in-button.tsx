@@ -1,38 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import type { signInCopy } from "@/modules/users";
+import { useActionState } from "react";
+import { signInCopy as copy } from "@/modules/users/client";
 import { authClient } from "@/shared/auth/client";
 import { Button } from "@/shared/ui";
 
-type SignInButtonProps = {
-  copy: typeof signInCopy;
-};
+type SignInState = { failed: boolean };
 
-export function SignInButton({ copy }: SignInButtonProps) {
-  const [failed, setFailed] = useState(false);
-  const [pending, setPending] = useState(false);
+async function signInWithGoogle(): Promise<SignInState> {
+  // Em caso de sucesso o navegador é redirecionado para o Google.
+  const { error } = await authClient.signIn.social({ provider: "google", callbackURL: "/" });
+  return { failed: Boolean(error) };
+}
 
-  async function signIn() {
-    setPending(true);
-    setFailed(false);
-    const { error } = await authClient.signIn.social({ provider: "google", callbackURL: "/" });
-    if (error) {
-      setFailed(true);
-      setPending(false);
-    }
-  }
+export function SignInButton() {
+  const [state, formAction, pending] = useActionState(signInWithGoogle, { failed: false });
 
   return (
-    <div className="flex flex-col gap-3">
-      <Button onClick={signIn} disabled={pending}>
+    <form action={formAction} className="flex flex-col gap-3">
+      <Button type="submit" disabled={pending}>
         {copy.button}
       </Button>
-      {failed ? (
+      {state.failed ? (
         <p role="alert" className="font-semibold text-honey-light-foreground">
           {copy.error}
         </p>
       ) : null}
-    </div>
+    </form>
   );
 }
