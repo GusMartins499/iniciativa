@@ -1,0 +1,1 @@
+export type MeetupsErrorCode = "VALIDATION_FAILED" | "CAPACITY_BELOW_OCCUPIED" | "NOT_FOUND";
