@@ -18,7 +18,7 @@ export default async function WelcomePage() {
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">{copy.title}</h1>
       <p className="text-muted-foreground">{copy.intro}</p>
-      <OnboardingForm copy={copy} action={completeOnboardingAction} />
+      <OnboardingForm action={completeOnboardingAction} />
     </div>
   );
 }

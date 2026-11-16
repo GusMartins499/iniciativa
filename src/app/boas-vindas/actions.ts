@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { completeOnboarding } from "@/modules/users";
+import { completeOnboarding, type OnboardingInput } from "@/modules/users";
 import { getSessionUser } from "@/shared/auth";
 import { getDb } from "@/shared/db";
 import { logger } from "@/shared/logger";
@@ -9,7 +9,7 @@ import type { OnboardingState } from "./state";
 
 export async function completeOnboardingAction(
   _state: OnboardingState,
-  formData: FormData,
+  input: OnboardingInput,
 ): Promise<OnboardingState> {
   let succeeded = false;
   try {
@@ -17,10 +17,8 @@ export async function completeOnboardingAction(
     if (!sessionUser) {
       return { code: "UNAUTHENTICATED" };
     }
-    const result = await completeOnboarding(getDb(), sessionUser.id, {
-      declaration: formData.get("declaration") === "on",
-      consent: formData.get("consent") === "on",
-    });
+    // A entrada vem do cliente: o caso de uso valida de novo com o mesmo schema Zod.
+    const result = await completeOnboarding(getDb(), sessionUser.id, input);
     if (!result.ok) {
       return { code: result.error.code };
     }
