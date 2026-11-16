@@ -22,6 +22,7 @@ describe.skipIf(!testDatabaseUrl)("rsvps.confirmRsvp — concorrência (Neon)", 
   });
 
   afterAll(async () => {
+    if (!db) return;
     await db.delete(meetups).where(inArray(meetups.creatorId, [`${prefix}creator`]));
     await db.delete(user).where(inArray(user.id, [`${prefix}creator`, `${prefix}b`, `${prefix}c`]));
     await close();
