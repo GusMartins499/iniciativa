@@ -50,10 +50,10 @@ export function OnboardingForm({ action }: OnboardingFormProps) {
   return (
     <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-6">
       <section
-        aria-labelledby="termo-titulo"
+        aria-labelledby="consent-title"
         className="rounded-lg border border-border bg-surface p-4"
       >
-        <h2 id="termo-titulo" className="font-bold">
+        <h2 id="consent-title" className="font-bold">
           {copy.consentTitle}
         </h2>
         {copy.consentText.map((paragraph) => (
