@@ -11,7 +11,15 @@ export default async function MeetupsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">{copy.listTitle}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">{copy.listTitle}</h1>
+        <Link
+          href="/encontros/novo"
+          className="inline-flex min-h-11 items-center rounded-md bg-primary px-4 font-semibold text-primary-foreground hover:bg-primary-hover"
+        >
+          {copy.newMeetupLink}
+        </Link>
+      </div>
       {meetups.length === 0 ? (
         <p className="text-muted-foreground">{copy.emptyList}</p>
       ) : (
