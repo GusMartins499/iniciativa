@@ -96,7 +96,7 @@ src/
 
 | Assunto | Use | Não use |
 |---|---|---|
-| UI / estilo | Tailwind CSS + shadcn/ui (Radix) | bibliotecas de animação (framer-motion etc.) |
+| UI / estilo | Tailwind CSS + shadcn/ui (Radix), com `clsx` + `tailwind-merge` + `class-variance-authority` (base do `cn` do shadcn) | bibliotecas de animação (framer-motion etc.) |
 | Formulários | react-hook-form + Zod (`@hookform/resolvers`) | — |
 | Validação | Zod | — |
 | Datas | date-fns + date-fns-tz | moment, dayjs |
@@ -105,7 +105,7 @@ src/
 | Banco | drizzle-orm + drizzle-kit + `@neondatabase/serverless` | outro ORM, SQL cru |
 | Auth | better-auth (adapter Drizzle, provider Google) | next-auth |
 | Logger | pino | — |
-| Testes | Vitest, PGlite, Testing Library, vitest-axe | — |
+| Testes | Vitest, PGlite, Testing Library, vitest-axe, jsdom (ambiente dos testes de tela) | — |
 
 - O gerenciador de pacotes é só o **pnpm**, com a versão fixada no campo `packageManager` do `package.json`. Commite o `pnpm-lock.yaml`; nunca commite `package-lock.json` nem `yarn.lock`.
 - Uma dependência nova só entra quando nenhuma da tabela resolve o problema, e precisa de aprovação explícita com nome e versão.
