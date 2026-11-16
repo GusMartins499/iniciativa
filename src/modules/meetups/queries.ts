@@ -1,4 +1,4 @@
-import { asc, eq, gt } from "drizzle-orm";
+import { and, asc, eq, gt } from "drizzle-orm";
 import type { Database } from "@/shared/db";
 import { err, ok, type Result } from "@/shared/result";
 import { meetups } from "./schema";
@@ -13,6 +13,8 @@ const publicColumns = {
   endsAt: meetups.endsAt,
   capacity: meetups.capacity,
   occupiedSeats: meetups.occupiedSeats,
+  status: meetups.status,
+  editedAt: meetups.editedAt,
 };
 
 type PublicRow = {
@@ -32,7 +34,7 @@ export async function listUpcoming(
   const rows = await db
     .select(publicColumns)
     .from(meetups)
-    .where(gt(meetups.startsAt, now))
+    .where(and(gt(meetups.startsAt, now), eq(meetups.status, "active")))
     .orderBy(asc(meetups.startsAt));
   return ok(rows.map(toPublic));
 }

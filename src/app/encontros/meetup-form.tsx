@@ -17,7 +17,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/shared/ui/dialog";
-import type { CreateMeetupState } from "./state";
+import type { MeetupFormState } from "./meetup-form-state";
 
 const copy = meetupsCopy.form;
 const inputClass = "min-h-11 w-full rounded-md border border-border bg-surface px-3 text-base";
@@ -25,7 +25,10 @@ const inputClass = "min-h-11 w-full rounded-md border border-border bg-surface p
 type FieldName = keyof typeof copy.fieldErrors;
 
 export type MeetupFormProps = {
-  action: (state: CreateMeetupState, input: unknown) => Promise<CreateMeetupState>;
+  action: (state: MeetupFormState, input: unknown) => Promise<MeetupFormState>;
+  // Na edição o acompanhante do criador não muda (fora do escopo do MVP).
+  mode?: "create" | "edit";
+  defaultValues?: Partial<MeetupFormValues>;
 };
 
 function FieldError({ errors, name }: { errors: FieldErrors<MeetupFormValues>; name: FieldName }) {
@@ -37,7 +40,8 @@ function FieldError({ errors, name }: { errors: FieldErrors<MeetupFormValues>; n
   );
 }
 
-export function MeetupForm({ action }: MeetupFormProps) {
+export function MeetupForm({ action, mode = "create", defaultValues }: MeetupFormProps) {
+  const texts = mode === "edit" ? meetupsCopy.editForm : copy;
   const [state, dispatch, pending] = useActionState(action, { code: null });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -48,7 +52,12 @@ export function MeetupForm({ action }: MeetupFormProps) {
     formState: { errors },
   } = useForm<MeetupFormValues>({
     resolver: zodResolver(meetupFormSchema),
-    defaultValues: { placeDescription: "", publicPlace: false, withCompanion: false },
+    defaultValues: {
+      placeDescription: "",
+      publicPlace: false,
+      withCompanion: false,
+      ...defaultValues,
+    },
   });
 
   const onSubmit = handleSubmit((values) => {
@@ -134,10 +143,12 @@ export function MeetupForm({ action }: MeetupFormProps) {
         />
         <FieldError errors={errors} name="capacity" />
       </div>
-      <label className="flex min-h-11 items-start gap-3">
-        <input type="checkbox" {...register("withCompanion")} className="mt-1 size-5 shrink-0" />
-        <span>{copy.withCompanionLabel}</span>
-      </label>
+      {mode === "create" ? (
+        <label className="flex min-h-11 items-start gap-3">
+          <input type="checkbox" {...register("withCompanion")} className="mt-1 size-5 shrink-0" />
+          <span>{copy.withCompanionLabel}</span>
+        </label>
+      ) : null}
       <div className="flex flex-col gap-1">
         <label className="flex min-h-11 items-start gap-3">
           <input
@@ -158,17 +169,17 @@ export function MeetupForm({ action }: MeetupFormProps) {
       ) : null}
 
       <Button onClick={openConfirm} disabled={pending}>
-        {copy.submit}
+        {texts.submit}
       </Button>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
-          <DialogTitle>{copy.dialogTitle}</DialogTitle>
-          <DialogDescription>{copy.dialogDescription}</DialogDescription>
+          <DialogTitle>{texts.dialogTitle}</DialogTitle>
+          <DialogDescription>{texts.dialogDescription}</DialogDescription>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row-reverse">
-            <Button onClick={confirm}>{copy.dialogConfirm}</Button>
+            <Button onClick={confirm}>{texts.dialogConfirm}</Button>
             <DialogClose asChild>
-              <Button variant="secondary">{copy.dialogCancel}</Button>
+              <Button variant="secondary">{texts.dialogCancel}</Button>
             </DialogClose>
           </div>
         </DialogContent>

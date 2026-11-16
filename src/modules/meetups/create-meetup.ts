@@ -1,8 +1,7 @@
 import type { Database } from "@/shared/db";
 import { logger } from "@/shared/logger";
 import { err, ok, type Result } from "@/shared/result";
-import { fromAppTime } from "@/shared/time";
-import { meetupInputSchema } from "./meetup-input";
+import { validateMeetupFields } from "./validate-meetup";
 import { meetups } from "./schema";
 
 type Meetup = typeof meetups.$inferSelect;
@@ -18,22 +17,12 @@ export async function createMeetup(
     return err(code);
   };
 
-  const parsed = meetupInputSchema.safeParse(input);
-  if (!parsed.success) {
-    return reject("VALIDATION_FAILED");
-  }
-  const data = parsed.data;
-  const startsAt = fromAppTime(data.startsAt);
-  const endsAt = fromAppTime(data.endsAt);
-  if (endsAt <= startsAt || startsAt <= now) {
-    return reject("VALIDATION_FAILED");
-  }
-
   // O criador entra confirmado: ocupa 1 vaga, ou 2 com acompanhante.
-  const occupiedSeats = data.withCompanion ? 2 : 1;
-  if (data.capacity < occupiedSeats) {
-    return reject("CAPACITY_BELOW_OCCUPIED");
+  const validated = validateMeetupFields(input, now, (data) => (data.withCompanion ? 2 : 1));
+  if (!validated.ok) {
+    return reject(validated.error.code);
   }
+  const { data, startsAt, endsAt, occupiedSeats } = validated.data;
 
   const [meetup] = await db
     .insert(meetups)

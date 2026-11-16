@@ -7,6 +7,23 @@ export const meetupsCopy = {
   dateTime: (date: string, start: string, end: string) => `${date}, das ${start} às ${end}`,
   backToList: "Voltar para a lista",
   notFound: "Este encontro não existe.",
+  editedNotice: "Este encontro foi alterado.",
+  cancelledNotice: "Este encontro foi cancelado.",
+  editLink: "Editar encontro",
+  cancelMeetupButton: "Cancelar este encontro",
+  cancelMeetupDescription:
+    "Quem confirmou presença vai ver que o encontro foi cancelado. Não é possível desfazer.",
+  back: "Voltar",
+  editNotAllowed: "Só quem criou o encontro pode editá-lo.",
+  editClosed: "Este encontro já começou ou foi cancelado e não pode mais ser editado.",
+  editForm: {
+    title: "Editar encontro",
+    submit: "Salvar alterações",
+    dialogTitle: "Salvar alterações",
+    dialogDescription: "Quem confirmou presença vai ver o aviso de que o encontro foi alterado.",
+    dialogConfirm: "Salvar alterações",
+    dialogCancel: "Voltar",
+  },
   form: {
     title: "Criar encontro",
     titleLabel: "Título",
@@ -38,7 +55,12 @@ export const meetupsCopy = {
   },
   errors: {
     VALIDATION_FAILED: "Confira os campos: a data precisa ser futura e o término depois do início.",
-    CAPACITY_BELOW_OCCUPIED: "O número de vagas precisa incluir você e o seu acompanhante.",
+    CAPACITY_BELOW_OCCUPIED:
+      "O número de vagas não pode ser menor que o de pessoas já confirmadas, incluindo você e acompanhantes.",
+    NOT_FOUND: "Este encontro não existe.",
+    NOT_MEETUP_CREATOR: "Só quem criou o encontro pode alterá-lo.",
+    MEETUP_STARTED: "Este encontro já começou.",
+    MEETUP_CANCELLED: "Este encontro foi cancelado.",
     ONBOARDING_REQUIRED: "Conclua o seu cadastro antes de criar um encontro.",
     UNAUTHENTICATED: "Entre com o Google antes de criar um encontro.",
     UNEXPECTED: "Algo deu errado. Tente de novo.",

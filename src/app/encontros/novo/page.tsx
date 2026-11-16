@@ -1,7 +1,7 @@
 import { meetupsCopy } from "@/modules/meetups";
 import { requirePageUser } from "../../require-page-user";
 import { createMeetupAction } from "./actions";
-import { MeetupForm } from "./meetup-form";
+import { MeetupForm } from "../meetup-form";
 
 export default async function NewMeetupPage() {
   await requirePageUser();

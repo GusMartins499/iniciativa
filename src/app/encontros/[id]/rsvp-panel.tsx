@@ -1,22 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startTransition, useActionState, useState } from "react";
+import { startTransition, useActionState } from "react";
 import { useForm } from "react-hook-form";
 import {
   type ConfirmRsvpInput,
   confirmRsvpSchema,
   rsvpsCopy as copy,
 } from "@/modules/rsvps/client";
-import { Button } from "@/shared/ui";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/shared/ui/dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 import type { RsvpActionState, RsvpStatus } from "./rsvp-state";
 
 export type RsvpPanelProps = {
@@ -24,42 +16,6 @@ export type RsvpPanelProps = {
   confirmAction: (state: RsvpActionState, input: unknown) => Promise<RsvpActionState>;
   cancelAction: (state: RsvpActionState) => Promise<RsvpActionState>;
 };
-
-type ConfirmDialogProps = {
-  trigger: string;
-  title: string;
-  description: string;
-  disabled: boolean;
-  onConfirm: () => void;
-};
-
-function ConfirmDialog({ trigger, title, description, disabled, onConfirm }: ConfirmDialogProps) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button disabled={disabled}>{trigger}</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>{description}</DialogDescription>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row-reverse">
-          <Button
-            onClick={() => {
-              onConfirm();
-              setOpen(false);
-            }}
-          >
-            {title}
-          </Button>
-          <DialogClose asChild>
-            <Button variant="secondary">{copy.back}</Button>
-          </DialogClose>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProps) {
   const [confirmState, confirm, confirming] = useActionState(confirmAction, { code: null });
@@ -82,6 +38,7 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
             trigger={copy.cancelButton}
             title={copy.cancelDialogTitle}
             description={copy.cancelDialogDescription}
+            backLabel={copy.back}
             disabled={pending}
             onConfirm={() => startTransition(() => cancel())}
           />
@@ -103,6 +60,7 @@ export function RsvpPanel({ status, confirmAction, cancelAction }: RsvpPanelProp
             trigger={copy.confirmButton}
             title={copy.confirmDialogTitle}
             description={copy.confirmDialogDescription}
+            backLabel={copy.back}
             disabled={status.full || pending}
             onConfirm={handleSubmit((values) => startTransition(() => confirm(values)))}
           />
