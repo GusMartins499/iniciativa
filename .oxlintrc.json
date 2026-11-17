@@ -25,7 +25,8 @@
         "src/app/**/not-found.tsx",
         "src/app/**/error.tsx",
         "*.config.ts",
-        "*.config.mjs"
+        "*.config.mjs",
+        "e2e/global-setup.ts"
       ],
       "rules": {
         "import/no-default-export": "off"

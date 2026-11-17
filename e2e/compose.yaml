@@ -1,0 +1,33 @@
+# Banco descartável dos testes e2e, usado igual na máquina local e no CI.
+# O driver do app (@neondatabase/serverless) só conecta por WebSocket, então o Postgres
+# fica atrás do wsproxy do próprio Neon.
+name: iniciativa-e2e
+
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:a77aa70e641402a21411b92b721c58d10f23b50ae5fdd2333efd22d166e1e5f7
+    environment:
+      POSTGRES_USER: iniciativa
+      POSTGRES_DB: iniciativa_e2e
+      # Sem senha: o Postgres não publica porta e só o wsproxy deste compose chega nele.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    # Em memória: cada `up` começa vazio e nada fica no disco.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iniciativa -d iniciativa_e2e"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  wsproxy:
+    image: ghcr.io/neondatabase/wsproxy@sha256:7f2e2149aa6a57ba382a140102fba44f5053f3e44389ccc18adcecf896054efb
+    environment:
+      LISTEN_PORT: ":80"
+      # O proxy só repassa para o Postgres deste compose.
+      ALLOW_ADDR_REGEX: "^postgres:5432$"
+    ports:
+      - "127.0.0.1:5488:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
