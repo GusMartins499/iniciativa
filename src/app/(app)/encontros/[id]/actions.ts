@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cancelRsvp, confirmRsvp } from "@/modules/rsvps";
 import { requireOnboardedUser } from "@/modules/users";
 import { getDb } from "@/shared/db";
-import { logger } from "@/shared/logger";
+import { reportError } from "@/shared/observability";
 import type { RsvpActionState } from "./rsvp-state";
 
 async function run(
@@ -20,7 +20,7 @@ async function run(
     const result = await useCase(guard.data.id);
     if (!result.ok) return { code: result.error.code };
   } catch (error) {
-    logger.error({ event, meetupId, err: error });
+    reportError(error, { event, meetupId });
     return { code: "UNEXPECTED" };
   }
   revalidatePath(`/encontros/${meetupId}`);

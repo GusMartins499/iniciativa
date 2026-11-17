@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { updateMeetup } from "@/modules/meetups";
 import { requireOnboardedUser } from "@/modules/users";
 import { getDb } from "@/shared/db";
-import { logger } from "@/shared/logger";
+import { reportError } from "@/shared/observability";
 import type { MeetupFormState } from "../../meetup-form-state";
 
 export async function updateMeetupAction(
@@ -19,7 +19,7 @@ export async function updateMeetupAction(
     const result = await updateMeetup(getDb(), guard.data.id, meetupId, input);
     if (!result.ok) return { code: result.error.code };
   } catch (error) {
-    logger.error({ event: "meetup.update_failed", meetupId, err: error });
+    reportError(error, { event: "meetup.update_failed", meetupId });
     return { code: "UNEXPECTED" };
   }
   // redirect() lança internamente; fica fora do try para não ser tratado como falha.

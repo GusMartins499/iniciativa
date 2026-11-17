@@ -4,6 +4,7 @@ import { nextCookies } from "better-auth/next-js";
 import { getDb } from "@/shared/db";
 import { getServerEnv } from "@/shared/env";
 import { logger } from "@/shared/logger";
+import { reportError } from "@/shared/observability";
 import { authCookieAttributes } from "./auth-cookie";
 import * as schema from "./schema";
 import {
@@ -59,9 +60,10 @@ function createAuth() {
       // O Better Auth acrescenta ?error=<código> a esta URL.
       errorURL: "/",
       onError(error) {
-        // Sem token, cookie ou e-mail no payload.
+        // Sem token, cookie ou e-mail no payload: o erro do Better Auth pode carregar a
+        // requisição; só a mensagem segue, num Error novo, para o log e para o span.
         const message = error instanceof Error ? error.message : "unknown";
-        logger.error({ event: "auth.oauth_failed", message });
+        reportError(new Error(message), { event: "auth.oauth_failed" });
       },
     },
     plugins: [nextCookies()],

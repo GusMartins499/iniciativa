@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createMeetup } from "@/modules/meetups";
 import { requireOnboardedUser } from "@/modules/users";
 import { getDb } from "@/shared/db";
-import { logger } from "@/shared/logger";
+import { reportError } from "@/shared/observability";
 import type { MeetupFormState } from "../meetup-form-state";
 
 export async function createMeetupAction(
@@ -24,7 +24,7 @@ export async function createMeetupAction(
     }
     meetupId = result.data.id;
   } catch (error) {
-    logger.error({ event: "meetup.create_failed", err: error });
+    reportError(error, { event: "meetup.create_failed" });
     return { code: "UNEXPECTED" };
   }
   // redirect() lança internamente; fica fora do try para não ser tratado como falha.

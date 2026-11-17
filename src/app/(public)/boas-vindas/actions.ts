@@ -9,7 +9,7 @@ import {
 } from "@/modules/users";
 import { getSessionUser, grantSignupConsent } from "@/shared/auth";
 import { getDb } from "@/shared/db";
-import { logger } from "@/shared/logger";
+import { reportError } from "@/shared/observability";
 import type { OnboardingState } from "./state";
 
 export async function completeOnboardingAction(
@@ -34,7 +34,7 @@ export async function completeOnboardingAction(
     }
     succeeded = true;
   } catch (error) {
-    logger.error({ event: "user.onboarding_failed", err: error });
+    reportError(error, { event: "user.onboarding_failed" });
     return { code: "UNEXPECTED" };
   }
   // redirect() lança internamente; fica fora do try para não ser tratado como falha.
