@@ -8,13 +8,15 @@ export function SeatsBar({ occupied, capacity }: SeatsBarProps) {
   const percent = capacity > 0 ? Math.min(100, Math.round((occupied / capacity) * 100)) : 0;
   return (
     <div>
-      <div className="flex justify-between gap-3 text-sm text-muted-foreground">
-        <span>{copy.seatsTaken(occupied, capacity)}</span>
-        <span>{copy.seatsFree(Math.max(0, capacity - occupied))}</span>
+      <div className="flex items-baseline justify-between gap-3 text-sm">
+        <span className="text-muted-foreground">{copy.seatsTaken(occupied, capacity)}</span>
+        <span className="font-semibold text-foreground">
+          {copy.seatsFree(Math.max(0, capacity - occupied))}
+        </span>
       </div>
-      <div aria-hidden="true" className="mt-1.5 h-2 overflow-hidden rounded-full bg-tag">
+      <div aria-hidden="true" className="mt-2 h-2.5 overflow-hidden rounded-full bg-tag">
         <div
-          className={`h-full ${full ? "bg-honey" : "bg-primary"}`}
+          className={`h-full rounded-full ${full ? "bg-honey" : "bg-primary"}`}
           style={{ width: `${percent}%` }}
         />
       </div>

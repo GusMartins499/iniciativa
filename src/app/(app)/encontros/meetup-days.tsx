@@ -1,5 +1,11 @@
 import type { PublicMeetup } from "@/modules/meetups/client";
-import { appDayKey, formatShortDay, formatWeekday } from "@/shared/time";
+import {
+  appDayKey,
+  formatDayNumber,
+  formatMonthShort,
+  formatShortDay,
+  formatWeekday,
+} from "@/shared/time";
 import { MeetupCard } from "./meetup-card";
 
 type MeetupDaysProps = {
@@ -17,10 +23,11 @@ export function groupByDay(meetups: PublicMeetup[]): { key: string; meetups: Pub
   return [...groups].map(([key, items]) => ({ key, meetups: items }));
 }
 
-// Linha do tempo por dia: data e dia da semana à esquerda, encontros do dia à direita.
+// Linha do tempo por dia: folhinha de calendário à esquerda, encontros do dia à direita.
+// A folhinha é só visual; o leitor de tela recebe a data por extenso.
 export function MeetupDays({ meetups, goingIds, createdIds }: MeetupDaysProps) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {groupByDay(meetups).map((day) => {
         const first = day.meetups[0];
         if (!first) return null;
@@ -28,15 +35,34 @@ export function MeetupDays({ meetups, goingIds, createdIds }: MeetupDaysProps) {
           <section
             key={day.key}
             aria-labelledby={`day-${day.key}`}
-            className="grid gap-2 sm:grid-cols-[7.5rem_1fr] sm:gap-6"
+            className="grid gap-3 sm:grid-cols-[5.5rem_1fr] sm:gap-6"
           >
-            <h2 id={`day-${day.key}`} className="flex items-baseline gap-2 sm:block sm:pt-3.5">
-              <span className="block text-[17px] font-bold">{formatShortDay(first.startsAt)}</span>
-              <span className="block font-normal text-muted-foreground">
+            <h2
+              id={`day-${day.key}`}
+              className="flex items-center gap-3 sm:flex-col sm:items-stretch"
+            >
+              <span className="sr-only">
+                {formatShortDay(first.startsAt)} {formatWeekday(first.startsAt)}
+              </span>
+              <span
+                aria-hidden="true"
+                className="flex w-16 shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-surface text-center shadow-sm sm:w-full"
+              >
+                <span className="bg-primary py-0.5 text-xs font-semibold tracking-wider text-primary-foreground uppercase">
+                  {formatMonthShort(first.startsAt)}
+                </span>
+                <span className="py-1 text-2xl leading-tight font-bold tabular-nums sm:text-3xl">
+                  {formatDayNumber(first.startsAt)}
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                className="text-sm font-medium text-muted-foreground first-letter:uppercase sm:text-center"
+              >
                 {formatWeekday(first.startsAt)}
               </span>
             </h2>
-            <ul className="flex flex-col gap-3 sm:border-l-2 sm:border-dashed sm:border-border sm:pl-6">
+            <ul className="flex flex-col gap-3">
               {day.meetups.map((meetup) => (
                 <li key={meetup.id}>
                   <MeetupCard

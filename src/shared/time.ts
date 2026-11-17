@@ -33,6 +33,16 @@ export function formatShortDay(date: Date): string {
   return inAppZone(date, "d 'de' MMM'.'");
 }
 
+// "5" — número do dia, para a folhinha de calendário.
+export function formatDayNumber(date: Date): string {
+  return inAppZone(date, "d");
+}
+
+// "dez"
+export function formatMonthShort(date: Date): string {
+  return inAppZone(date, "MMM");
+}
+
 // "sábado"
 export function formatWeekday(date: Date): string {
   return inAppZone(date, "EEEE");

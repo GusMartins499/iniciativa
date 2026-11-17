@@ -2,29 +2,45 @@
 
 /* Tokens da identidade visual (docs/product/iniciativa-mvp.md). */
 @theme {
-  --color-background: #f8fafc;
+  --color-background: #faf7f2;
   --color-surface: #ffffff;
-  --color-border: #e2e8f0;
-  --color-foreground: #0f172a;
-  --color-muted-foreground: #475569;
+  --color-border: #e9e2d6;
+  --color-border-strong: #d6ccbb;
+  --color-foreground: #1c1917;
+  --color-muted-foreground: #57534e;
   --color-primary: #334155;
   --color-primary-hover: #1e293b;
   --color-primary-foreground: #ffffff;
-  --color-tag: #e2e8f0;
-  --color-tag-foreground: #334155;
+  --color-tag: #f0ebe3;
+  --color-tag-foreground: #44403c;
   --color-honey: #f59e0b;
   --color-honey-light: #fef3c7;
   --color-honey-light-foreground: #92400e;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* O produto proíbe animação e transição (GUIDELINES.md § Accessibility). */
+/*
+ * O produto proíbe animação (GUIDELINES.md § Accessibility). A única exceção é um
+ * fade curto de cor no hover/foco: sem ele a troca de cor pisca, e cor não é movimento.
+ * Propriedades de movimento (transform, opacity, tamanho) continuam sem transição.
+ */
 *,
 *::before,
 *::after {
   animation: none !important;
-  transition: none !important;
   scroll-behavior: auto !important;
+  transition-property:
+    color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow !important;
+  transition-duration: 150ms !important;
+  transition-timing-function: ease-out !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
 }
 
 :focus-visible {
