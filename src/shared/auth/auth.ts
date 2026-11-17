@@ -6,6 +6,9 @@ import { getServerEnv } from "@/shared/env";
 import { logger } from "@/shared/logger";
 import * as schema from "./schema";
 
+// Exportado para a instância de teste do e2e assinar o mesmo cookie que o app lê.
+export const authCookieAttributes = { httpOnly: true, sameSite: "lax", secure: true } as const;
+
 function createAuth() {
   const env = getServerEnv();
   const baseURL = env.BETTER_AUTH_URL;
@@ -24,7 +27,7 @@ function createAuth() {
     // O app não chama APIs do Google; os tokens do OAuth ficam cifrados no banco mesmo assim.
     account: { encryptOAuthTokens: true },
     advanced: {
-      defaultCookieAttributes: { httpOnly: true, sameSite: "lax", secure: true },
+      defaultCookieAttributes: authCookieAttributes,
     },
     onAPIError: {
       // O Better Auth acrescenta ?error=<código> a esta URL.

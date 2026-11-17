@@ -41,6 +41,15 @@ describe("shared/env", () => {
     );
   });
 
+  it("aceita o wsproxy só sem protocolo", () => {
+    expect(parseServerEnv({ ...valid, DATABASE_WS_PROXY: "localhost:5488/v1" })).toMatchObject({
+      DATABASE_WS_PROXY: "localhost:5488/v1",
+    });
+    expect(() => parseServerEnv({ ...valid, DATABASE_WS_PROXY: "ws://localhost:5488/v1" })).toThrow(
+      /DATABASE_WS_PROXY/,
+    );
+  });
+
   it("nunca coloca os valores na mensagem de erro", () => {
     const error = captureError(() =>
       parseServerEnv({ ...valid, BETTER_AUTH_SECRET: "segredo-curto" }),
