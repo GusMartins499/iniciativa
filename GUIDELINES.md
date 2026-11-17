@@ -109,6 +109,7 @@ src/
 | Banco | drizzle-orm + drizzle-kit + `@neondatabase/serverless` | outro ORM, SQL cru |
 | Auth | better-auth (adapter Drizzle, provider Google) | next-auth |
 | Logger | pino | — |
+| Scripts de dev | tsx (só para rodar `scripts/`, como o `pnpm db:seed`, fora do Next) | ts-node |
 | Testes | Vitest, PGlite, Testing Library, vitest-axe, jsdom (ambiente dos testes de tela); Playwright (`@playwright/test`, só Chromium) nos testes e2e de `e2e/` | Cypress |
 
 - O gerenciador de pacotes é só o **pnpm**, com a versão fixada no campo `packageManager` do `package.json`. Commite o `pnpm-lock.yaml`; nunca commite `package-lock.json` nem `yarn.lock`.
