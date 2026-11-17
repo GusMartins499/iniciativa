@@ -8,10 +8,14 @@ const serverEnvSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   // Só nos testes e2e: endereço do wsproxy do Neon na frente de um Postgres comum, sem protocolo.
-  DATABASE_WS_PROXY: z
-    .string()
-    .regex(/^[^/:]+:\d+\/\S*$/)
-    .optional(),
+  // A linha `DATABASE_WS_PROXY=` do .env.example chega como "": vale como ausente.
+  DATABASE_WS_PROXY: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z
+      .string()
+      .regex(/^[^/:]+:\d+\/\S*$/)
+      .optional(),
+  ),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

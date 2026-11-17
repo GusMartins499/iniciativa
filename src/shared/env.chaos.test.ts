@@ -12,11 +12,9 @@ const valid = {
 
 describe("chaos: DATABASE_WS_PROXY ausente", () => {
   // O .env.example traz `DATABASE_WS_PROXY=`; o dotenv do Next carrega isso como "".
-  // oxlint-disable-next-line vitest/no-disabled-tests -- CHAOS: achado em código já mergeado
-  it.skip("trata o valor vazio do .env.example como ausente, sem derrubar o boot", () => {
-    // CHAOS: 💀 KILLED — #31
+  it("trata o valor vazio do .env.example como ausente, sem derrubar o boot", () => {
     const env = parseServerEnv({ ...valid, DATABASE_WS_PROXY: "" });
-    expect(env.DATABASE_WS_PROXY).toBeFalsy();
+    expect(env.DATABASE_WS_PROXY).toBeUndefined();
   });
 });
 
