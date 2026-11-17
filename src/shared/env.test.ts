@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseLogLevel, parseServerEnv } from "./env";
+import { parseLogLevel, parseServerEnv, parseTelemetryEnv } from "./env";
 
 const valid = {
   DATABASE_URL: "postgres://usuario:senha@exemplo.test/db",
@@ -20,7 +20,7 @@ function captureError(fn: () => unknown): Error {
 
 describe("shared/env", () => {
   it("devolve as variáveis validadas", () => {
-    expect(parseServerEnv(valid)).toEqual(valid);
+    expect(parseServerEnv(valid)).toEqual({ ...valid, OTEL_SERVICE_NAME: "iniciativa" });
   });
 
   it("lista todas as variáveis ausentes de uma vez", () => {
@@ -48,6 +48,46 @@ describe("shared/env", () => {
     expect(() => parseServerEnv({ ...valid, DATABASE_WS_PROXY: "ws://localhost:5488/v1" })).toThrow(
       /DATABASE_WS_PROXY/,
     );
+  });
+
+  it("aceita as variáveis de OTEL ausentes", () => {
+    // A linha vazia do .env.example chega como "": vale como ausente.
+    const empty = {
+      OTEL_EXPORTER_OTLP_ENDPOINT: "",
+      OTEL_EXPORTER_OTLP_HEADERS: "",
+      OTEL_SERVICE_NAME: "",
+    };
+    for (const source of [valid, { ...valid, ...empty }]) {
+      const env = parseServerEnv(source);
+      expect(env.OTEL_EXPORTER_OTLP_ENDPOINT).toBeUndefined();
+      expect(env.OTEL_EXPORTER_OTLP_HEADERS).toBeUndefined();
+      expect(env.OTEL_SERVICE_NAME).toBe("iniciativa");
+    }
+  });
+
+  it("recusa OTEL_EXPORTER_OTLP_ENDPOINT que não é URL", () => {
+    const error = captureError(() =>
+      parseServerEnv({
+        ...valid,
+        OTEL_EXPORTER_OTLP_ENDPOINT: "otlp.exemplo.test",
+        OTEL_EXPORTER_OTLP_HEADERS: "Authorization=Basic segredo-otel",
+      }),
+    );
+    expect(error.message).toContain("OTEL_EXPORTER_OTLP_ENDPOINT");
+    expect(error.message).not.toContain("segredo-otel");
+  });
+
+  it("lê as variáveis de OTEL sem exigir as do banco e do login", () => {
+    expect(
+      parseTelemetryEnv({
+        OTEL_EXPORTER_OTLP_ENDPOINT: "https://otlp.exemplo.test/otlp",
+        OTEL_SERVICE_NAME: "outro",
+      }),
+    ).toEqual({
+      OTEL_EXPORTER_OTLP_ENDPOINT: "https://otlp.exemplo.test/otlp",
+      OTEL_EXPORTER_OTLP_HEADERS: undefined,
+      OTEL_SERVICE_NAME: "outro",
+    });
   });
 
   it("usa info como nível de log quando LOG_LEVEL está ausente ou vazio", () => {

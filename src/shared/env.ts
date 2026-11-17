@@ -1,7 +1,18 @@
 import { z } from "zod";
 
+// Linha vazia do .env.example chega como "": vale como ausente.
+const emptyAsUndefined = (value: unknown) => (value === "" ? undefined : value);
+
+// Traces por OTLP (GUIDELINES.md § Tracing). Sem endpoint, a telemetria fica desligada.
+const telemetryEnvSchema = z.object({
+  OTEL_EXPORTER_OTLP_ENDPOINT: z.preprocess(emptyAsUndefined, z.url().optional()),
+  // Segredo: leva o token do Grafana Cloud.
+  OTEL_EXPORTER_OTLP_HEADERS: z.preprocess(emptyAsUndefined, z.string().optional()),
+  OTEL_SERVICE_NAME: z.preprocess(emptyAsUndefined, z.string().default("iniciativa")),
+});
+
 // Única porta de leitura de variáveis de ambiente do app (GUIDELINES.md § Best practices).
-const serverEnvSchema = z.object({
+const serverEnvSchema = telemetryEnvSchema.extend({
   DATABASE_URL: z.url(),
   BETTER_AUTH_SECRET: z.string().min(32),
   BETTER_AUTH_URL: z.url(),
@@ -11,7 +22,7 @@ const serverEnvSchema = z.object({
   // A linha `DATABASE_WS_PROXY=` do .env.example chega como "": vale como ausente.
   // Só loopback: o ws-proxy.ts desliga o TLS, e a senha do banco não pode sair da máquina.
   DATABASE_WS_PROXY: z.preprocess(
-    (value) => (value === "" ? undefined : value),
+    emptyAsUndefined,
     z
       .string()
       .regex(/^(localhost|127\.0\.0\.1):\d+\/\S*$/)
@@ -20,15 +31,29 @@ const serverEnvSchema = z.object({
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
+export type TelemetryEnv = z.infer<typeof telemetryEnvSchema>;
 
-export function parseServerEnv(source: Record<string, string | undefined>): ServerEnv {
-  const parsed = serverEnvSchema.safeParse(source);
+function parseOrThrow<T>(schema: z.ZodType<T>, source: Record<string, string | undefined>): T {
+  const parsed = schema.safeParse(source);
   if (!parsed.success) {
     // Só os nomes: o valor de uma variável pode ser segredo.
     const names = [...new Set(parsed.error.issues.map((issue) => String(issue.path[0])))];
     throw new Error(`Variáveis de ambiente ausentes ou inválidas: ${names.join(", ")}`);
   }
   return parsed.data;
+}
+
+export function parseServerEnv(source: Record<string, string | undefined>): ServerEnv {
+  return parseOrThrow(serverEnvSchema, source);
+}
+
+// Só as variáveis de OTEL: o instrumentation.ts roda no boot, antes de qualquer outra validação.
+export function parseTelemetryEnv(source: Record<string, string | undefined>): TelemetryEnv {
+  return parseOrThrow(telemetryEnvSchema, source);
+}
+
+export function getTelemetryEnv(): TelemetryEnv {
+  return parseTelemetryEnv(process.env);
 }
 
 let cached: ServerEnv | undefined;

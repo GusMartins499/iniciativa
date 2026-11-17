@@ -1,6 +1,6 @@
 // Versão do termo aceito; muda sempre que o texto do termo mudar. Quem aceitou outra
 // versão precisa aceitar de novo antes de usar o app.
-export const CONSENT_VERSION = "v1.0";
+export const CONSENT_VERSION = "v1.1";
 
 const controllerName = "Gustavo Martins";
 const controllerEmail = "gustavosm994@gmail.com";
@@ -13,12 +13,13 @@ export const onboardingCopy = {
   declarationLabel:
     "Sou autista, com nível de suporte 1 ou com autonomia para participar de encontros, e tenho 18 anos ou mais.",
   consentLabel: "Li e aceito o termo de consentimento abaixo.",
-  consentTitle: "Termo de consentimento (versão 1.0)",
+  consentTitle: "Termo de consentimento (versão 1.1)",
   consentText: [
     "A sua autodeclaração de autismo é um dado de saúde. A lei chama isso de dado pessoal sensível (LGPD).",
     "Usamos a autodeclaração só para liberar o seu acesso ao iniciativa. Ela não aparece para outras pessoas.",
     "Quem cria um encontro vê o seu primeiro nome e se você leva acompanhante. As outras pessoas veem só o número de vagas ocupadas.",
-    "O banco de dados fica em São Paulo. O login com Google e o site, na Vercel, podem tratar os seus dados fora do Brasil.",
+    "O banco de dados fica em São Paulo. O login com Google, o site, na Vercel, e o monitoramento de erros e desempenho, no Grafana Labs, podem tratar os seus dados fora do Brasil.",
+    "O Grafana Labs recebe só identificadores internos, nunca o seu nome, o seu email ou a sua autodeclaração.",
     "Você pode excluir a sua conta a qualquer momento. Isso apaga os seus dados e encerra este consentimento.",
     `Responsável pelos dados: ${controllerName}. Contato: ${controllerEmail}.`,
   ],
@@ -80,7 +81,7 @@ export const privacyCopy: {
   back: string;
 } = {
   title: "Política de privacidade e termo de consentimento",
-  version: "Versão 1.0",
+  version: "Versão 1.1",
   sections: [
     {
       title: "1. Quem é responsável pelos seus dados",
@@ -135,10 +136,11 @@ export const privacyCopy: {
         "Google: para você entrar com a sua conta Google.",
         "Vercel: para o site funcionar.",
         "Neon: para guardar o banco de dados, em servidores em São Paulo.",
+        "Grafana Labs: para monitorar erros e desempenho do site. Recebe só identificadores internos, nunca o seu nome, o seu email ou a sua autodeclaração.",
       ],
       after: [
         "O banco de dados e as cópias de segurança ficam no Brasil.",
-        "O Google e a Vercel podem tratar os seus dados em servidores fora do Brasil quando você entra no app ou usa o site.",
+        "O Google, a Vercel e o Grafana Labs podem tratar os seus dados em servidores fora do Brasil quando você entra no app ou usa o site.",
       ],
     },
     {
