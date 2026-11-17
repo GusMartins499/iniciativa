@@ -140,6 +140,7 @@ src/
 - **PII neste domínio:** nome, email e foto vindos do Google; a **autodeclaração e o consentimento**, que são dado de saúde, ou seja, dado sensível pela LGPD; e a lista de confirmados de cada encontro.
 - Segredos ficam só nas variáveis de ambiente da Vercel e no `.env.local`. Nunca commite arquivos `.env*` (exceto `.env.example`). **O repositório é público.**
 - Seeds, fixtures e dados de teste são sempre **sintéticos**, nunca de pessoas reais.
+- ❌ Nem sintético, um teste usa valor com cara de credencial: header `Authorization`, `Basic`/`Bearer` com base64, string longa aleatória. O GitGuardian acusa no PR, e o commit fica no histórico (sem force-push). Use um header qualquer (`X-Equipe=valor`) ou um valor curto e legível.
 - A sessão é do Better Auth, com cookie `httpOnly`, `secure` e `sameSite=lax`. Não guarde token em `localStorage`.
 - A autorização é verificada sempre no servidor:
   - só o criador edita ou cancela o encontro;
