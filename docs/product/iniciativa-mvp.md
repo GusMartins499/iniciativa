@@ -1,4 +1,4 @@
-# iniciativa — MVP
+# iniciativa: MVP
 
 Webapp para jovens autistas proporem encontros presenciais e confirmarem presença, parecido com um meetup feito só para esse público. O projeto faz parte de um programa do SIGMA PARK e também será inscrito no hackathon HackBrasil.
 

@@ -11,7 +11,7 @@ in-review:       in-review
 needs-human:     needs-human          # parked by the automode park protocol
 category:feature: enhancement         # existe (padrão do GitHub)
 category:fix:     bug                 # existe (padrão do GitHub)
-category:dx:      enhancement         # [DX] — escolhido no /create-tasks
+category:dx:      enhancement         # [DX], escolhido no /create-tasks
 chaos:passed:     chaos:passed
 chaos:found-bugs: chaos:found-bugs
 required:        []                   # labels CI enforces on every PR, if any

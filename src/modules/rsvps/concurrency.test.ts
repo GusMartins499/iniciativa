@@ -12,7 +12,7 @@ import { confirmRsvp } from "./rsvps";
 import { NOW, setupMeetup } from "./test-setup";
 
 // O PGlite usa uma conexão só e não reproduz a corrida: este teste roda numa branch do Neon.
-describe.skipIf(!testDatabaseUrl)("rsvps.confirmRsvp — concorrência (Neon)", () => {
+describe.skipIf(!testDatabaseUrl)("rsvps.confirmRsvp com concorrência (Neon)", () => {
   const prefix = `conc-${Date.now()}-`;
   let db: Database;
   let close: () => Promise<void>;

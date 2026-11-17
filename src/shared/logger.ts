@@ -1,7 +1,7 @@
 import pino, { type DestinationStream, type Logger } from "pino";
 import { logLevel } from "./env";
 
-// PII e dado de saúde (autodeclaração) nunca podem chegar ao log — GUIDELINES.md § Logging.
+// PII e dado de saúde (autodeclaração) nunca podem chegar ao log (GUIDELINES.md § Logging).
 const SENSITIVE_KEYS = [
   "name",
   "email",

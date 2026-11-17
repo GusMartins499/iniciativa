@@ -1,6 +1,6 @@
-# Guidelines — iniciativa
+# Guidelines do iniciativa
 
-> Precedence: module GUIDELINES.md > codebase GUIDELINES.md > defaults. Guidelines tighten the pipeline's guardrails — they can never loosen them.
+> Precedence: module GUIDELINES.md > codebase GUIDELINES.md > defaults. Guidelines tighten the pipeline's guardrails, but can never loosen them.
 
 Stack: Next.js (App Router) + TypeScript, Postgres no Neon, Drizzle ORM, Better Auth (login com Google), deploy na Vercel. Produto: `docs/product/iniciativa-mvp.md`.
 
@@ -42,7 +42,7 @@ src/
 - Valide toda entrada no servidor com Zod, mesmo que o formulário já tenha validado.
 - Verifique a sessão **e** a autodeclaração com consentimento aceito em toda Server Action e em toda rota protegida. Sem isso, redirecione para o onboarding.
 - Mantenha as regras de negócio só no servidor: vagas, acompanhante, prazo até o início, permissão do criador.
-- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts`, o `vitest.config.ts` e o `playwright.config.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`). Variável nova entra no schema do `env.ts`, no `.env.example` e no README.
+- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts`, o `vitest.config.ts` e o `playwright.config.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`). Variável nova entra no schema do `env.ts` e no `.env.example` (e no README só quando o repositório for privado; ver § Infra provisioning).
 - Grave datas em **UTC** no banco (`timestamp with time zone`). Exiba e interprete as datas no fuso `America/Sao_Paulo`.
 
 **Nunca:**
@@ -54,7 +54,9 @@ src/
 
 - Não há IaC no MVP. Vercel, Neon e o OAuth do Google são configurados pelos painéis de cada serviço.
 - Toda variável de ambiente usada no código aparece em `.env.example`, com nome e descrição e **sem valor**.
-- Os passos de setup (criar o projeto no Neon, configurar o OAuth do Google, configurar as variáveis na Vercel) ficam no `README.md`. Uma variável nova entra no `.env.example` e no README no mesmo PR.
+- Os passos de setup (criar o projeto no Neon, configurar o OAuth do Google, configurar as variáveis na Vercel) dependem da visibilidade do repositório:
+  - **Enquanto o repositório for público:** ❌ nenhum passo de setup nem de configuração de infraestrutura vai para o `README.md` ou outro arquivo do repositório. Eles ficam só nos cards (issues). Uma variável nova entra apenas no `.env.example`.
+  - **Se o repositório se tornar privado (a partir desse momento):** os passos de setup passam a ficar no `README.md`, e uma variável nova entra no `.env.example` e no README no mesmo PR.
 - Use apenas planos gratuitos e o subdomínio da Vercel. Não adicione serviço pago nem domínio próprio.
 
 ## Logging
@@ -101,14 +103,14 @@ src/
 |---|---|---|
 | UI / estilo | Tailwind CSS + shadcn/ui (Radix), com `clsx` + `tailwind-merge` + `class-variance-authority` (base do `cn` do shadcn) | bibliotecas de animação (framer-motion etc.) |
 | Formulários | react-hook-form + Zod (`@hookform/resolvers`), com o schema Zod compartilhado entre cliente e servidor | estado manual com `useState` por campo |
-| Validação | Zod | — |
+| Validação | Zod | nenhuma |
 | Datas | date-fns + date-fns-tz | moment, dayjs |
-| Ícones | lucide-react | — |
+| Ícones | lucide-react | nenhuma |
 | HTTP | `fetch` nativo | axios |
 | Estado de ação assíncrona | `useActionState` / `useTransition` do React | `useState` manual para pending/erro; TanStack Query (sem cache de dados no cliente no MVP) |
 | Banco | drizzle-orm + drizzle-kit + `@neondatabase/serverless` | outro ORM, SQL cru |
 | Auth | better-auth (adapter Drizzle, provider Google) | next-auth |
-| Logger | pino | — |
+| Logger | pino | nenhuma |
 | Scripts de dev | tsx (só para rodar `scripts/`, como o `pnpm db:seed`, fora do Next) | ts-node |
 | Testes | Vitest, PGlite, Testing Library, vitest-axe, jsdom (ambiente dos testes de tela); Playwright (`@playwright/test`, só Chromium) nos testes e2e de `e2e/` | Cypress |
 

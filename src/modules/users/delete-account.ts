@@ -9,7 +9,7 @@ import { userOnboardings } from "./schema";
 
 type DeletedCounts = { cancelledMeetups: number; releasedRsvps: number };
 
-// Direito de exclusão (LGPD): tudo numa transação só — ou a pessoa sai por inteiro,
+// Direito de exclusão (LGPD): tudo numa transação só: ou a pessoa sai por inteiro,
 // ou nada muda. Hard delete: não fica cópia de PII no app.
 export async function deleteAccount(
   db: Database,

@@ -22,7 +22,7 @@ beforeEach(async () => {
   db = await createTestDb();
 });
 
-describe("users.deleteAccount — atomicidade", () => {
+describe("users.deleteAccount: atomicidade", () => {
   it("desfaz tudo se um passo falhar", async () => {
     const ids = await setupAccount(db);
     const before = await snapshot(db, ids);
