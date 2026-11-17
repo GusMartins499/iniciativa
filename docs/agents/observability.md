@@ -13,15 +13,18 @@ alerts: site fora do ar, falha inesperada, taxa de erro HTTP, lentidão (email d
 dashboard: iniciativa
 ```
 
-Configurados nos painéis do Grafana Cloud, sem IaC (GUIDELINES.md § Infra provisioning). Os
-passos ficam no card #45. Os thresholds iniciais são chute: revisar com tráfego real.
+Configurados nos painéis do Grafana Cloud, sem IaC (GUIDELINES.md § Infra provisioning), na pasta
+`iniciativa`, com notificação por email (contact point `iniciativa-email`). Os passos ficam no
+card #45. Os thresholds iniciais são chute: revisar com tráfego real. O Tempo não serve de fonte
+de alerta; taxa de erro e latência vêm das métricas que o Grafana Cloud gera dos spans
+(`traces_spanmetrics_*`, label `service="iniciativa"`).
 
 | Alerta | Fonte | O que mede |
 |---|---|---|
-| Site fora do ar | Synthetic Monitoring | check HTTP da home de produção, de 2 regiões; dispara após 2 falhas seguidas |
-| Falha inesperada | Loki | qualquer log `level="error"` do serviço `iniciativa` em 5 min |
-| Taxa de erro HTTP | Tempo (TraceQL) | spans de rota com `status = error` acima de 5% em 15 min, com mínimo de requisições |
-| Lentidão | Tempo (TraceQL) | p95 dos spans de Server Action (POST de página) acima de 2 s por 15 min |
+| Site fora do ar | Synthetic Monitoring (`probe_success`) | check HTTP `iniciativa-home` na home de produção a cada 5 min, de São Paulo e North Virginia; dispara quando a falha dura 5 min (2 checagens seguidas) |
+| Falha inesperada | Loki | qualquer log do serviço `iniciativa` com `severity_number >= 17` (error ou fatal) em 5 min |
+| Taxa de erro HTTP | métricas de span (`traces_spanmetrics_calls_total`) | spans de rota (`SPAN_KIND_SERVER`) com status de erro acima de 5% em 15 min, com no mínimo 20 requisições |
+| Lentidão | métricas de span (`traces_spanmetrics_latency`) | p95 dos spans de Server Action (POST de página, fora `/api/*`) acima de 2 s por 15 min |
 
 Dashboard **iniciativa**: requisições por minuto, taxa de erro, p95 por rota e Server Action, e a
 contagem dos eventos de negócio a partir do Loki. As consultas agregam por evento e rota, nunca
