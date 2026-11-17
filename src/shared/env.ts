@@ -39,11 +39,18 @@ export function getServerEnv(): ServerEnv {
   return cached;
 }
 
-const logLevelSchema = z
-  .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
-  .default("info");
+// A linha `LOG_LEVEL=` do .env.example chega como "": vale como ausente, senão o app
+// nem sobe para quem copiou o arquivo.
+const logLevelSchema = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
+);
 
-export const logLevel = logLevelSchema.parse(process.env.LOG_LEVEL);
+export function parseLogLevel(value: string | undefined) {
+  return logLevelSchema.parse(value);
+}
+
+export const logLevel = parseLogLevel(process.env.LOG_LEVEL);
 
 // Só nos testes: branch "test" do Neon para o teste de concorrência (opcional).
 export const testDatabaseUrl = z.url().optional().parse(process.env.TEST_DATABASE_URL);
