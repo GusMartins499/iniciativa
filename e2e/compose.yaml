@@ -1,6 +1,6 @@
 # Banco descartável dos testes e2e, usado igual na máquina local e no CI.
 # O driver do app (@neondatabase/serverless) só conecta por WebSocket, então o Postgres
-# fica atrás do wsproxy do próprio Neon. Usuário e senha só valem para este banco local.
+# fica atrás do wsproxy do próprio Neon.
 name: iniciativa-e2e
 
 services:
@@ -8,8 +8,9 @@ services:
     image: postgres:17-alpine@sha256:a77aa70e641402a21411b92b721c58d10f23b50ae5fdd2333efd22d166e1e5f7
     environment:
       POSTGRES_USER: iniciativa
-      POSTGRES_PASSWORD: iniciativa
       POSTGRES_DB: iniciativa_e2e
+      # Sem senha: o Postgres não publica porta e só o wsproxy deste compose chega nele.
+      POSTGRES_HOST_AUTH_METHOD: trust
     # Em memória: cada `up` começa vazio e nada fica no disco.
     tmpfs:
       - /var/lib/postgresql/data

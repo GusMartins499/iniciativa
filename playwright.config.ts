@@ -10,7 +10,7 @@ process.env.E2E_AUTH_SECRET ??= randomBytes(32).toString("base64");
 // O banco é sempre o do e2e/compose.yaml, nunca o do .env.local: o global-setup apaga o
 // schema dele a cada execução. O Google não é exercido, então as credenciais são falsas.
 const e2eEnv = {
-  DATABASE_URL: "postgres://iniciativa:iniciativa@postgres:5432/iniciativa_e2e",
+  DATABASE_URL: "postgres://iniciativa@postgres:5432/iniciativa_e2e",
   DATABASE_WS_PROXY: "localhost:5488/v1",
   BETTER_AUTH_URL: baseURL,
   BETTER_AUTH_SECRET: process.env.E2E_AUTH_SECRET,
