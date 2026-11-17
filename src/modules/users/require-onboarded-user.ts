@@ -1,7 +1,8 @@
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { getSessionUser, type SessionUser } from "@/shared/auth";
 import { type Database, getDb } from "@/shared/db";
 import { err, ok, type Result } from "@/shared/result";
+import { CONSENT_VERSION } from "./copy";
 import { userOnboardings } from "./schema";
 
 type GuardDeps = {
@@ -19,11 +20,26 @@ function defaultDeps(): GuardDeps {
   };
 }
 
+// Concluído = aceitou a versão atual do termo. Aceite de outra versão não libera o app.
 export async function hasCompletedOnboarding(db: Database, userId: string): Promise<boolean> {
   const rows = await db
     .select({ userId: userOnboardings.userId })
     .from(userOnboardings)
-    .where(eq(userOnboardings.userId, userId))
+    .where(
+      and(eq(userOnboardings.userId, userId), eq(userOnboardings.consentVersion, CONSENT_VERSION)),
+    )
+    .limit(1);
+  return rows.length > 0;
+}
+
+// Aceitou uma versão anterior do termo: a tela de aceite avisa que o termo mudou.
+export async function hasOutdatedConsent(db: Database, userId: string): Promise<boolean> {
+  const rows = await db
+    .select({ userId: userOnboardings.userId })
+    .from(userOnboardings)
+    .where(
+      and(eq(userOnboardings.userId, userId), ne(userOnboardings.consentVersion, CONSENT_VERSION)),
+    )
     .limit(1);
   return rows.length > 0;
 }

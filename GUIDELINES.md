@@ -67,7 +67,7 @@ src/
 ## Observability instrumentation
 
 - Todo caso de uso de escrita, ao terminar com sucesso, emite um evento `info` com nome `<domínio>.<ação no passado>`:
-  `meetup.created`, `meetup.updated`, `meetup.cancelled`, `rsvp.confirmed`, `rsvp.cancelled`, `user.onboarded`, `user.deleted`.
+  `meetup.created`, `meetup.updated`, `meetup.cancelled`, `rsvp.confirmed`, `rsvp.cancelled`, `user.onboarded`, `user.consent_renewed` (aceite de uma versão nova do termo), `user.deleted`.
 - Payload do evento: `{ event, userId, meetupId?, rsvpId?, withCompanion? }`. Os IDs vão no payload; PII nunca vai.
 - Evento novo segue o mesmo padrão e é registrado nesta lista.
 

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import type { Database } from "@/shared/db";
 import { logger } from "@/shared/logger";
 import { err, ok, type Result } from "@/shared/result";
@@ -16,23 +17,45 @@ export async function completeOnboarding(
     return err("VALIDATION_FAILED");
   }
 
-  const inserted = await db.transaction(async (tx) =>
-    tx
-      .insert(userOnboardings)
-      .values({
-        userId,
+  const outcome = await db.transaction(async (tx) => {
+    const [current] = await tx
+      .select({ consentVersion: userOnboardings.consentVersion })
+      .from(userOnboardings)
+      .where(eq(userOnboardings.userId, userId))
+      .for("update");
+    if (!current) {
+      const inserted = await tx
+        .insert(userOnboardings)
+        .values({
+          userId,
+          declaredAutismLevel1OrAutonomous: true,
+          declaredAdult: true,
+          consentVersion: CONSENT_VERSION,
+          consentedAt: new Date(),
+        })
+        // Dois envios ao mesmo tempo: o segundo não duplica nem falha.
+        .onConflictDoNothing({ target: userOnboardings.userId })
+        .returning({ userId: userOnboardings.userId });
+      return inserted.length > 0 ? "onboarded" : "unchanged";
+    }
+    // Idempotente: quem já aceitou a versão atual mantém o aceite original.
+    if (current.consentVersion === CONSENT_VERSION) return "unchanged";
+    await tx
+      .update(userOnboardings)
+      .set({
         declaredAutismLevel1OrAutonomous: true,
         declaredAdult: true,
         consentVersion: CONSENT_VERSION,
         consentedAt: new Date(),
       })
-      // Idempotente: quem já concluiu mantém o aceite original.
-      .onConflictDoNothing({ target: userOnboardings.userId })
-      .returning({ userId: userOnboardings.userId }),
-  );
+      .where(eq(userOnboardings.userId, userId));
+    return "renewed";
+  });
 
-  if (inserted.length > 0) {
+  if (outcome === "onboarded") {
     logger.info({ event: "user.onboarded", userId });
+  } else if (outcome === "renewed") {
+    logger.info({ event: "user.consent_renewed", userId });
   }
   return ok({ userId });
 }

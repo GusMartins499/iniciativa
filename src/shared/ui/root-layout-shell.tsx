@@ -51,7 +51,12 @@ export function RootLayoutShell({ children, nav, width = "narrow" }: RootLayoutS
               {layoutCopy.footer.productName}
             </span>
           </div>
-          <p>{layoutCopy.footer.copyright(currentYearInSaoPaulo())}</p>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <Link href="/privacidade" className="inline-flex min-h-11 items-center underline">
+              {layoutCopy.footer.privacy}
+            </Link>
+            <p>{layoutCopy.footer.copyright(currentYearInSaoPaulo())}</p>
+          </div>
         </div>
       </footer>
     </div>
