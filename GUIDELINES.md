@@ -42,7 +42,7 @@ src/
 - Valide toda entrada no servidor com Zod, mesmo que o formulário já tenha validado.
 - Verifique a sessão **e** a autodeclaração com consentimento aceito em toda Server Action e em toda rota protegida. Sem isso, redirecione para o onboarding.
 - Mantenha as regras de negócio só no servidor: vagas, acompanhante, prazo até o início, permissão do criador.
-- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts` e o `vitest.config.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`). Variável nova entra no schema do `env.ts`, no `.env.example` e no README.
+- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts`, o `vitest.config.ts` e o `playwright.config.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`). Variável nova entra no schema do `env.ts`, no `.env.example` e no README.
 - Grave datas em **UTC** no banco (`timestamp with time zone`). Exiba e interprete as datas no fuso `America/Sao_Paulo`.
 
 **Nunca:**
@@ -109,7 +109,7 @@ src/
 | Banco | drizzle-orm + drizzle-kit + `@neondatabase/serverless` | outro ORM, SQL cru |
 | Auth | better-auth (adapter Drizzle, provider Google) | next-auth |
 | Logger | pino | — |
-| Testes | Vitest, PGlite, Testing Library, vitest-axe, jsdom (ambiente dos testes de tela) | — |
+| Testes | Vitest, PGlite, Testing Library, vitest-axe, jsdom (ambiente dos testes de tela); Playwright (`@playwright/test`, só Chromium) nos testes e2e de `e2e/` | Cypress |
 
 - O gerenciador de pacotes é só o **pnpm**, com a versão fixada no campo `packageManager` do `package.json`. Commite o `pnpm-lock.yaml`; nunca commite `package-lock.json` nem `yarn.lock`.
 - Uma dependência nova só entra quando nenhuma da tabela resolve o problema, e precisa de aprovação explícita com nome e versão.
@@ -154,6 +154,7 @@ src/
   - exclusão de conta.
 - Os testes de módulo rodam contra **Postgres de verdade** (PGlite em memória ou branch do Neon). Não use mock do banco.
 - Telas: teste de componente com Testing Library e checagem com axe (`vitest-axe`) nos fluxos principais (onboarding, criar encontro, confirmar e cancelar presença).
+- Fluxos de ponta a ponta: Playwright em `e2e/`, contra o build de produção e um Postgres descartável (`e2e/compose.yaml`), no job `e2e` do CI em todo PR. Local: `pnpm e2e:db && pnpm e2e`. A sessão entra pelo `storageState` gravado no `e2e/global-setup.ts`; o login com o Google não é exercido.
 - Não há meta de cobertura. A regra de negócio sem teste é o que bloqueia o PR.
 
 ## Domain criticality
