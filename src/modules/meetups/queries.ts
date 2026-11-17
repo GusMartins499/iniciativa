@@ -3,7 +3,7 @@ import type { Database } from "@/shared/db";
 import { err, ok, type Result } from "@/shared/result";
 import { meetups } from "./schema";
 
-// Visão pública: sem criador, sem nomes — só a ocupação.
+// Visão pública: sem criador e sem nomes, só a ocupação.
 const publicColumns = {
   id: meetups.id,
   title: meetups.title,
@@ -51,7 +51,7 @@ export async function getMeetup(
   return row ? ok(toPublic(row)) : err("NOT_FOUND");
 }
 
-// "Meus encontros": futuros, ativos e cancelados — o cancelado aparece com o aviso.
+// "Meus encontros": futuros, ativos e cancelados. O cancelado aparece com o aviso.
 export async function listByCreator(
   db: Database,
   userId: string,

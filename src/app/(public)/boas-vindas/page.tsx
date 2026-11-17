@@ -1,5 +1,9 @@
 import { redirect } from "next/navigation";
-import { hasCompletedOnboarding, onboardingCopy as copy } from "@/modules/users";
+import {
+  hasCompletedOnboarding,
+  hasOutdatedConsent,
+  onboardingCopy as copy,
+} from "@/modules/users";
 import { getSessionUser } from "@/shared/auth";
 import { getDb } from "@/shared/db";
 import { completeOnboardingAction } from "./actions";
@@ -12,11 +16,19 @@ export default async function WelcomePage() {
   if (sessionUser && (await hasCompletedOnboarding(getDb(), sessionUser.id))) {
     redirect("/");
   }
+  // Quem aceitou uma versão anterior do termo volta aqui para aceitar a atual.
+  const outdated = sessionUser ? await hasOutdatedConsent(getDb(), sessionUser.id) : false;
 
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">{copy.title}</h1>
-      <p className="text-muted-foreground">{copy.intro}</p>
+      {outdated ? (
+        <p className="rounded-md bg-honey-light px-3 py-2 font-semibold text-honey-light-foreground">
+          {copy.outdatedConsent}
+        </p>
+      ) : (
+        <p className="text-muted-foreground">{copy.intro}</p>
+      )}
       <OnboardingForm action={completeOnboardingAction} />
     </div>
   );

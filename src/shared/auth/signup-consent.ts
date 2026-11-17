@@ -11,7 +11,7 @@ import {
 // A conta só nasce depois do aceite dos termos. Quem aceita em /boas-vindas recebe este
 // cookie assinado (HMAC com o BETTER_AUTH_SECRET) e vai para o Google pedindo cadastro.
 // O hook de criação de usuário do Better Auth recusa o cadastro sem um aceite válido.
-// O cookie guarda só a versão do termo e o horário do aceite — nenhum dado pessoal.
+// O cookie guarda só a versão do termo e o horário do aceite, sem nenhum dado pessoal.
 
 // Chamado pela ação de /boas-vindas quando a pessoa aceita os dois termos sem ter conta.
 export async function grantSignupConsent(version: string): Promise<void> {

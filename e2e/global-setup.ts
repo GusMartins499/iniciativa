@@ -48,7 +48,7 @@ export default async function globalSetup() {
   // Recria o schema e aplica as migrações: cada execução começa de um banco limpo.
   const { db, close } = await createNeonTestDb(env.DATABASE_URL);
   try {
-    // Dados sintéticos — nunca de pessoas reais (GUIDELINES.md § Security).
+    // Dados sintéticos, nunca de pessoas reais (GUIDELINES.md § Security).
     const users = await createSignedInUsers(db, env, {
       newcomer: { name: "Pessoa Nova", email: "pessoa-nova@exemplo.test" },
       member: { name: "Ana Teste", email: "ana-teste@exemplo.test" },

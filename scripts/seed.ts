@@ -13,7 +13,7 @@ import { getDb } from "@/shared/db/client";
 import type { Database } from "@/shared/db";
 import { toAppDateInput } from "@/shared/time";
 
-// Dados sintéticos — nunca de pessoas reais (GUIDELINES.md § Security). O domínio
+// Dados sintéticos, nunca de pessoas reais (GUIDELINES.md § Security). O domínio
 // reservado marca o que é do seed: rodar de novo apaga só essas linhas.
 const SEED_EMAIL_DOMAIN = "@seed.exemplo.test";
 
@@ -48,7 +48,7 @@ const seedMeetups: SeedMeetup[] = [
   {
     creator: "ana",
     title: "Café da tarde no centro",
-    address: "Praça Walter Zumblick, Centro — Tubarão, SC",
+    address: "Praça Walter Zumblick, Centro, Tubarão, SC",
     placeDescription: "Mesa do lado de fora, perto da fonte. Vou estar com uma camiseta azul.",
     inDays: 2,
     start: "15:00",
@@ -63,7 +63,7 @@ const seedMeetups: SeedMeetup[] = [
   {
     creator: "bruno",
     title: "Tarde de jogos de tabuleiro na biblioteca",
-    address: "Biblioteca Pública Municipal, Centro — Tubarão, SC",
+    address: "Biblioteca Pública Municipal, Centro, Tubarão, SC",
     placeDescription: "Sala de estudos do térreo. Levo dois jogos curtos e fáceis de aprender.",
     inDays: 4,
     start: "14:00",
@@ -80,7 +80,7 @@ const seedMeetups: SeedMeetup[] = [
     // Lotado: 4 de 4 vagas, para ver o estado sem vagas.
     creator: "carla",
     title: "Caminhada na Beira-Rio",
-    address: "Avenida Marcolino Martins Cabral, Beira-Rio — Tubarão, SC",
+    address: "Avenida Marcolino Martins Cabral, Beira-Rio, Tubarão, SC",
     placeDescription: "Saída em frente à ponte. Ritmo leve, cerca de 3 km.",
     inDays: 6,
     start: "08:30",
@@ -96,7 +96,7 @@ const seedMeetups: SeedMeetup[] = [
     // Sem confirmações além do criador.
     creator: "davi",
     title: "Desenho livre na praça",
-    address: "Praça Sete de Setembro, Centro — Tubarão, SC",
+    address: "Praça Sete de Setembro, Centro, Tubarão, SC",
     inDays: 9,
     start: "10:00",
     end: "12:00",
@@ -108,7 +108,7 @@ const seedMeetups: SeedMeetup[] = [
     // Cancelado com presença confirmada, para ver o aviso de cancelado.
     creator: "elisa",
     title: "Conversa sobre filmes",
-    address: "Café do Shopping Farol, Centro — Tubarão, SC",
+    address: "Café do Shopping Farol, Centro, Tubarão, SC",
     inDays: 12,
     start: "16:00",
     end: "18:00",
@@ -121,7 +121,7 @@ const seedMeetups: SeedMeetup[] = [
     // Já aconteceu: criado e confirmado "no passado" pelo `now` dos casos de uso.
     creator: "fabio",
     title: "Piquenique no parque",
-    address: "Parque Municipal, Centro — Tubarão, SC",
+    address: "Parque Municipal, Centro, Tubarão, SC",
     inDays: -5,
     start: "10:00",
     end: "13:00",

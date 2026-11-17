@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseServerEnv } from "./env";
 
-// Ambiente sintético — nenhum valor real.
+// Ambiente sintético, sem nenhum valor real.
 const valid = {
   DATABASE_URL: "postgres://usuario:senha@exemplo.test/db",
   BETTER_AUTH_SECRET: "a".repeat(32),

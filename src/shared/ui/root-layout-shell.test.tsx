@@ -53,6 +53,15 @@ describe("rodapé do layout", () => {
     );
   });
 
+  it("leva à política de privacidade", () => {
+    renderShell();
+    expect(
+      within(screen.getByRole("contentinfo")).getByRole("link", {
+        name: "Política de privacidade",
+      }),
+    ).toHaveAttribute("href", "/privacidade");
+  });
+
   it("fica depois do conteúdo principal", () => {
     renderShell();
     const main = screen.getByRole("main");

@@ -62,4 +62,23 @@ describe("users.completeOnboarding", () => {
     expect(records).toHaveLength(1);
     expect(records[0]?.consentedAt).toEqual(first?.consentedAt);
   });
+
+  it("atualiza versão e data do aceite de quem aceitou uma versão anterior do termo", async () => {
+    const oldConsentedAt = new Date("2026-10-01T12:00:00Z");
+    await db.insert(userOnboardings).values({
+      userId,
+      declaredAutismLevel1OrAutonomous: true,
+      declaredAdult: true,
+      consentVersion: "v0.1-provisorio",
+      consentedAt: oldConsentedAt,
+    });
+
+    const r = await completeOnboarding(db, userId, { declaration: true, consent: true });
+
+    expect(r.ok).toBe(true);
+    const records = await findOnboardings();
+    expect(records).toHaveLength(1);
+    expect(records[0]?.consentVersion).toBe(CONSENT_VERSION);
+    expect(records[0]?.consentedAt.getTime()).toBeGreaterThan(oldConsentedAt.getTime());
+  });
 });

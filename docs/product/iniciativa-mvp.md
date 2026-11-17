@@ -1,4 +1,4 @@
-# iniciativa — MVP
+# iniciativa: MVP
 
 Webapp para jovens autistas proporem encontros presenciais e confirmarem presença, parecido com um meetup feito só para esse público. O projeto faz parte de um programa do SIGMA PARK e também será inscrito no hackathon HackBrasil.
 
@@ -121,6 +121,6 @@ São três premissas, e qualquer uma delas, se falhar, derruba o MVP:
 | Question | Owner | Status |
 |---|---|---|
 | O programa SIGMA PARK tem exigências próprias de entrega, prazo ou relatório além das do hackathon? | Autor do projeto (Gustavo) | Aberta |
-| Qual o texto do termo de consentimento LGPD e da política de privacidade, e quem responde como controlador dos dados? | Autor do projeto (Gustavo) | Aberta |
+| Qual o texto do termo de consentimento LGPD e da política de privacidade, e quem responde como controlador dos dados? | Autor do projeto (Gustavo) | Resolvida: o controlador é o autor, como pessoa física. O termo v1.0 fica em `/boas-vindas` (resumo) e em `/privacidade` (texto completo). Quem aceitou outra versão aceita de novo antes de usar o app. |
 | Como o autor vai colher o retorno dos organizadores no piloto (formulário, conversa)? | Autor do projeto (Gustavo) | Aberta |
 | Qual a data de início do piloto de 8 semanas? | Autor do projeto (Gustavo) | Aberta |

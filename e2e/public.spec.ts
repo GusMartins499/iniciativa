@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { meetupsCopy } from "@/modules/meetups/client";
-import { signInCopy } from "@/modules/users/client";
+import { privacyCopy, signInCopy } from "@/modules/users/client";
 import { storageStatePath } from "./support/profiles";
 
 test("visitante sem sessão é levado para a tela inicial", async ({ page }) => {
@@ -14,6 +14,13 @@ test("o endereço antigo /entrar leva à tela inicial", async ({ page }) => {
   await page.goto("/entrar");
 
   await expect(page).toHaveURL(/^http:\/\/localhost:3000\/$/);
+});
+
+test("visitante sem sessão lê a política de privacidade", async ({ page }) => {
+  await page.goto("/privacidade");
+
+  await expect(page).toHaveURL(/\/privacidade$/);
+  await expect(page.getByRole("heading", { level: 1, name: privacyCopy.title })).toBeVisible();
 });
 
 test.describe("com cadastro completo", () => {

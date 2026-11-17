@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
@@ -85,6 +86,12 @@ export function OnboardingForm({ action }: OnboardingFormProps) {
             {paragraph}
           </p>
         ))}
+        <Link
+          href="/privacidade"
+          className="mt-3 inline-flex min-h-11 items-center font-semibold text-foreground underline"
+        >
+          {copy.privacyLink}
+        </Link>
       </section>
 
       <label className="flex min-h-11 items-start gap-3">

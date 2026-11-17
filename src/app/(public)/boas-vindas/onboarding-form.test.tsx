@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { axe } from "vitest-axe";
+import { onboardingCopy as copy } from "@/modules/users/client";
 import { OnboardingForm, type OnboardingFormProps } from "./onboarding-form";
 
 const social = vi.hoisted(() =>
@@ -70,9 +71,14 @@ describe("tela /boas-vindas", () => {
     );
   });
 
-  it("mostra o termo marcado como provisório", () => {
+  it("mostra a versão definitiva do termo, com link para o texto completo", () => {
     render(<OnboardingForm action={noopAction} />);
-    expect(screen.getByRole("heading", { name: /PROVISÓRIO/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: copy.consentTitle })).toBeInTheDocument();
+    expect(screen.queryByText(/PROVISÓRIO/)).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: copy.privacyLink })).toHaveAttribute(
+      "href",
+      "/privacidade",
+    );
   });
 
   it("não tem violações de acessibilidade", async () => {
