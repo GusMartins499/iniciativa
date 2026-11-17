@@ -8,11 +8,15 @@ const serverEnvSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   // Só nos testes e2e: endereço do wsproxy do Neon na frente de um Postgres comum, sem protocolo.
+  // A linha `DATABASE_WS_PROXY=` do .env.example chega como "": vale como ausente.
   // Só loopback: o ws-proxy.ts desliga o TLS, e a senha do banco não pode sair da máquina.
-  DATABASE_WS_PROXY: z
-    .string()
-    .regex(/^(localhost|127\.0\.0\.1):\d+\/\S*$/)
-    .optional(),
+  DATABASE_WS_PROXY: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z
+      .string()
+      .regex(/^(localhost|127\.0\.0\.1):\d+\/\S*$/)
+      .optional(),
+  ),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
