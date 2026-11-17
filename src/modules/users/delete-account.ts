@@ -4,6 +4,7 @@ import { removeAllByUser } from "@/modules/rsvps";
 import { deleteAuthUser } from "@/shared/auth";
 import type { Database } from "@/shared/db";
 import { logger } from "@/shared/logger";
+import { reportError } from "@/shared/observability";
 import { ok, type Result } from "@/shared/result";
 import { userOnboardings } from "./schema";
 
@@ -28,7 +29,7 @@ export async function deleteAccount(
     logger.info({ event: "user.deleted", userId, ...counts });
     return ok(counts);
   } catch (error) {
-    logger.error({ event: "user.delete_failed", userId, err: error });
+    reportError(error, { event: "user.delete_failed", userId });
     throw error;
   }
 }

@@ -62,7 +62,10 @@ src/
 ## Logging
 
 - O logger é o **pino**, com saída JSON em stdout, que a Vercel captura. A instância única fica em `src/shared/logger`.
+- Com a telemetria ligada (§ Tracing), os logs também vão por OTLP para o Grafana Cloud (Loki), com `trace_id` e `span_id` da requisição. A ponte (`src/shared/observability/otel-log-stream.ts`) lê a linha **já serializada e redigida** pelo pino. ❌ Não troque por hook antes da serialização (`hooks.logMethod`, `@opentelemetry/instrumentation-pino`): a redação deixa de valer para o que é exportado.
+- O `@vercel/otel` não faz o flush dos logs no fim da requisição; o span processor de `createLogFlushSpanProcessor()` faz. Não o remova do `src/instrumentation.ts`.
 - Use os níveis assim: `info` para ação de negócio concluída, `warn` para regra violada ou entrada recusada, `error` para falha inesperada, sempre com o erro anexado.
+- Falha inesperada capturada no limite (Server Action, rota, `delete-account`, `auth`) usa `reportError(error, { event, ...ids })` de `src/shared/observability`: loga com `error`, anexa o erro e marca o span ativo com a exceção e o status `ERROR`. A mensagem de erro do app nunca interpola email, nome ou outra PII: a stack vai para o log e para o trace.
 - Logue só **IDs internos** (`userId`, `meetupId`, `rsvpId`) e códigos de erro.
 - **Nunca** logue nome, email, foto, token, cookie, conteúdo da autodeclaração ou do consentimento, nem a lista de confirmados.
 
@@ -118,7 +121,7 @@ src/
 | Banco | drizzle-orm + drizzle-kit + `@neondatabase/serverless` | outro ORM, SQL cru |
 | Auth | better-auth (adapter Drizzle, provider Google) | next-auth |
 | Logger | pino | nenhuma |
-| Tracing | OpenTelemetry: `@vercel/otel` 2.3.0, com os peers `@opentelemetry/api` 1.9.1, `sdk-trace-base`, `resources` e `sdk-metrics` 2.12.1, `instrumentation`, `api-logs` e `sdk-logs` 0.223.2 (versões exatas) | SDK de fornecedor (Sentry, Datadog etc.) |
+| Tracing | OpenTelemetry: `@vercel/otel` 2.3.0, com os peers `@opentelemetry/api` 1.9.1, `sdk-trace-base`, `resources` e `sdk-metrics` 2.12.1, `instrumentation`, `api-logs`, `sdk-logs` e `exporter-logs-otlp-http` 0.223.2 (versões exatas) | SDK de fornecedor (Sentry, Datadog etc.) |
 | Scripts de dev | tsx (só para rodar `scripts/`, como o `pnpm db:seed`, fora do Next) | ts-node |
 | Testes | Vitest, PGlite, Testing Library, vitest-axe, jsdom (ambiente dos testes de tela); Playwright (`@playwright/test`, só Chromium) nos testes e2e de `e2e/` | Cypress |
 
