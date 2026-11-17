@@ -102,7 +102,7 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
     | Texto secundário | `#57534E` |
     | Primária (ardósia) | `#334155`, hover `#1E293B` |
     | Etiqueta | fundo `#F0EBE3`, texto `#44403C` |
-    | Mel | `#F59E0B` |
+    | Mel | `#F59E0B`, hover `#D97706` |
     | Mel claro | fundo `#FEF3C7`, texto `#92400E` |
 
   - Fonte: Inter em todo o app. O nome "iniciativa" vai em Inter Bold, em minúsculas, com espaçamento entre letras levemente fechado.

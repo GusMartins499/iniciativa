@@ -3,6 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 import { axe } from "vitest-axe";
 import { OnboardingForm, type OnboardingFormProps } from "./onboarding-form";
 
+const social = vi.hoisted(() =>
+  vi.fn<(input: Record<string, unknown>) => Promise<{ error: unknown }>>(async () => ({
+    error: null,
+  })),
+);
+vi.mock("@/shared/auth/client", () => ({ authClient: { signIn: { social } } }));
+
 async function noopAction() {
   return { code: null };
 }
@@ -40,6 +47,26 @@ describe("tela /boas-vindas", () => {
 
     await waitFor(() =>
       expect(action).toHaveBeenCalledWith({ code: null }, { declaration: true, consent: true }),
+    );
+  });
+
+  it("depois do aceite sem conta, segue para o Google pedindo o cadastro", async () => {
+    render(<OnboardingForm action={async () => ({ code: "SIGN_UP_READY" })} />);
+    fireEvent.click(screen.getByRole("checkbox", { name: /sou autista/i }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /aceito o termo/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar e entrar" }));
+
+    await waitFor(() =>
+      expect(social).toHaveBeenCalledWith(
+        // Sempre pela conclusão: conta já existente também precisa registrar o aceite.
+        expect.objectContaining({
+          provider: "google",
+          requestSignUp: true,
+          callbackURL: "/boas-vindas/concluir",
+        }),
+      ),
     );
   });
 

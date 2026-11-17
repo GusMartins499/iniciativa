@@ -41,7 +41,7 @@ export default defineConfig({
   // Testa o build de produção, não o `next dev`.
   webServer: {
     command: "pnpm build && pnpm start",
-    url: `${baseURL}/entrar`,
+    url: baseURL,
     reuseExistingServer: false,
     timeout: 300_000,
     env: e2eEnv,

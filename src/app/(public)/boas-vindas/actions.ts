@@ -1,8 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { completeOnboarding, type OnboardingInput } from "@/modules/users";
-import { getSessionUser } from "@/shared/auth";
+import {
+  CONSENT_VERSION,
+  completeOnboarding,
+  type OnboardingInput,
+  onboardingSchema,
+} from "@/modules/users";
+import { getSessionUser, grantSignupConsent } from "@/shared/auth";
 import { getDb } from "@/shared/db";
 import { logger } from "@/shared/logger";
 import type { OnboardingState } from "./state";
@@ -15,8 +20,13 @@ export async function completeOnboardingAction(
   try {
     const sessionUser = await getSessionUser();
     if (!sessionUser) {
-      return { code: "UNAUTHENTICATED" };
+      // Ainda sem conta: o aceite vira um cookie assinado e a conta só nasce no
+      // cadastro com Google que o formulário dispara em seguida.
+      if (!onboardingSchema.safeParse(input).success) return { code: "VALIDATION_FAILED" };
+      await grantSignupConsent(CONSENT_VERSION);
+      return { code: "SIGN_UP_READY" };
     }
+    // Conta que já existe sem autodeclaração (criada antes desta regra): registra aqui.
     // A entrada vem do cliente: o caso de uso valida de novo com o mesmo schema Zod.
     const result = await completeOnboarding(getDb(), sessionUser.id, input);
     if (!result.ok) {

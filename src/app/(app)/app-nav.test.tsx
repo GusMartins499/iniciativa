@@ -12,7 +12,7 @@ describe("navegação principal", () => {
   });
 
   it("marca a página atual", () => {
-    render(<AppNav userInitial="G" />);
+    render(<AppNav user={{ name: "Gustavo", image: null }} />);
     expect(screen.getByRole("link", { name: "Encontros" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Meus encontros" })).not.toHaveAttribute(
       "aria-current",
@@ -21,18 +21,18 @@ describe("navegação principal", () => {
 
   it("mantém 'Encontros' marcado no detalhe de um encontro", () => {
     pathname.value = "/encontros/abc";
-    render(<AppNav userInitial="G" />);
+    render(<AppNav user={{ name: "Gustavo", image: null }} />);
     expect(screen.getByRole("link", { name: "Encontros" })).toHaveAttribute("aria-current", "page");
   });
 
   it("não marca 'Encontros' na tela de criar encontro", () => {
     pathname.value = "/encontros/novo";
-    render(<AppNav userInitial="G" />);
+    render(<AppNav user={{ name: "Gustavo", image: null }} />);
     expect(screen.getByRole("link", { name: "Encontros" })).not.toHaveAttribute("aria-current");
   });
 
   it("dá nome acessível ao botão de criar e à conta", () => {
-    render(<AppNav userInitial="G" />);
+    render(<AppNav user={{ name: "Gustavo", image: null }} />);
     expect(screen.getByRole("link", { name: "Criar encontro" })).toHaveAttribute(
       "href",
       "/encontros/novo",
@@ -41,7 +41,7 @@ describe("navegação principal", () => {
   });
 
   it("não tem violações de acessibilidade", async () => {
-    const { container } = render(<AppNav userInitial="G" />);
+    const { container } = render(<AppNav user={{ name: "Gustavo", image: null }} />);
     expect(await axe(container)).toHaveNoViolations();
   });
 });

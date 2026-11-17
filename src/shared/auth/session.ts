@@ -4,6 +4,10 @@ import { getAuth } from "./auth";
 export type SessionUser = {
   id: string;
   name: string;
+  // E-mail da conta Google; só aparece para a própria pessoa (Minha conta).
+  email: string;
+  // URL da foto de perfil do Google; null quando a conta não tem foto.
+  image: string | null;
 };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -13,7 +17,12 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   if (!session) {
     return null;
   }
-  return { id: session.user.id, name: session.user.name };
+  return {
+    id: session.user.id,
+    name: session.user.name,
+    email: session.user.email,
+    image: session.user.image ?? null,
+  };
 }
 
 // Depois da exclusão a sessão já não existe no banco; os cookies do Better Auth

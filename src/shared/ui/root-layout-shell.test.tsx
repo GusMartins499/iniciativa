@@ -17,6 +17,19 @@ describe("layout raiz", () => {
     expect(within(screen.getByRole("banner")).getByText("iniciativa")).toBeInTheDocument();
   });
 
+  it("usa a largura estreita por padrão e a larga quando pedida", () => {
+    const { unmount } = renderShell();
+    expect(screen.getByRole("main")).toHaveClass("max-w-3xl");
+    unmount();
+    render(
+      <RootLayoutShell width="wide">
+        <p>conteúdo</p>
+      </RootLayoutShell>,
+    );
+    expect(screen.getByRole("banner")).toHaveClass("max-w-6xl");
+    expect(screen.getByRole("main")).not.toHaveClass("max-w-3xl");
+  });
+
   it("não tem violações de acessibilidade", async () => {
     const { container } = renderShell();
     expect(await axe(container)).toHaveNoViolations();

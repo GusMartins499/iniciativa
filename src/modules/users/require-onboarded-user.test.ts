@@ -23,7 +23,12 @@ describe("requireOnboardedUser", () => {
   it("bloqueia usuário autenticado sem onboarding", async () => {
     const r = await requireOnboardedUser({
       db,
-      getSessionUser: async () => ({ id: userId, name: "Pessoa Teste" }),
+      getSessionUser: async () => ({
+        id: userId,
+        name: "Pessoa Teste",
+        email: "pessoa-teste@exemplo.test",
+        image: null,
+      }),
     });
 
     expect(r).toEqual({ ok: false, error: { code: "ONBOARDING_REQUIRED" } });
@@ -34,9 +39,22 @@ describe("requireOnboardedUser", () => {
 
     const r = await requireOnboardedUser({
       db,
-      getSessionUser: async () => ({ id: userId, name: "Pessoa Teste" }),
+      getSessionUser: async () => ({
+        id: userId,
+        name: "Pessoa Teste",
+        email: "pessoa-teste@exemplo.test",
+        image: null,
+      }),
     });
 
-    expect(r).toEqual({ ok: true, data: { id: userId, name: "Pessoa Teste" } });
+    expect(r).toEqual({
+      ok: true,
+      data: {
+        id: userId,
+        name: "Pessoa Teste",
+        email: "pessoa-teste@exemplo.test",
+        image: null,
+      },
+    });
   });
 });

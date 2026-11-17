@@ -17,5 +17,5 @@ export async function deleteAccountAction(_state: DeleteAccountState): Promise<D
     return { code: "UNEXPECTED" };
   }
   // redirect() lança internamente; fica fora do try para não ser tratado como falha.
-  redirect("/entrar?deleted=1");
+  redirect("/?deleted=1");
 }

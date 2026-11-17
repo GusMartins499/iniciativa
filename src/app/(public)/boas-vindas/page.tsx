@@ -5,12 +5,11 @@ import { getDb } from "@/shared/db";
 import { completeOnboardingAction } from "./actions";
 import { OnboardingForm } from "./onboarding-form";
 
+// Termos antes da conta: quem ainda não tem conta chega aqui sem sessão, vindo do
+// "Entrar com Google". Quem já concluiu o cadastro segue direto para o app.
 export default async function WelcomePage() {
   const sessionUser = await getSessionUser();
-  if (!sessionUser) {
-    redirect("/entrar");
-  }
-  if (await hasCompletedOnboarding(getDb(), sessionUser.id)) {
+  if (sessionUser && (await hasCompletedOnboarding(getDb(), sessionUser.id))) {
     redirect("/");
   }
 
