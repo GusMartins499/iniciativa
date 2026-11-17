@@ -75,6 +75,7 @@ src/
   `meetup.created`, `meetup.updated`, `meetup.cancelled`, `rsvp.confirmed`, `rsvp.cancelled`, `user.onboarded`, `user.signup_completed` (volta do Google em `/boas-vindas/concluir` com o aceite registrado, para conta nova ou já existente), `user.consent_renewed` (aceite de uma versão nova do termo), `user.deleted`.
 - Payload do evento: `{ event, userId, meetupId?, rsvpId?, withCompanion? }`. Os IDs vão no payload; PII nunca vai.
 - Evento novo segue o mesmo padrão e é registrado nesta lista.
+- Evento novo que precisar de alerta ou de painel entra também no dashboard **iniciativa** do Grafana Cloud (alertas e painéis em `docs/agents/observability.md`). Painel e consulta agregam por evento e rota, nunca por `userId`.
 
 ## Tracing
 
