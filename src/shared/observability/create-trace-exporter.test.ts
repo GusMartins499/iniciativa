@@ -3,7 +3,7 @@ import type { OTLPExporterConfig } from "@vercel/otel";
 import { describe, expect, it, vi } from "vitest";
 import { createTraceExporter } from "./create-trace-exporter";
 
-// Endpoint e token sintéticos, nenhum valor real.
+// Endpoint e headers sintéticos, nenhum valor real.
 const endpoint = "https://otlp.exemplo.test/otlp";
 
 type CreateOtlp = (config: OTLPExporterConfig) => SpanExporter;
@@ -58,7 +58,7 @@ describe("shared/observability/createTraceExporter", () => {
     const exporter = createTraceExporter(
       {
         OTEL_EXPORTER_OTLP_ENDPOINT: `${endpoint}/`,
-        OTEL_EXPORTER_OTLP_HEADERS: "Authorization=Basic%20dGVzdGU6dGVzdGU=, X-Scope = equipe",
+        OTEL_EXPORTER_OTLP_HEADERS: "X-Equipe=iniciativa%20piloto, X-Scope = a=b",
       },
       createOtlp,
     );
@@ -66,7 +66,7 @@ describe("shared/observability/createTraceExporter", () => {
     expect(exporter).toBeDefined();
     expect(createOtlp).toHaveBeenCalledWith({
       url: `${endpoint}/v1/traces`,
-      headers: { Authorization: "Basic dGVzdGU6dGVzdGU=", "X-Scope": "equipe" },
+      headers: { "X-Equipe": "iniciativa piloto", "X-Scope": "a=b" },
     });
   });
 
