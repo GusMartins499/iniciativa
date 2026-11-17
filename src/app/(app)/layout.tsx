@@ -5,6 +5,6 @@ import { requirePageUser } from "./require-page-user";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const currentUser = await requirePageUser();
-  const userInitial = currentUser.name.trim().charAt(0).toUpperCase() || "?";
-  return <RootLayoutShell nav={<AppNav userInitial={userInitial} />}>{children}</RootLayoutShell>;
+  const user = { name: currentUser.name, image: currentUser.image };
+  return <RootLayoutShell nav={<AppNav user={user} />}>{children}</RootLayoutShell>;
 }

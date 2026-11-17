@@ -3,6 +3,7 @@
 import { CalendarDays, CircleCheck, Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Avatar } from "@/shared/ui";
 import { navCopy as copy } from "./copy";
 
 const links = [
@@ -19,11 +20,11 @@ function isCurrent(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export type AppNavProps = { userInitial: string };
+export type AppNavProps = { user: { name: string; image: string | null } };
 
 // No celular o contêiner usa display: contents: marca e ações ficam na mesma linha e a
 // navegação desce para a linha de baixo (order-last + w-full).
-export function AppNav({ userInitial }: AppNavProps) {
+export function AppNav({ user }: AppNavProps) {
   const pathname = usePathname();
   return (
     <div className="contents sm:flex sm:flex-1 sm:items-center sm:justify-end sm:gap-2">
@@ -65,9 +66,9 @@ export function AppNav({ userInitial }: AppNavProps) {
         href="/conta"
         aria-label={copy.account}
         aria-current={pathname === "/conta" ? "page" : undefined}
-        className="grid size-11 place-items-center rounded-full bg-honey-light font-bold text-honey-light-foreground ring-2 ring-honey ring-inset"
+        className="rounded-full"
       >
-        {userInitial}
+        <Avatar name={user.name} image={user.image} className="size-11" />
       </Link>
     </div>
   );

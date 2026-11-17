@@ -20,8 +20,8 @@ describe("requirePageUser", () => {
     await expect(requirePageUser()).rejects.toThrow("redirect:/boas-vindas");
   });
 
-  it("redireciona visitante sem sessão para /entrar", async () => {
+  it("redireciona visitante sem sessão para a tela inicial", async () => {
     guardResult.value = { ok: false, error: { code: "UNAUTHENTICATED" } };
-    await expect(requirePageUser()).rejects.toThrow("redirect:/entrar");
+    await expect(requirePageUser()).rejects.toThrow("redirect:/");
   });
 });

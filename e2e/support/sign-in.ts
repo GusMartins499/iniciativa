@@ -20,7 +20,7 @@ export type StorageState = {
   origins: [];
 };
 
-type TestUser = { name: string; email: string };
+type TestUser = { name: string; email: string; image?: string };
 
 // Único ponto que conhece o formato da sessão: o plugin test-utils do Better Auth grava
 // a sessão no banco e assina o cookie como o app espera. Se a lib mudar, quebra só aqui.

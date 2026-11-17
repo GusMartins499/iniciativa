@@ -74,7 +74,12 @@ describe("users.deleteAccount", () => {
 
     const r = await requireOnboardedUser({
       db,
-      getSessionUser: async () => ({ id: returning, name: "Pessoa Teste" }),
+      getSessionUser: async () => ({
+        id: returning,
+        name: "Pessoa Teste",
+        email: "pessoa-teste@exemplo.test",
+        image: null,
+      }),
     });
 
     expect(r).toEqual({ ok: false, error: { code: "ONBOARDING_REQUIRED" } });

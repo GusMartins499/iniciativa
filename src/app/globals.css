@@ -14,6 +14,7 @@
   --color-tag: #f0ebe3;
   --color-tag-foreground: #44403c;
   --color-honey: #f59e0b;
+  --color-honey-hover: #d97706;
   --color-honey-light: #fef3c7;
   --color-honey-light-foreground: #92400e;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -52,4 +53,15 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+}
+
+/*
+ * Todo botão mostra a mãozinha (o Tailwind v4 volta o cursor de <button> para o padrão).
+ * Desabilitado não: o componente Button usa cursor-not-allowed nesse caso.
+ */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
 }

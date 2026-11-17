@@ -10,7 +10,7 @@ import { createNeonTestDb } from "@/shared/db/test-db";
 import { routeThroughWsProxy } from "@/shared/db/ws-proxy";
 import { getServerEnv } from "@/shared/env";
 import { toAppDateInput } from "@/shared/time";
-import { type Profile, seedMeetups, storageStatePath } from "./support/profiles";
+import { type Profile, profilePhoto, seedMeetups, storageStatePath } from "./support/profiles";
 import { createSignedInUsers } from "./support/sign-in";
 
 // Data relativa a agora, para os encontros seed nunca ficarem no passado.
@@ -53,13 +53,16 @@ export default async function globalSetup() {
       newcomer: { name: "Pessoa Nova", email: "pessoa-nova@exemplo.test" },
       member: { name: "Ana Teste", email: "ana-teste@exemplo.test" },
       host: { name: "Bruno Teste", email: "bruno-teste@exemplo.test" },
+      signup: { name: "Carla Teste", email: "carla-teste@exemplo.test" },
+      leaver: { name: "Davi Teste", email: "davi-teste@exemplo.test", image: profilePhoto },
     });
     await completeOnboardingOf(db, users.member.id);
     await completeOnboardingOf(db, users.host.id);
+    await completeOnboardingOf(db, users.leaver.id);
     await seedMeetup(db, users.host.id, seedMeetups.hosted);
     await seedMeetup(db, users.member.id, seedMeetups.ownedByMember);
 
-    const profiles: Profile[] = ["newcomer", "member"];
+    const profiles: Profile[] = ["newcomer", "member", "signup", "leaver"];
     for (const profile of profiles) {
       const path = storageStatePath(profile);
       await mkdir(dirname(path), { recursive: true });

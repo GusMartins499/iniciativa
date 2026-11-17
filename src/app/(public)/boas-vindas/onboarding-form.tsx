@@ -1,13 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startTransition, useActionState, useRef, useState } from "react";
+import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
   onboardingCopy as copy,
   type OnboardingInput,
   onboardingSchema,
 } from "@/modules/users/client";
+import { authClient } from "@/shared/auth/client";
 import { Button } from "@/shared/ui";
 import {
   Dialog,
@@ -32,9 +33,32 @@ export function OnboardingForm({ action }: OnboardingFormProps) {
   const [declaration, consent] = useWatch({ control, name: ["declaration", "consent"] });
 
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [signUpFailed, setSignUpFailed] = useState(false);
+
+  // Aceite gravado: agora sim vai para o Google pedindo o cadastro. Conta nova ou já
+  // existente, o retorno passa sempre por /boas-vindas/concluir, que registra a
+  // autodeclaração (idempotente) e segue para o app. O newUserCallbackURL do Better Auth
+  // não serve aqui: ele só vale para conta recém-criada.
+  useEffect(() => {
+    if (state.code !== "SIGN_UP_READY") return;
+    authClient.signIn
+      .social({
+        provider: "google",
+        requestSignUp: true,
+        callbackURL: "/boas-vindas/concluir",
+      })
+      .then(({ error }) => setSignUpFailed(Boolean(error)))
+      .catch(() => setSignUpFailed(true));
+  }, [state]);
+
+  const errorCode = signUpFailed
+    ? "SIGN_UP_FAILED"
+    : state.code && state.code !== "SIGN_UP_READY"
+      ? state.code
+      : null;
   const formRef = useRef<HTMLFormElement>(null);
 
-  const canContinue = declaration && consent && !pending;
+  const canContinue = declaration && consent && !pending && state.code !== "SIGN_UP_READY";
 
   // O envio acontece antes de fechar o diálogo: se o botão de envio sair do DOM
   // durante o clique, o navegador cancela a submissão.
@@ -73,9 +97,9 @@ export function OnboardingForm({ action }: OnboardingFormProps) {
         <span>{copy.consentLabel}</span>
       </label>
 
-      {state.code ? (
+      {errorCode ? (
         <p role="alert" className="font-semibold text-honey-light-foreground">
-          {copy.errors[state.code]}
+          {copy.errors[errorCode]}
         </p>
       ) : null}
 

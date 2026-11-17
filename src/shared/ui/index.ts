@@ -1,3 +1,4 @@
+export { Avatar, avatarInitial } from "./avatar";
 export { Button } from "./button";
 export { cn } from "./cn";
 export { Logo } from "./logo";
