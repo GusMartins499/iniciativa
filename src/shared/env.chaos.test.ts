@@ -20,11 +20,15 @@ describe("chaos: DATABASE_WS_PROXY ausente", () => {
 
 describe("chaos: DATABASE_WS_PROXY hostil", () => {
   // ws-proxy.ts desliga TLS e o pipeline da senha porque "o proxy é local".
-  // oxlint-disable-next-line vitest/no-disabled-tests -- CHAOS: achado em código já mergeado
-  it.skip("recusa wsproxy fora do loopback, que levaria a senha do banco sem TLS", () => {
-    // CHAOS: 💀 KILLED (contestável) — #32
+  it("recusa wsproxy fora do loopback, que levaria a senha do banco sem TLS", () => {
     expect(() =>
       parseServerEnv({ ...valid, DATABASE_WS_PROXY: "proxy.exemplo.test:80/v1" }),
     ).toThrow(/DATABASE_WS_PROXY/);
+  });
+
+  it("aceita o wsproxy do e2e", () => {
+    for (const proxy of ["localhost:5488/v1", "127.0.0.1:5488/v1"]) {
+      expect(parseServerEnv({ ...valid, DATABASE_WS_PROXY: proxy }).DATABASE_WS_PROXY).toBe(proxy);
+    }
   });
 });
