@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseServerEnv } from "./env";
+import { parseLogLevel, parseServerEnv } from "./env";
 
 const valid = {
   DATABASE_URL: "postgres://usuario:senha@exemplo.test/db",
@@ -48,6 +48,16 @@ describe("shared/env", () => {
     expect(() => parseServerEnv({ ...valid, DATABASE_WS_PROXY: "ws://localhost:5488/v1" })).toThrow(
       /DATABASE_WS_PROXY/,
     );
+  });
+
+  it("usa info como nível de log quando LOG_LEVEL está ausente ou vazio", () => {
+    expect(parseLogLevel(undefined)).toBe("info");
+    expect(parseLogLevel("")).toBe("info");
+  });
+
+  it("aceita os níveis do pino e recusa os demais", () => {
+    expect(parseLogLevel("debug")).toBe("debug");
+    expect(() => parseLogLevel("verbose")).toThrow(/Invalid option/);
   });
 
   it("nunca coloca os valores na mensagem de erro", () => {
