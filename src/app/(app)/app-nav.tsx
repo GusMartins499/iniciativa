@@ -10,6 +10,9 @@ const links = [
   { href: "/meus-encontros", label: copy.myMeetups, Icon: CircleCheck },
 ] as const;
 
+// Base comum dos três botões da barra: mesma altura, recuo, raio e peso de fonte.
+const navButton = "inline-flex h-11 items-center gap-2 rounded-md px-4 font-semibold";
+
 function isCurrent(pathname: string, href: string): boolean {
   // "Criar encontro" tem botão próprio: não marca "Encontros" como página atual.
   if (pathname === "/encontros/novo") return false;
@@ -36,10 +39,10 @@ export function AppNav({ userInitial }: AppNavProps) {
                 <Link
                   href={href}
                   aria-current={current ? "page" : undefined}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-md px-3 font-medium ${
+                  className={`${navButton} ${
                     current
-                      ? "bg-surface/80 text-foreground ring-1 ring-border ring-inset"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-honey-light text-honey-light-foreground"
+                      : "text-muted-foreground hover:bg-tag hover:text-foreground"
                   }`}
                 >
                   <Icon aria-hidden="true" className="size-[18px]" />
@@ -53,7 +56,7 @@ export function AppNav({ userInitial }: AppNavProps) {
       <Link
         href="/encontros/novo"
         aria-label={copy.createMeetup}
-        className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-3 font-semibold text-primary-foreground hover:bg-primary-hover sm:ml-0 sm:px-4"
+        className={`${navButton} ml-auto bg-primary text-primary-foreground hover:bg-primary-hover max-sm:px-3 sm:ml-0`}
       >
         <Plus aria-hidden="true" className="size-[18px]" />
         <span className="hidden sm:inline">{copy.createMeetup}</span>
@@ -62,7 +65,7 @@ export function AppNav({ userInitial }: AppNavProps) {
         href="/conta"
         aria-label={copy.account}
         aria-current={pathname === "/conta" ? "page" : undefined}
-        className="grid size-11 place-items-center rounded-full bg-primary font-bold text-primary-foreground"
+        className="grid size-11 place-items-center rounded-full bg-honey-light font-bold text-honey-light-foreground ring-2 ring-honey ring-inset"
       >
         {userInitial}
       </Link>

@@ -95,13 +95,13 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 
     | Uso | Cor |
     |---|---|
-    | Fundo | `#F8FAFC` |
+    | Fundo (neutro quente) | `#FAF7F2` |
     | Superfície | `#FFFFFF` |
-    | Borda | `#E2E8F0` |
-    | Texto | `#0F172A` |
-    | Texto secundário | `#475569` |
+    | Borda | `#E9E2D6`, reforçada `#D6CCBB` |
+    | Texto | `#1C1917` |
+    | Texto secundário | `#57534E` |
     | Primária (ardósia) | `#334155`, hover `#1E293B` |
-    | Etiqueta | fundo `#E2E8F0`, texto `#334155` |
+    | Etiqueta | fundo `#F0EBE3`, texto `#44403C` |
     | Mel | `#F59E0B` |
     | Mel claro | fundo `#FEF3C7`, texto `#92400E` |
 

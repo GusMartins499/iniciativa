@@ -24,16 +24,20 @@ describe("layout raiz", () => {
 });
 
 describe("rodapé do layout", () => {
-  it("mostra o nome do produto e a cidade do piloto", () => {
+  it("mostra o nome do produto", () => {
     renderShell();
-    const footer = screen.getByRole("contentinfo");
-    expect(footer).toHaveTextContent("iniciativa");
-    expect(footer).toHaveTextContent("Tubarão-SC");
+    expect(within(screen.getByRole("contentinfo")).getByText("iniciativa")).toBeInTheDocument();
   });
 
-  it("menciona o programa SIGMA PARK", () => {
+  it("mostra o copyright com o ano atual", () => {
     renderShell();
-    expect(screen.getByRole("contentinfo")).toHaveTextContent("SIGMA PARK");
+    const year = new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+    }).format(new Date());
+    expect(screen.getByRole("contentinfo")).toHaveTextContent(
+      `© ${year} iniciativa. Todos os direitos reservados.`,
+    );
   });
 
   it("fica depois do conteúdo principal", () => {

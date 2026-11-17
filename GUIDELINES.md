@@ -175,7 +175,8 @@ Os níveis abaixo são a referência de severidade do `/chaos-engineering`.
 
 - Use os componentes shadcn/ui (Radix), que já trazem navegação por teclado e ARIA. Não crie um controle interativo do zero sem a semântica equivalente.
 - O foco fica sempre visível. Contraste mínimo **WCAG 2.1 AA** com a paleta da marca (definida no documento de produto).
-- Não use animação, transição, som nem autoplay. Desligue as animações padrão dos componentes.
+- Não use animação, som nem autoplay. Desligue as animações padrão dos componentes.
+- Transição só de **cor** (texto, fundo, borda, sombra), curta (150 ms), já aplicada globalmente no `globals.css` e desligada com `prefers-reduced-motion`. Não anime movimento, opacidade nem tamanho.
 - Toda ação que muda dados abre um diálogo de confirmação com **verbo literal**: "Cancelar minha presença", "Excluir minha conta", "Cancelar este encontro". Não use "OK" nem "Sim".
 - A mensagem de erro aparece em texto claro, junto do campo ou da ação que falhou.
 - Alvos de toque têm no mínimo **44×44 px**.
