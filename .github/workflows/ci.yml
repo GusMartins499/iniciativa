@@ -5,10 +5,11 @@ on:
   push:
     branches: [main]
 
-# Um push novo no mesmo PR cancela a execução anterior.
+# Um push novo no mesmo PR cancela a execução anterior. Na main não: cada merge
+# precisa terminar com o próprio resultado de CI.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read

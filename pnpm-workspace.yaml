@@ -1,5 +1,7 @@
 allowBuilds:
   esbuild: false
+overrides:
+  "@esbuild-kit/core-utils>esbuild": 0.25.12
 minimumReleaseAgeExclude:
   - "@oxfmt/binding-android-arm-eabi@0.79.0"
   - "@oxfmt/binding-android-arm64@0.79.0"
