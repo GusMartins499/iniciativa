@@ -148,7 +148,7 @@ describe("meetups.listUpcoming: visibilidade", () => {
     await create("aberto dia 6", "open", "2026-12-06");
     await create("rpg dia 5", "rpg", "2026-12-05");
 
-    const r = await listUpcoming(db, ["rpg"], NOW);
+    const r = await listUpcoming(db, ["rpg"], "all", NOW);
 
     expect(r.ok && r.data.map((m) => m.title)).toEqual(["rpg dia 5", "aberto dia 6", "rpg dia 7"]);
   });
@@ -157,9 +157,42 @@ describe("meetups.listUpcoming: visibilidade", () => {
     await create("rpg", "rpg");
     await create("aberto", "open");
 
-    const r = await listUpcoming(db, ["cinema"], NOW);
+    const r = await listUpcoming(db, ["cinema"], "all", NOW);
 
     expect(r.ok && r.data.map((m) => m.title)).toEqual(["aberto"]);
+  });
+});
+
+describe("meetups.listUpcoming: filtro por público", () => {
+  beforeEach(async () => {
+    await joinCommunity(db, creatorId, "cinema");
+    await create("rpg", "rpg", "2026-12-05");
+    await create("aberto", "open", "2026-12-06");
+    await create("cinema", "cinema", "2026-12-07");
+  });
+
+  it("filtrar por RPG mostra só os encontros de RPG", async () => {
+    const r = await listUpcoming(db, ["rpg", "cinema"], "rpg", NOW);
+
+    expect(r.ok && r.data.map((m) => m.title)).toEqual(["rpg"]);
+  });
+
+  it('"Abertos" mostra só os encontros sem comunidade', async () => {
+    const r = await listUpcoming(db, ["rpg", "cinema"], "open", NOW);
+
+    expect(r.ok && r.data.map((m) => m.title)).toEqual(["aberto"]);
+  });
+
+  it('"Todos" mantém os abertos mais os das minhas comunidades', async () => {
+    const r = await listUpcoming(db, ["rpg"], "all", NOW);
+
+    expect(r.ok && r.data.map((m) => m.title)).toEqual(["rpg", "aberto"]);
+  });
+
+  it("comunidade de que a pessoa não é membro não sai do banco", async () => {
+    const r = await listUpcoming(db, ["rpg"], "cinema", NOW);
+
+    expect(r).toEqual({ ok: true, data: [] });
   });
 });
 

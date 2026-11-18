@@ -33,21 +33,31 @@ function toPublic(row: PublicRow): PublicMeetup {
 
 const upcoming = (now: Date) => and(gt(meetups.startsAt, now), eq(meetups.status, "active"));
 
+// "all": tudo o que a pessoa vê; "open": só os sem comunidade; slug: só os daquela comunidade.
+export type AudienceFilter = "all" | "open" | CommunitySlug;
+
 // Abertos mais os das comunidades da pessoa (slugs de communities.listMemberSlugs).
-// O filtro fica no SQL: encontro de comunidade alheia nunca sai do banco.
+// O filtro fica no SQL e sempre dentro de memberSlugs: comunidade alheia nunca sai do banco.
 export async function listUpcoming(
   db: Database,
   memberSlugs: readonly CommunitySlug[],
+  filter: AudienceFilter = "all",
   now: Date = new Date(),
 ): Promise<Result<PublicMeetup[], never>> {
-  const audience =
+  const visible =
     memberSlugs.length > 0
       ? or(isNull(meetups.communitySlug), inArray(meetups.communitySlug, [...memberSlugs]))
       : isNull(meetups.communitySlug);
+  const chosen =
+    filter === "all"
+      ? undefined
+      : filter === "open"
+        ? isNull(meetups.communitySlug)
+        : eq(meetups.communitySlug, filter);
   const rows = await db
     .select(publicColumns)
     .from(meetups)
-    .where(and(upcoming(now), audience))
+    .where(and(upcoming(now), visible, chosen))
     .orderBy(asc(meetups.startsAt));
   return ok(rows.map(toPublic));
 }
