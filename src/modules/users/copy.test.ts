@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CONSENT_VERSION, onboardingCopy, privacyCopy } from "./copy";
+import { accountCopy, CONSENT_VERSION, onboardingCopy, privacyCopy } from "./copy";
 
 // Texto corrido de cada termo, para conferir o que ele cobre sem depender da ordem das frases.
 const summary = onboardingCopy.consentText.join("\n");
@@ -64,4 +64,41 @@ describe("termo de consentimento v2", () => {
       expect(text).not.toMatch(/só (quem cria|o criador)[^\n]*vê[^\n]*nome/i);
     }
   });
+});
+
+// Cada consequência da exclusão, como aparece na tela /conta e na seção 11 do termo.
+const deletionTopics: [string, RegExp][] = [
+  ["perfil, autodeclaração e consentimento", /perfil[^\n]*autodeclaração[^\n]*consentimento/i],
+  ["participação nas comunidades", /participação nas comunidades/i],
+  ['comentários viram "Comentário apagado"', /coment[áa]rios[^\n]*"Comentário apagado"/i],
+  ["encontros futuros cancelados", /encontros futuros que você criou/i],
+  ["presenças canceladas", /presenças confirmadas/i],
+];
+
+const termDeletion = privacyCopy.sections.find((section) =>
+  section.title.includes("Excluir a conta"),
+);
+const termDeletionItems = termDeletion?.items ?? [];
+
+describe("consequências da exclusão de conta em /conta", () => {
+  it("cita a participação nas comunidades e os comentários", () => {
+    expect(accountCopy.deleteConsequences).toContain("Apaga a sua participação nas comunidades.");
+    expect(accountCopy.deleteConsequences).toContain(
+      'Troca os seus comentários por "Comentário apagado".',
+    );
+  });
+
+  it.each(deletionTopics.slice(1, 3))("o diálogo de confirmação cita %s", (_topic, pattern) => {
+    expect(accountCopy.deleteDescription).toMatch(pattern);
+  });
+
+  it.each([...accountCopy.deleteConsequences])(
+    'o item "%s" tem um correspondente no termo',
+    (item) => {
+      const topic = deletionTopics.find(([, pattern]) => pattern.test(item));
+      expect(topic, `nenhum tema conhecido cobre "${item}"`).toBeDefined();
+      const [, pattern] = topic as [string, RegExp];
+      expect(termDeletionItems.some((termItem) => pattern.test(termItem))).toBe(true);
+    },
+  );
 });
