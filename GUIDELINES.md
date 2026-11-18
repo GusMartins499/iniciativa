@@ -197,6 +197,7 @@ Os níveis abaixo são a referência de severidade do `/chaos-engineering`.
 - Toda ação que muda dados abre um diálogo de confirmação com **verbo literal**: "Cancelar minha presença", "Excluir minha conta", "Cancelar este encontro". Não use "OK" nem "Sim".
 - A mensagem de erro aparece em texto claro, junto do campo ou da ação que falhou.
 - Alvos de toque têm no mínimo **44×44 px**.
+- A barra de navegação cabe sem rolagem horizontal de **375 px** até a largura do container, sem passar da borda do cabeçalho. Item novo na navegação vem com o e2e de largura (`e2e/communities.spec.ts`, em 375, 640 e 1280 px).
 - Linguagem de tela literal e direta, sem ironia, metáfora ou gíria.
 
 ## i18n & routes (frontend)
