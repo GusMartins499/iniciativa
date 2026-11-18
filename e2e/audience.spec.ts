@@ -30,11 +30,6 @@ test("encontro de comunidade aparece só para quem participa dela", async ({ pag
   await page.goto("/encontros");
   await expect(page.getByText(meetupsCopy.noCommunitiesBanner)).toHaveCount(0);
   const link = page.getByRole("link", { name: rpgTitle });
-  const card = page.getByRole("listitem").filter({ has: link });
-  await expect(card.getByRole("link", { name: "RPG", exact: true })).toHaveAttribute(
-    "href",
-    "/comunidades/rpg",
-  );
   const href = await link.getAttribute("href");
 
   await page.goto("/comunidades");
@@ -59,4 +54,56 @@ test("encontro de comunidade aparece só para quem participa dela", async ({ pag
   const response = await page.goto(href ?? "/encontros/x");
   expect(response?.status()).toBe(404);
   await expect(page.getByText(meetupsCopy.notFound)).toBeVisible();
+});
+
+test("filtra Próximos por uma comunidade e guarda a escolha na URL", async ({ page }) => {
+  await page.goto("/comunidades/rpg");
+  await page.getByRole("button", { name: communitiesCopy.joinButton }).click();
+  await confirmInDialog(page, communitiesCopy.joinButton);
+  await expect(page.getByRole("button", { name: communitiesCopy.leaveButton })).toBeVisible();
+
+  await page.goto("/encontros");
+  const filter = page.getByRole("navigation", { name: meetupsCopy.filter.label });
+  await expect(filter.getByRole("link", { name: meetupsCopy.filter.all })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  await expect(page.getByRole("link", { name: rpgTitle })).toBeVisible();
+  await expect(page.getByRole("link", { name: seedMeetups.hosted.title })).toBeVisible();
+
+  await filter.getByRole("link", { name: "RPG", exact: true }).click();
+  await expect(page).toHaveURL(/\/encontros\?publico=rpg$/);
+  await expect(filter.getByRole("link", { name: "RPG", exact: true })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  await expect(page.getByRole("link", { name: rpgTitle })).toBeVisible();
+  await expect(page.getByRole("link", { name: seedMeetups.hosted.title })).toHaveCount(0);
+
+  await page.reload();
+  await expect(page.getByRole("link", { name: seedMeetups.hosted.title })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: rpgTitle })).toBeVisible();
+
+  await filter.getByRole("link", { name: meetupsCopy.filter.open }).click();
+  await expect(page).toHaveURL(/\/encontros\?publico=abertos$/);
+  await expect(page.getByRole("link", { name: rpgTitle })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: seedMeetups.hosted.title })).toBeVisible();
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/encontros\?publico=rpg$/);
+  await expect(page.getByRole("link", { name: seedMeetups.hosted.title })).toHaveCount(0);
+
+  // Comunidade de que a pessoa não é membro cai em "Todos", sem erro.
+  const response = await page.goto("/encontros?publico=cinema");
+  expect(response?.status()).toBe(200);
+  await expect(filter.getByRole("link", { name: meetupsCopy.filter.all })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+
+  // Devolve o member ao estado inicial (sem comunidades) para os specs seguintes.
+  await page.goto("/comunidades/rpg");
+  await page.getByRole("button", { name: communitiesCopy.leaveButton }).click();
+  await confirmInDialog(page, communitiesCopy.leaveButton);
+  await expect(page.getByRole("button", { name: communitiesCopy.joinButton })).toBeVisible();
 });

@@ -76,11 +76,11 @@ describe("lista de encontros por dia", () => {
     expect(screen.getByText("Alterado")).toBeInTheDocument();
   });
 
-  it("mostra a etiqueta do público: a comunidade ou Aberto", () => {
+  it("não mostra etiqueta de público no card", () => {
     render(<MeetupDays meetups={[meetup({}), meetup({ id: "m4", communitySlug: "rpg" })]} />);
-    const cards = screen.getAllByRole("listitem");
-    expect(within(cards[0] as HTMLElement).getByText("Aberto")).toBeInTheDocument();
-    expect(within(cards[1] as HTMLElement).getByText("RPG")).toBeInTheDocument();
+
+    expect(screen.queryByText("Aberto")).not.toBeInTheDocument();
+    expect(screen.queryByText("RPG")).not.toBeInTheDocument();
   });
 
   it("cada card leva ao detalhe pelo título", () => {
@@ -92,39 +92,11 @@ describe("lista de encontros por dia", () => {
     );
   });
 
-  it("a etiqueta da comunidade leva à página dela para quem participa; Aberto não é link", () => {
-    render(
-      <MeetupDays
-        meetups={[meetup({}), meetup({ id: "m4", communitySlug: "rpg" })]}
-        memberSlugs={new Set(["rpg"])}
-      />,
-    );
-
-    const tag = screen.getByRole("link", { name: "RPG" });
-    expect(tag).toHaveAttribute("href", "/comunidades/rpg");
-    expect(tag).toHaveClass("min-h-11");
-    expect(screen.queryByRole("link", { name: "Aberto" })).not.toBeInTheDocument();
-    expect(screen.getByText("Aberto")).toBeInTheDocument();
-  });
-
-  it("a etiqueta da comunidade não é link para quem não participa", () => {
-    render(
-      <MeetupDays
-        meetups={[meetup({ id: "m4", communitySlug: "rpg" })]}
-        memberSlugs={new Set(["cinema"])}
-      />,
-    );
-
-    expect(screen.queryByRole("link", { name: "RPG" })).not.toBeInTheDocument();
-    expect(screen.getByText("RPG")).toBeInTheDocument();
-  });
-
   it("não tem violações de acessibilidade", async () => {
     const { container } = render(
       <MeetupDays
         meetups={[meetup({}), nextWeek, meetup({ id: "m4", communitySlug: "rpg" })]}
         goingIds={new Set(["m1"])}
-        memberSlugs={new Set(["rpg"])}
       />,
     );
     expect(await axe(container)).toHaveNoViolations();

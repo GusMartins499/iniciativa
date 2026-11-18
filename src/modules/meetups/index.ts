@@ -5,6 +5,7 @@ export type { MeetupsErrorCode } from "./errors";
 export { cancelMeetup, updateMeetup } from "./manage-meetup";
 export { type MeetupInput, meetupInputSchema, OPEN_AUDIENCE } from "./meetup-input";
 export {
+  type AudienceFilter,
   canSeeMeetup,
   countUpcomingByCommunities,
   countUpcomingByCommunity,

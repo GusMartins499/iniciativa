@@ -7,4 +7,4 @@ export {
   OPEN_AUDIENCE,
   toMeetupInput,
 } from "./meetup-input";
-export type { PublicMeetup } from "./queries";
+export type { AudienceFilter, PublicMeetup } from "./queries";

@@ -2,7 +2,6 @@ import { ChevronRight, Clock, MapPin } from "lucide-react";
 import Link from "next/link";
 import { meetupsCopy as copy, type PublicMeetup } from "@/modules/meetups/client";
 import { formatHourRange } from "@/shared/time";
-import { audienceTag } from "./audience";
 import { SeatsBar } from "./seats-bar";
 
 export type MeetupCardProps = {
@@ -11,33 +10,21 @@ export type MeetupCardProps = {
   created?: boolean;
   // Em "Meus encontros" o aviso aparece por extenso: é por ali que a pessoa fica sabendo.
   longNotices?: boolean;
-  // Comunidades de quem vê: a etiqueta da comunidade vira link para a página dela.
-  memberSlugs?: ReadonlySet<string>;
 };
 
 const tagBase = "rounded-full px-2.5 py-0.5 text-sm font-semibold";
 
 // Só dados públicos e a ocupação. O card inteiro leva ao detalhe por um link esticado no
-// título (link dentro de link não vale em HTML); a etiqueta da comunidade fica por cima dele.
+// título (link dentro de link não vale em HTML).
 export function MeetupCard({
   meetup,
   going = false,
   created = false,
   longNotices = false,
-  memberSlugs,
 }: MeetupCardProps) {
   const cancelled = meetup.status === "cancelled";
   const edited = meetup.editedAt !== null;
-  const communityHref =
-    meetup.communitySlug !== null && memberSlugs?.has(meetup.communitySlug)
-      ? `/comunidades/${meetup.communitySlug}`
-      : null;
-  const tags: { label: string; className: string; href?: string }[] = [
-    {
-      label: audienceTag(meetup.communitySlug),
-      className: "bg-tag text-tag-foreground",
-      href: communityHref ?? undefined,
-    },
+  const tags: { label: string; className: string }[] = [
     created ? { label: copy.tags.created, className: "bg-primary text-primary-foreground" } : null,
     going && !created
       ? { label: copy.tags.going, className: "bg-primary text-primary-foreground" }
@@ -93,21 +80,11 @@ export function MeetupCard({
       )}
       {tags.length > 0 ? (
         <p className="mt-3 flex flex-wrap items-center gap-2">
-          {tags.map((tag) =>
-            tag.href ? (
-              <Link
-                key={tag.label}
-                href={tag.href}
-                className="relative z-10 inline-flex min-h-11 items-center underline underline-offset-4"
-              >
-                <span className={`${tagBase} ${tag.className}`}>{tag.label}</span>
-              </Link>
-            ) : (
-              <span key={tag.label} className={`${tagBase} ${tag.className}`}>
-                {tag.label}
-              </span>
-            ),
-          )}
+          {tags.map((tag) => (
+            <span key={tag.label} className={`${tagBase} ${tag.className}`}>
+              {tag.label}
+            </span>
+          ))}
         </p>
       ) : null}
     </div>

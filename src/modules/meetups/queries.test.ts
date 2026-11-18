@@ -43,7 +43,7 @@ describe("meetups.listUpcoming", () => {
     await create("dia 10", "2026-12-10");
     await create("dia 5", "2026-12-05");
 
-    const r = await listUpcoming(db, [], NOW);
+    const r = await listUpcoming(db, [], "all", NOW);
 
     expect(r.ok && r.data.map((m) => m.title)).toEqual(["dia 5", "dia 10"]);
   });
