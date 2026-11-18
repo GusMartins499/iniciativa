@@ -1,0 +1,9 @@
+export type CommentsErrorCode =
+  | "VALIDATION_FAILED"
+  | "COMMENT_EMPTY"
+  | "COMMENT_TOO_LONG"
+  | "NOT_FOUND"
+  | "MEETUP_ENDED"
+  | "MEETUP_CANCELLED"
+  | "RATE_LIMITED"
+  | "NOT_COMMENT_AUTHOR";
