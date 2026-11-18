@@ -32,7 +32,7 @@ export default defineConfig({
           // Cada suíte de módulo sobe um PGlite e aplica as migrações; com os testes em paralelo, 5s não basta.
           testTimeout: 20_000,
           hookTimeout: 20_000,
-          include: ["src/**/*.test.ts"],
+          include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
         },
       },
       {
