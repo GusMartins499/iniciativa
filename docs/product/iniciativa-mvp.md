@@ -29,7 +29,8 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
   - Um usuário participa de **N comunidades**. Entrar e sair é livre, sem aprovação, e pede confirmação explícita.
   - Quem sai de uma comunidade **continua vendo e participando** dos encontros dela em que já confirmou (em "meus encontros"), mas deixa de ver os novos.
   - Ninguém vê a lista de membros. Cada comunidade mostra só o **número de membros** e o **número de encontros futuros**.
-  - Página **"Comunidades"**: as 9 em lista, com nome, uma frase literal de descrição, nº de membros, nº de encontros futuros e o botão Entrar/Sair.
+  - Página **"Comunidades"**: as 9 em lista, com nome, uma frase literal de descrição, nº de membros, nº de encontros futuros e o botão Entrar/Sair. Para quem é membro, cada card tem também um link visível **"Ver encontros"**, que leva à página da comunidade.
+  - A etiqueta de comunidade nos cards de encontro ("RPG") leva à página da comunidade, para quem é membro.
   - **Página de cada comunidade** (por exemplo `/comunidades/rpg`): descrição, Entrar/Sair e, só para membros, os próximos encontros dela.
 - **Cadastro de encontro por qualquer usuário cadastrado**, sem aprovação prévia.
   - Campos obrigatórios: título, data, horário de início e de fim, endereço (texto livre), número de vagas e **público**.
@@ -57,7 +58,8 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
   - Os comentários **fecham no horário de fim** do encontro. Num encontro cancelado, ficam só para leitura.
   - **Retenção:** um job diário apaga os comentários **30 dias depois do fim** do encontro.
 - **Navegação** com três visões:
-  - "Próximos": os encontros abertos mais os das minhas comunidades, em ordem de data (encontros que já passaram não aparecem), sem filtro. Cada card tem uma etiqueta com o público ("RPG" ou "Aberto");
+  - "Próximos": os encontros abertos mais os das minhas comunidades, em ordem de data (encontros que já passaram não aparecem). Cada card tem uma etiqueta com o público ("RPG" ou "Aberto");
+    - **Filtro por público:** "Todos" (padrão), "Abertos" ou uma das comunidades de que sou membro. Só aparecem as minhas comunidades, nunca as outras. A escolha fica na URL, para que voltar e recarregar mostrem o mesmo filtro. Com o filtro sem resultado, a tela diz isso de forma literal e oferece voltar para "Todos";
   - "meus encontros", com os que eu criei e os que eu confirmei;
   - "Comunidades".
 - **Exclusão da conta pelo próprio usuário.** Apaga o perfil, a autodeclaração e a participação nas comunidades e cancela as presenças futuras. Os comentários da pessoa viram "Comentário apagado". Os encontros futuros que a pessoa criou são cancelados. Os encontros passados continuam, sem o nome do criador.
@@ -69,6 +71,7 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
   - seção com as 9 comunidades;
   - FAQ reescrito: quem vê o meu nome e a minha foto, o que acontece quando um encontro muda (sem notificações, mas com comentários), e "Posso criar uma comunidade nova?" ("Ainda não. Por enquanto existem só estas 9.").
 - **Acessibilidade pensada para o público autista** (detalhes em Constraints & dependencies).
+- **Mais personalidade nas telas do app**, a partir do d20 do logo e do tema de jogos e encontros. A direção visual é escolhida num protótipo antes e respeita as regras de acessibilidade (sem animações, cores suaves, WCAG 2.1 AA).
 
 ### Out
 
@@ -77,7 +80,7 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 - Criação de comunidades ou de interesses pelos usuários.
 - Lista de membros de uma comunidade.
 - Encontro em mais de uma comunidade, ou troca do público depois de criado.
-- Filtro na lista de próximos.
+- Filtros na lista de próximos além do público (por data, bairro ou vagas livres).
 - Notificações por email ou push. Alterações, cancelamentos e comentários aparecem só dentro do app.
 - Envio de laudo. A validação é só por autodeclaração.
 - Mapa e geolocalização.
@@ -112,6 +115,9 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 - **Dado** um usuário que aceitou uma versão anterior do termo, **quando** entra no app, **então** precisa aceitar a versão atual antes de ver qualquer encontro.
 - **Dado** um usuário fora de uma comunidade, **quando** entra nela, **então** passa a ver os próximos encontros dela em "Próximos" e na página da comunidade, e a contagem de membros aumenta em 1.
 - **Dado** um usuário que não é membro de uma comunidade, **quando** abre "Próximos" ou a página dela, **então** não vê os encontros dela, só o número de encontros futuros.
+- **Dado** um membro de RPG e de cinema, **quando** filtra "Próximos" por RPG, **então** vê só os próximos encontros de RPG. O filtro oferece só "Todos", "Abertos", RPG e cinema.
+- **Dado** um usuário com um filtro escolhido em "Próximos", **quando** recarrega a página ou volta para ela, **então** o mesmo filtro continua aplicado.
+- **Dado** um membro de uma comunidade, **quando** abre "Comunidades", **então** cada comunidade dele tem um link "Ver encontros" que leva à página dela, com os próximos encontros.
 - **Dado** um membro que confirmou presença num encontro da comunidade, **quando** sai da comunidade, **então** a presença continua e o encontro segue em "meus encontros".
 - **Dado** um usuário criando um encontro, **quando** abre o campo de público, **então** vê "Aberto" e só as comunidades das quais é membro, sem nada pré-marcado. Sem escolher, o cadastro é recusado.
 - **Dado** um encontro já criado, **quando** o criador o edita, **então** o público não pode ser alterado.
@@ -136,7 +142,10 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
   3. passo de comunidades no onboarding e a faixa para contas antigas;
   4. termo v2 com reaceite;
   5. comentários, com a foto também na lista de confirmados e o job de apagamento de 30 dias no mesmo card;
-  6. landing (protótipo da grade de hexágonos, depois o texto).
+  6. landing (protótipo da grade de hexágonos, depois o texto);
+  7. acesso à página da comunidade ("Ver encontros", nº de encontros futuros, etiqueta com link);
+  8. filtro por público em "Próximos";
+  9. personalidade nas telas (protótipo de direções, depois aplicação).
 
   O termo v2 (4) entra em produção **antes** dos comentários (5): comentário sem o termo expõe nome e foto sem consentimento. O apagamento de 30 dias vai no mesmo card dos comentários, porque o termo o promete. **Linha de corte:** se faltar tempo, a landing é simplificada primeiro (só texto e FAQ, sem a grade nova), e depois o onboarding (só a faixa). As fatias 1, 2, 4 e 5 são o núcleo.
 - **Stack:** continua Postgres (Neon) e Vercel, sem serviço novo. Comentários e limite de envio ficam no Postgres. Cada operador novo de dados (MongoDB, Cloudflare, Upstash...) exigiria atualizar o termo.
