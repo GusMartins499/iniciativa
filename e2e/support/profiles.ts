@@ -13,6 +13,8 @@ export function storageStatePath(profile: Profile): string {
 export const seedMeetups = {
   hosted: { title: "Café de quinta no centro", capacity: 5 },
   ownedByMember: { title: "Caminhada na beira-rio", capacity: 4 },
+  // Do anfitrião, na comunidade RPG, da qual o member não participa no início.
+  rpg: { title: "Mesa de RPG na biblioteca", capacity: 6, audience: "rpg" },
 } as const;
 
 // Foto de perfil sintética (um quadrado 1x1 em data URL): o e2e não depende da internet.

@@ -2,6 +2,8 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 // Só para conferir o resultado: código de produção nunca lê a tabela de outro módulo.
 import { communityMemberships } from "@/modules/communities/schema";
+import { createComment } from "@/modules/comments";
+import { meetupCommentStats, meetupComments } from "@/modules/comments/schema";
 import { joinCommunity } from "@/modules/communities";
 import { meetups } from "@/modules/meetups/schema";
 import { rsvps } from "@/modules/rsvps/schema";
@@ -69,7 +71,12 @@ describe("users.deleteAccount", () => {
 
     expect(r).toEqual({
       ok: true,
-      data: { cancelledMeetups: 1, releasedRsvps: 1, removedMemberships: 0 },
+      data: {
+        cancelledMeetups: 1,
+        releasedRsvps: 1,
+        removedMemberships: 0,
+        anonymizedComments: 0,
+      },
     });
   });
 
@@ -84,6 +91,30 @@ describe("users.deleteAccount", () => {
     expect(r.ok && r.data.removedMemberships).toBe(2);
     const left = await db.select().from(communityMemberships);
     expect(left.map((row) => row.userId)).toEqual([other]);
+  });
+
+  it("transforma os comentários em comentário apagado e mantém as contagens", async () => {
+    const otherCreator = "other-creator";
+    const r1 = await createComment(db, ids.userId, ids.otherId, { body: "vou" }, NOW);
+    const r2 = await createComment(db, otherCreator, ids.otherId, { body: "ok" }, NOW);
+    if (!r1.ok || !r2.ok) throw new Error("falha ao comentar");
+
+    const r = await deleteAccount(db, ids.userId, NOW);
+
+    expect(r.ok && r.data.anonymizedComments).toBe(1);
+    const [gone] = await db
+      .select()
+      .from(meetupComments)
+      .where(eq(meetupComments.id, r1.data.commentId));
+    expect(gone).toMatchObject({ body: null, authorId: null, deletedAt: NOW });
+    const [kept] = await db
+      .select()
+      .from(meetupComments)
+      .where(eq(meetupComments.id, r2.data.commentId));
+    expect(kept?.body).toBe("ok");
+    expect(await db.select().from(meetupCommentStats)).toEqual([
+      { meetupId: ids.otherId, commentCount: 2, distinctAuthors: 2 },
+    ]);
   });
 
   it("trata quem volta a entrar com Google como usuário novo, com onboarding pendente", async () => {

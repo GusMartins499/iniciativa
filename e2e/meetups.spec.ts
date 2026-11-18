@@ -33,6 +33,7 @@ test("cria um encontro e vê na lista e no detalhe", async ({ page }) => {
   await page.getByLabel(form.addressLabel).fill(address);
   await page.getByLabel(form.capacityLabel).fill("6");
   await page.getByLabel(form.publicPlaceLabel).check();
+  await page.getByLabel(form.audienceOpen).check();
   await page.getByRole("button", { name: form.submit }).click();
   await confirmInDialog(page, form.dialogConfirm);
 
@@ -43,7 +44,7 @@ test("cria um encontro e vê na lista e no detalhe", async ({ page }) => {
   await expect(page.getByText(rsvpsCopy.creatorNote)).toBeVisible();
 
   await page.goto("/encontros");
-  await expect(page.getByRole("link", { name: title })).toBeVisible();
+  await expect(page.getByRole("link", { name: title })).toContainText(meetupsCopy.tags.open);
 
   await page.goto("/meus-encontros");
   await expect(

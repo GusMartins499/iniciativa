@@ -1,4 +1,10 @@
 import { z } from "zod";
+import { COMMUNITIES } from "@/modules/communities/client";
+
+export const OPEN_AUDIENCE = "open";
+
+// "open" (todos) ou o slug de uma das comunidades fixas; ser membro é checado no caso de uso.
+const audienceSchema = z.enum([OPEN_AUDIENCE, ...COMMUNITIES.map((community) => community.slug)]);
 
 // Data e hora locais (America/Sao_Paulo), como vêm do formulário.
 const localDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
@@ -13,6 +19,7 @@ export const meetupInputSchema = z.object({
   capacity: z.number().int().min(1).max(50),
   publicPlace: z.literal(true),
   withCompanion: z.boolean(),
+  audience: audienceSchema,
 });
 
 export type MeetupInput = z.infer<typeof meetupInputSchema>;
@@ -29,6 +36,8 @@ export const meetupFormSchema = z
     capacity: meetupInputSchema.shape.capacity,
     publicPlace: z.boolean().refine((checked) => checked),
     withCompanion: z.boolean(),
+    // Sem opção pré-marcada: o formulário começa sem valor e exige a escolha.
+    audience: audienceSchema,
   })
   .refine((form) => form.endTime > form.startTime, { path: ["endTime"] });
 
@@ -44,5 +53,6 @@ export function toMeetupInput(form: MeetupFormValues): MeetupInput {
     capacity: form.capacity,
     publicPlace: true,
     withCompanion: form.withCompanion,
+    audience: form.audience,
   };
 }

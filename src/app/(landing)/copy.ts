@@ -1,13 +1,18 @@
 // Textos da tela inicial (antes do login). Botão e erro do login ficam em signInCopy.
 export const landingCopy = {
   title: "Promovemos encontros face a face para jovens autistas",
-  lead: "O iniciativa é um app simples para propor um encontro em um lugar público e confirmar presença nos encontros de outras pessoas.",
+  lead: "Entre nas suas comunidades, proponha um encontro e divirta-se.",
   howItWorksTitle: "Como funciona",
   steps: [
     {
       key: "sign-in",
       title: "Entre com a sua conta do Google",
       text: "Use a conta que você já tem. Não é preciso criar senha.",
+    },
+    {
+      key: "communities",
+      title: "Escolha as suas comunidades",
+      text: "RPG, Cinema, Corrida, Clube do livro e outras. Entre nas que combinam com você e saia quando quiser.",
     },
     {
       key: "initiative",
@@ -20,17 +25,25 @@ export const landingCopy = {
       text: "Para propor, escolha a data, o horário, o número de vagas e um lugar público, como uma praça, um café, uma biblioteca ou um cinema.",
     },
     {
+      key: "comments",
+      title: "Combine nos comentários",
+      text: "Tire dúvidas e acerte os detalhes com as outras pessoas nos comentários do encontro.",
+    },
+    {
       key: "go",
       title: "Confirme presença e vá",
       text: "Vá sozinho ou leve um acompanhante. Faça amigos e divirta-se.",
     },
   ],
+  communitiesTitle: "As comunidades",
+  communitiesText:
+    "Cada encontro é aberto a todos ou é de uma comunidade. Os encontros de uma comunidade aparecem só para quem entrou nela.",
   faqTitle: "Perguntas frequentes",
   faq: [
     {
-      question: "Quem vê que eu vou a um encontro?",
+      question: "Quem vê o meu nome e a minha foto?",
       answer:
-        "As outras pessoas veem só quantas vagas estão ocupadas. Só quem criou o encontro vê o seu primeiro nome.",
+        "Quem criou o encontro vê o primeiro nome e a foto de quem confirmou presença. As outras pessoas veem só quantas vagas estão ocupadas. Se você comentar, o seu primeiro nome e a sua foto aparecem no comentário para quem vê o encontro. Ninguém vê quem está numa comunidade.",
     },
     {
       question: "Posso desistir depois de confirmar?",
@@ -44,7 +57,11 @@ export const landingCopy = {
     {
       question: "E se o encontro mudar ou for cancelado?",
       answer:
-        'O aviso aparece dentro do app, em "Meus encontros". O app não tem chat nem manda notificações.',
+        'O aviso aparece dentro do app, em "Meus encontros". O app não manda notificações. Para combinar os detalhes, use os comentários do encontro.',
+    },
+    {
+      question: "Posso criar uma comunidade nova?",
+      answer: "Ainda não. Por enquanto existem só estas 9.",
     },
     {
       question: "Posso apagar a minha conta?",

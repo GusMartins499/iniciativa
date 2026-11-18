@@ -30,8 +30,10 @@ de alerta; taxa de erro e latência vêm das métricas que o Grafana Cloud gera 
 
 Dashboard **iniciativa**: requisições por minuto, taxa de erro, p95 por rota e Server Action, e a
 contagem dos eventos de negócio a partir do Loki. As consultas agregam por evento e rota, nunca
-por `userId`. Painéis das comunidades: comentários por dia, entradas por comunidade (`communitySlug`)
+por `userId`. Painéis das comunidades: comentários por dia, entradas por comunidade (`communitySlug`), separando as do onboarding pelo `source`
 e encontros criados por público (`audience`), agregados por comunidade, nunca por usuário.
+Painel de aceites do termo por versão: `user.onboarded` e `user.consent_renewed` agrupados por
+`consentVersion`, para acompanhar o reaceite da v2.
 
 ## Comunidades e comentários
 
@@ -39,10 +41,12 @@ Eventos (só IDs e slugs, nunca PII):
 
 | Evento | Atributos |
 |---|---|
-| `community.joined`, `community.left` | `userId`, `communitySlug` |
+| `community.joined`, `community.left` | `userId`, `communitySlug`; o `community.joined` do passo de comunidades do onboarding leva também `source: onboarding` |
 | `meetup.created` | ganha `audience`: `open` ou o slug da comunidade |
 | `comment.created` | `commentId`, `meetupId`, `userId` |
 | `comment.deleted` | `commentId`, `meetupId`, `by`: `self` (o autor apagou o próprio), `organizer` (o criador do encontro apagou o de outra pessoa) ou `account_deletion` |
+| `comment.rate_limited` (`warn`) | `userId`, `meetupId` (recusa do 11º comentário no mesmo minuto) |
+| `comment.rejected` (`warn`) | `userId`, `meetupId`, `code` (envio recusado: vazio, longo, encontro encerrado ou cancelado, não-membro) |
 | `comment.purged` / `comment.purge.completed` | `count` (comentários apagados pelo job de 30 dias) |
 
 O critério secundário do piloto (encontros com 3 ou mais comentários de 2 ou mais pessoas) não sai

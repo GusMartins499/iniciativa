@@ -1,11 +1,17 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { getCreatorId, getMeetup, meetupsCopy } from "@/modules/meetups";
-import { getUserRsvp, listAttendeesForCreator, rsvpsCopy } from "@/modules/rsvps";
+import { notFound } from "next/navigation";
+import { listComments } from "@/modules/comments";
+import { listMemberSlugs } from "@/modules/communities";
+import { canSeeMeetup, getCreatorId, getMeetup, meetupsCopy } from "@/modules/meetups";
+import { getUserRsvp, listAttendeesForCreator } from "@/modules/rsvps";
 import { getDb } from "@/shared/db";
 import { requirePageUser } from "../../require-page-user";
 import { SeatsBar } from "../seats-bar";
 import { cancelRsvpAction, confirmRsvpAction } from "./actions";
+import { AttendeeList } from "./attendee-list";
+import { createCommentAction, deleteCommentAction, refreshCommentsAction } from "./comment-actions";
+import { CommentsSection } from "./comments-section";
 import { CreatorActions } from "./creator-actions";
 import { cancelMeetupAction } from "./meetup-actions";
 import { MeetupFacts } from "./meetup-facts";
@@ -21,7 +27,19 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
   const currentUser = await requirePageUser();
   const { id } = await params;
   const db = getDb();
+  const [memberSlugs, rsvp] = await Promise.all([
+    listMemberSlugs(db, currentUser.id),
+    getUserRsvp(db, currentUser.id, id),
+  ]);
+  const access = await canSeeMeetup(db, id, {
+    userId: currentUser.id,
+    memberSlugs,
+    hasRsvp: rsvp !== null,
+  });
+  // Encontro de comunidade alheia e encontro inexistente dão o mesmo 404.
+  if (!access.visible) notFound();
   const result = await getMeetup(db, id);
+  if (!result.ok) notFound();
 
   const backLink = (
     <Link
@@ -32,20 +50,11 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
       {meetupsCopy.backToList}
     </Link>
   );
-  if (!result.ok) {
-    return (
-      <div className="flex flex-col gap-4">
-        {backLink}
-        <p>{meetupsCopy.notFound}</p>
-      </div>
-    );
-  }
-
   const meetup = result.data;
   const isCreator = (await getCreatorId(db, id)) === currentUser.id;
-  const rsvp = isCreator ? null : await getUserRsvp(db, currentUser.id, id);
   // Os nomes só são lidos depois de o servidor conferir que quem pede é o criador.
   const attendees = isCreator ? await listAttendeesForCreator(db, currentUser.id, id) : null;
+  const comments = await listComments(db, id, currentUser.id);
 
   const started = meetup.startsAt <= new Date();
   const active = meetup.status === "active";
@@ -79,37 +88,7 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
               cancelAction={cancelRsvpAction.bind(null, id)}
             />
           ) : null}
-          {attendees?.ok ? (
-            <section
-              aria-labelledby="attendees-title"
-              className="flex flex-col gap-2 border-t border-border pt-4"
-            >
-              <h3 id="attendees-title" className="font-bold">
-                {rsvpsCopy.attendeesTitle}
-              </h3>
-              <p className="text-sm text-muted-foreground">{rsvpsCopy.attendeesHint}</p>
-              {attendees.data.length === 0 ? (
-                <p className="text-muted-foreground">{rsvpsCopy.attendeesEmpty}</p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {attendees.data.map((attendee, index) => (
-                    <li
-                      key={`${attendee.firstName}-${index}`}
-                      className="flex items-center gap-2.5"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="grid size-8 place-items-center rounded-full bg-tag text-sm font-bold text-tag-foreground"
-                      >
-                        {attendee.firstName.charAt(0).toUpperCase()}
-                      </span>
-                      {rsvpsCopy.attendee(attendee.firstName, attendee.withCompanion)}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ) : null}
+          {attendees?.ok ? <AttendeeList attendees={attendees.data} /> : null}
           {isCreator && active && !started ? (
             <section
               aria-labelledby="manage-title"
@@ -126,6 +105,14 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
           ) : null}
         </aside>
       </div>
+      {comments.ok ? (
+        <CommentsSection
+          {...comments.data}
+          createAction={createCommentAction.bind(null, id)}
+          deleteAction={deleteCommentAction.bind(null, id)}
+          refreshAction={refreshCommentsAction.bind(null, id)}
+        />
+      ) : null}
     </div>
   );
 }

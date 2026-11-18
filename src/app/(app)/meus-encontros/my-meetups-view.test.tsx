@@ -16,6 +16,7 @@ function meetup(overrides: Partial<PublicMeetup>): PublicMeetup {
     occupiedSeats: 1,
     status: "active",
     editedAt: null,
+    communitySlug: null,
     isFull: false,
     ...overrides,
   };

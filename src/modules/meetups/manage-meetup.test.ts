@@ -18,6 +18,7 @@ const baseInput = {
   address: "Rua X, 100",
   capacity: 10,
   publicPlace: true,
+  audience: "open",
   withCompanion: false,
 };
 
@@ -138,7 +139,7 @@ describe("efeitos do cancelamento", () => {
   it("remove o encontro cancelado da lista de próximos", async () => {
     await cancelMeetup(db, creatorId, meetupId, NOW);
 
-    const r = await listUpcoming(db, NOW);
+    const r = await listUpcoming(db, [], NOW);
 
     expect(r.ok && r.data.map((m) => m.id)).not.toContain(meetupId);
   });

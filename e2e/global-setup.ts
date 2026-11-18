@@ -3,6 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 // Os casos de uso vêm do próprio arquivo, não do index.ts do módulo: o index puxa
 // next/headers (sessão), que só carrega dentro do Next.
+import { joinCommunity } from "@/modules/communities/communities";
 import { createMeetup } from "@/modules/meetups/create-meetup";
 import { completeOnboarding } from "@/modules/users/complete-onboarding";
 import type { Database } from "@/shared/db";
@@ -21,7 +22,7 @@ function nextWeekAt(time: string): string {
 async function seedMeetup(
   db: Database,
   creatorId: string,
-  meetup: { title: string; capacity: number },
+  meetup: { title: string; capacity: number; audience?: string },
 ) {
   const result = await createMeetup(db, creatorId, {
     title: meetup.title,
@@ -30,6 +31,7 @@ async function seedMeetup(
     address: "Praça Sete de Setembro, Centro",
     capacity: meetup.capacity,
     publicPlace: true,
+    audience: meetup.audience ?? "open",
     withCompanion: false,
   });
   if (!result.ok) throw new Error(`seed do encontro falhou: ${result.error.code}`);
@@ -61,6 +63,8 @@ export default async function globalSetup() {
     await completeOnboardingOf(db, users.leaver.id);
     await seedMeetup(db, users.host.id, seedMeetups.hosted);
     await seedMeetup(db, users.member.id, seedMeetups.ownedByMember);
+    await joinCommunity(db, users.host.id, "rpg");
+    await seedMeetup(db, users.host.id, seedMeetups.rpg);
 
     const profiles: Profile[] = ["newcomer", "member", "signup", "leaver"];
     for (const profile of profiles) {

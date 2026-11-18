@@ -6,18 +6,22 @@ import { CONSENT_VERSION } from "./copy";
 import { onboardingSchema } from "./onboarding-schema";
 import { userOnboardings } from "./schema";
 
+// "onboarded" só para quem concluiu agora pela primeira vez: é quem vê o passo de
+// comunidades. Conta antiga (aceite renovado ou já em dia) segue direto para o app.
+export type OnboardingOutcome = "onboarded" | "renewed" | "unchanged";
+
 export async function completeOnboarding(
   db: Database,
   userId: string,
   input: unknown,
-): Promise<Result<{ userId: string }, "VALIDATION_FAILED">> {
+): Promise<Result<{ userId: string; outcome: OnboardingOutcome }, "VALIDATION_FAILED">> {
   const parsed = onboardingSchema.safeParse(input);
   if (!parsed.success) {
     logger.warn({ event: "user.onboarding_rejected", userId, code: "VALIDATION_FAILED" });
     return err("VALIDATION_FAILED");
   }
 
-  const outcome = await db.transaction(async (tx) => {
+  const outcome = await db.transaction(async (tx): Promise<OnboardingOutcome> => {
     const [current] = await tx
       .select({ consentVersion: userOnboardings.consentVersion })
       .from(userOnboardings)
@@ -53,9 +57,9 @@ export async function completeOnboarding(
   });
 
   if (outcome === "onboarded") {
-    logger.info({ event: "user.onboarded", userId });
+    logger.info({ event: "user.onboarded", userId, consentVersion: CONSENT_VERSION });
   } else if (outcome === "renewed") {
-    logger.info({ event: "user.consent_renewed", userId });
+    logger.info({ event: "user.consent_renewed", userId, consentVersion: CONSENT_VERSION });
   }
-  return ok({ userId });
+  return ok({ userId, outcome });
 }

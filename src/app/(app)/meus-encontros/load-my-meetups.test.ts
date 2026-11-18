@@ -30,6 +30,7 @@ async function create(creatorId: string, title: string, day: string) {
       address: "Rua X, 100",
       capacity: 10,
       publicPlace: true,
+      audience: "open",
       withCompanion: false,
     },
     CREATED_AT,

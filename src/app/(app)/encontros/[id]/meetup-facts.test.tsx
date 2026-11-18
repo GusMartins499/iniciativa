@@ -15,6 +15,7 @@ const meetup: PublicMeetup = {
   occupiedSeats: 2,
   status: "active",
   editedAt: null,
+  communitySlug: null,
   isFull: false,
 };
 

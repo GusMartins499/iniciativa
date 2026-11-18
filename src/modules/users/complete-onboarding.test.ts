@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Database } from "@/shared/db";
 import { createTestDb } from "@/shared/db/test-db";
+import { logger } from "@/shared/logger";
 import { CONSENT_VERSION } from "./copy";
 import { completeOnboarding } from "./complete-onboarding";
 import { userOnboardings } from "./schema";
@@ -80,5 +81,42 @@ describe("users.completeOnboarding", () => {
     expect(records).toHaveLength(1);
     expect(records[0]?.consentVersion).toBe(CONSENT_VERSION);
     expect(records[0]?.consentedAt.getTime()).toBeGreaterThan(oldConsentedAt.getTime());
+  });
+
+  it("diz se a conta acabou de concluir o onboarding, renovou o aceite ou já estava em dia", async () => {
+    const first = await completeOnboarding(db, userId, { declaration: true, consent: true });
+    const again = await completeOnboarding(db, userId, { declaration: true, consent: true });
+    await db
+      .update(userOnboardings)
+      .set({ consentVersion: "v0.1-provisorio" })
+      .where(eq(userOnboardings.userId, userId));
+    const renewed = await completeOnboarding(db, userId, { declaration: true, consent: true });
+
+    expect(first).toEqual({ ok: true, data: { userId, outcome: "onboarded" } });
+    expect(again).toEqual({ ok: true, data: { userId, outcome: "unchanged" } });
+    expect(renewed).toEqual({ ok: true, data: { userId, outcome: "renewed" } });
+  });
+
+  it("registra a versão do termo nos eventos de aceite, para contar os aceites por versão", async () => {
+    const info = vi.spyOn(logger, "info");
+
+    await completeOnboarding(db, userId, { declaration: true, consent: true });
+    await db
+      .update(userOnboardings)
+      .set({ consentVersion: "v1.1" })
+      .where(eq(userOnboardings.userId, userId));
+    await completeOnboarding(db, userId, { declaration: true, consent: true });
+
+    expect(info).toHaveBeenCalledWith({
+      event: "user.onboarded",
+      userId,
+      consentVersion: CONSENT_VERSION,
+    });
+    expect(info).toHaveBeenCalledWith({
+      event: "user.consent_renewed",
+      userId,
+      consentVersion: CONSENT_VERSION,
+    });
+    info.mockRestore();
   });
 });

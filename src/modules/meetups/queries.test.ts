@@ -3,7 +3,7 @@ import { insertTestUser } from "@/shared/auth/test-helpers";
 import type { Database } from "@/shared/db";
 import { createTestDb } from "@/shared/db/test-db";
 import { createMeetup } from "./create-meetup";
-import { getMeetup, listUpcoming } from "./queries";
+import { getMeetup, listEndedBefore, listUpcoming } from "./queries";
 
 const CREATED_AT = new Date("2026-11-01T12:00:00.000Z");
 const NOW = new Date("2026-11-20T12:00:00.000Z");
@@ -27,6 +27,7 @@ async function create(title: string, day: string, extra: Record<string, unknown>
       address: "Rua X, 100",
       capacity: 10,
       publicPlace: true,
+      audience: "open",
       withCompanion: false,
       ...extra,
     },
@@ -42,9 +43,21 @@ describe("meetups.listUpcoming", () => {
     await create("dia 10", "2026-12-10");
     await create("dia 5", "2026-12-05");
 
-    const r = await listUpcoming(db, NOW);
+    const r = await listUpcoming(db, [], NOW);
 
     expect(r.ok && r.data.map((m) => m.title)).toEqual(["dia 5", "dia 10"]);
+  });
+});
+
+describe("meetups.listEndedBefore", () => {
+  it("devolve só os IDs dos encontros que terminaram antes do corte", async () => {
+    const ended = await create("terminou", "2026-11-10");
+    await create("terminou depois do corte", "2026-11-15");
+    await create("futuro", "2026-12-05");
+
+    const ids = await listEndedBefore(db, new Date("2026-11-12T00:00:00.000Z"));
+
+    expect(ids).toEqual([ended]);
   });
 });
 

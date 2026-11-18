@@ -16,6 +16,7 @@ const e2eEnv = {
   BETTER_AUTH_SECRET: process.env.E2E_AUTH_SECRET,
   GOOGLE_CLIENT_ID: "e2e-client-id",
   GOOGLE_CLIENT_SECRET: "e2e-client-secret",
+  CRON_SECRET: "e2e-cron-secret-local",
   LOG_LEVEL: "warn",
 };
 
