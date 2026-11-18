@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { listComments } from "@/modules/comments";
 import { listMemberSlugs } from "@/modules/communities";
 import { canSeeMeetup, getCreatorId, getMeetup, meetupsCopy } from "@/modules/meetups";
 import { getUserRsvp, listAttendeesForCreator } from "@/modules/rsvps";
@@ -9,6 +10,8 @@ import { requirePageUser } from "../../require-page-user";
 import { SeatsBar } from "../seats-bar";
 import { cancelRsvpAction, confirmRsvpAction } from "./actions";
 import { AttendeeList } from "./attendee-list";
+import { createCommentAction, deleteCommentAction, refreshCommentsAction } from "./comment-actions";
+import { CommentsSection } from "./comments-section";
 import { CreatorActions } from "./creator-actions";
 import { cancelMeetupAction } from "./meetup-actions";
 import { MeetupFacts } from "./meetup-facts";
@@ -51,6 +54,7 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
   const isCreator = (await getCreatorId(db, id)) === currentUser.id;
   // Os nomes só são lidos depois de o servidor conferir que quem pede é o criador.
   const attendees = isCreator ? await listAttendeesForCreator(db, currentUser.id, id) : null;
+  const comments = await listComments(db, id, currentUser.id);
 
   const started = meetup.startsAt <= new Date();
   const active = meetup.status === "active";
@@ -101,6 +105,14 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
           ) : null}
         </aside>
       </div>
+      {comments.ok ? (
+        <CommentsSection
+          {...comments.data}
+          createAction={createCommentAction.bind(null, id)}
+          deleteAction={deleteCommentAction.bind(null, id)}
+          refreshAction={refreshCommentsAction.bind(null, id)}
+        />
+      ) : null}
     </div>
   );
 }
