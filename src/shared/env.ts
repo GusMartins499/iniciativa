@@ -18,6 +18,8 @@ const serverEnvSchema = telemetryEnvSchema.extend({
   BETTER_AUTH_URL: z.url(),
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
+  // A Vercel manda nos crons como `Authorization: Bearer <CRON_SECRET>`.
+  CRON_SECRET: z.string().min(16),
   // Só nos testes e2e: endereço do wsproxy do Neon na frente de um Postgres comum, sem protocolo.
   // A linha `DATABASE_WS_PROXY=` do .env.example chega como "": vale como ausente.
   // Só loopback: o ws-proxy.ts desliga o TLS, e a senha do banco não pode sair da máquina.
