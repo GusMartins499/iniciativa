@@ -30,11 +30,6 @@ test("encontro de comunidade aparece só para quem participa dela", async ({ pag
   await page.goto("/encontros");
   await expect(page.getByText(meetupsCopy.noCommunitiesBanner)).toHaveCount(0);
   const link = page.getByRole("link", { name: rpgTitle });
-  const card = page.getByRole("listitem").filter({ has: link });
-  await expect(card.getByRole("link", { name: "RPG", exact: true })).toHaveAttribute(
-    "href",
-    "/comunidades/rpg",
-  );
   const href = await link.getAttribute("href");
 
   await page.goto("/comunidades");

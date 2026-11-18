@@ -62,7 +62,6 @@ export default async function MeetupsPage({ searchParams }: MeetupsPageProps) {
           meetups={meetups}
           goingIds={new Set(goingIds)}
           createdIds={new Set(created.map((meetup) => meetup.id))}
-          memberSlugs={new Set(memberSlugs)}
         />
       )}
     </div>
