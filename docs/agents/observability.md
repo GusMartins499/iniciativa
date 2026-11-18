@@ -45,6 +45,8 @@ Eventos (só IDs e slugs, nunca PII):
 | `meetup.created` | ganha `audience`: `open` ou o slug da comunidade |
 | `comment.created` | `commentId`, `meetupId`, `userId` |
 | `comment.deleted` | `commentId`, `meetupId`, `by`: `self` (o autor apagou o próprio), `organizer` (o criador do encontro apagou o de outra pessoa) ou `account_deletion` |
+| `comment.rate_limited` (`warn`) | `userId`, `meetupId` (recusa do 11º comentário no mesmo minuto) |
+| `comment.rejected` (`warn`) | `userId`, `meetupId`, `code` (envio recusado: vazio, longo, encontro encerrado ou cancelado, não-membro) |
 | `comment.purged` / `comment.purge.completed` | `count` (comentários apagados pelo job de 30 dias) |
 
 O critério secundário do piloto (encontros com 3 ou mais comentários de 2 ou mais pessoas) não sai
