@@ -1,6 +1,6 @@
 # iniciativa: MVP
 
-Webapp para jovens autistas proporem encontros presenciais e confirmarem presença, parecido com um meetup feito só para esse público. O projeto faz parte de um programa do SIGMA PARK e também será inscrito no hackathon HackBrasil.
+Webapp para jovens autistas proporem encontros presenciais e confirmarem presença, parecido com um meetup feito só para esse público. Os encontros acontecem dentro de **comunidades** de interesse em comum (RPG, cinema, corrida...) ou abertos a todos, e os detalhes são combinados nos **comentários** do próprio encontro, para que a conversa não saia do app. O projeto faz parte de um programa do SIGMA PARK e também será inscrito no hackathon HackBrasil.
 
 ## Problem
 
@@ -15,15 +15,27 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 ## Success criteria
 
 - **Resultado do piloto:** pelo menos **3 encontros realizados**, cada um com **5 ou mais participantes**, em **8 semanas** de piloto. O app não registra comparecimento. Quem mede é o autor, de fora do app, colhendo o retorno de quem organizou cada encontro.
-- **Entrega no hackathon:** até **30/11/2026**, a demo funciona de ponta a ponta. Isso significa entrar com Google, fazer a autodeclaração, cadastrar um encontro, confirmar presença e cancelar presença.
+- **Resultado secundário do piloto:** pelo menos **metade dos encontros realizados** teve **3 ou mais comentários de 2 ou mais pessoas diferentes**. É medido no fim do piloto por contagens anônimas por encontro (nº de comentários e de autores distintos), que sobrevivem ao apagamento de 30 dias e não guardam quem comentou.
+- **Entrega no hackathon:** até **30/11/2026**, a demo funciona de ponta a ponta. Isso significa entrar com Google, fazer a autodeclaração, escolher comunidades, cadastrar um encontro para uma comunidade, comentar nele, confirmar presença e cancelar presença.
 
 ## Scope
 
 ### In
 
 - **Login com Google.** No primeiro acesso a pessoa faz uma **autodeclaração**. Ela marca que é autista (nível 1 ou com autonomia) e maior de 18, e aceita um **termo de consentimento LGPD** para o uso desse dado de saúde. Quem não aceita não acessa o app.
+  - Depois do termo vem um passo **opcional** "Escolha suas comunidades", com as 9 marcáveis. Dá para marcar nenhuma e seguir.
+  - Quem já tinha conta antes das comunidades não refaz o onboarding: vê uma faixa no topo de "Próximos" ("Você ainda não está em nenhuma comunidade. Ver comunidades") enquanto não estiver em nenhuma.
+- **Comunidades fixas**, já existentes no app: **ar livre, academia, RPG, card games, cinema, música, clube do livro, corrida e caminhada**. Usuários não criam comunidades.
+  - Um usuário participa de **N comunidades**. Entrar e sair é livre, sem aprovação, e pede confirmação explícita.
+  - Quem sai de uma comunidade **continua vendo e participando** dos encontros dela em que já confirmou (em "meus encontros"), mas deixa de ver os novos.
+  - Ninguém vê a lista de membros. Cada comunidade mostra só o **número de membros** e o **número de encontros futuros**.
+  - Página **"Comunidades"**: as 9 em lista, com nome, uma frase literal de descrição, nº de membros, nº de encontros futuros e o botão Entrar/Sair.
+  - **Página de cada comunidade** (por exemplo `/comunidades/rpg`): descrição, Entrar/Sair e, só para membros, os próximos encontros dela.
 - **Cadastro de encontro por qualquer usuário cadastrado**, sem aprovação prévia.
-  - Campos obrigatórios: título, data, horário de início e de fim, endereço (texto livre) e número de vagas.
+  - Campos obrigatórios: título, data, horário de início e de fim, endereço (texto livre), número de vagas e **público**.
+  - **Público:** "Aberto (todos)" **ou uma** comunidade da qual o criador é membro. Sem opção pré-marcada. O público **não muda** depois de criado: para trocar, cancela e cria de novo.
+  - Encontro **aberto** aparece para todos os usuários. Encontro **de comunidade** aparece só para os membros dela.
+  - Os encontros que já existiam antes das comunidades passam a ser abertos.
   - Campo opcional: descrição do local.
   - O criador declara que o local é **público**, como praça, café ou biblioteca.
   - O criador entra **confirmado automaticamente** e ocupa 1 vaga. Ele pode marcar que leva acompanhante.
@@ -34,22 +46,44 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
   - Cada pessoa pode levar **no máximo 1 acompanhante**, e o acompanhante **ocupa uma vaga**.
   - Quando não há vaga, a confirmação é bloqueada e o encontro aparece como **lotado**. Se alguém cancelar, a vaga volta a ficar livre para quem chegar primeiro. Não há lista de espera.
   - O criador não pode cancelar a própria presença. Para sair, ele precisa cancelar o encontro.
-- **Privacidade da lista de confirmados.** Todo mundo vê só a ocupação, por exemplo "7 de 10 vagas". Apenas o criador vê os primeiros nomes de quem confirmou e se cada um leva acompanhante.
-- **Navegação** com duas visões:
-  - lista dos próximos encontros, em ordem de data (encontros que já passaram não aparecem);
-  - "meus encontros", com os que eu criei e os que eu confirmei.
-- **Exclusão da conta pelo próprio usuário.** Apaga o perfil e a autodeclaração e cancela as presenças futuras. Os encontros futuros que a pessoa criou são cancelados. Os encontros passados continuam, sem o nome do criador.
+- **Privacidade da lista de confirmados.** Todo mundo vê só a ocupação, por exemplo "7 de 10 vagas". Apenas o criador vê o **primeiro nome e a foto** de quem confirmou e se cada um leva acompanhante. Sem foto, aparece a inicial.
+- **Comentários no encontro**, para combinar os detalhes (horário, filme, ponto de encontro) sem sair do app.
+  - **Quem vê o encontro lê e comenta**, confirmado ou não.
+  - Cada comentário mostra o **primeiro nome e a foto** do autor (a foto do Google, ou a inicial), **sem indicar se ele confirmou presença**. O criador do encontro aparece com o selo **"organizador"**.
+  - O campo de comentário avisa que o primeiro nome e a foto aparecem para quem vê o encontro, e que não se deve escrever dados pessoais ou de saúde (telefone, endereço, diagnóstico).
+  - Só texto, até **500 caracteres**, sem links clicáveis, sem imagens, sem reações. Sem edição.
+  - Ficam no fim da página do encontro, do mais antigo para o mais novo, com o campo de escrever no final. Sem tempo real: a lista atualiza ao enviar ou recarregar.
+  - **Moderação:** o autor apaga o próprio comentário, e o criador do encontro apaga qualquer comentário do encontro dele. No lugar fica "Comentário apagado", e o texto é removido do banco.
+  - Os comentários **fecham no horário de fim** do encontro. Num encontro cancelado, ficam só para leitura.
+  - **Retenção:** um job diário apaga os comentários **30 dias depois do fim** do encontro.
+- **Navegação** com três visões:
+  - "Próximos": os encontros abertos mais os das minhas comunidades, em ordem de data (encontros que já passaram não aparecem), sem filtro. Cada card tem uma etiqueta com o público ("RPG" ou "Aberto");
+  - "meus encontros", com os que eu criei e os que eu confirmei;
+  - "Comunidades".
+- **Exclusão da conta pelo próprio usuário.** Apaga o perfil, a autodeclaração e a participação nas comunidades e cancela as presenças futuras. Os comentários da pessoa viram "Comentário apagado". Os encontros futuros que a pessoa criou são cancelados. Os encontros passados continuam, sem o nome do criador.
+- **Termo de consentimento v2**, com reaceite por quem aceitou a v1.0. Cobre a exibição do nome e da foto (em comentários e para o criador), a participação em comunidades, o conteúdo dos comentários e a retenção de 30 dias.
+- **Landing page:**
+  - título mantido: "Promovemos encontros face a face para jovens autistas";
+  - lead: "Entre nas suas comunidades, proponha um encontro e divirta-se.";
+  - "Como funciona" com 5 a 6 passos (incluindo escolher comunidades e combinar nos comentários), numa **grade de cards com o número dentro de um hexágono** no estilo do logo, estática, com "Tome INICIATIVA" em destaque. O design é escolhido num protótipo antes;
+  - seção com as 9 comunidades;
+  - FAQ reescrito: quem vê o meu nome e a minha foto, o que acontece quando um encontro muda (sem notificações, mas com comentários), e "Posso criar uma comunidade nova?" ("Ainda não. Por enquanto existem só estas 9.").
 - **Acessibilidade pensada para o público autista** (detalhes em Constraints & dependencies).
 
 ### Out
 
-- Chat entre usuários.
-- Notificações por email ou push. Alterações e cancelamentos aparecem só dentro do app.
+- Chat em tempo real, chat da comunidade fora dos encontros e mensagens diretas. A conversa é só nos comentários de cada encontro.
+- Edição de comentário, reações, imagens e links clicáveis em comentários.
+- Criação de comunidades ou de interesses pelos usuários.
+- Lista de membros de uma comunidade.
+- Encontro em mais de uma comunidade, ou troca do público depois de criado.
+- Filtro na lista de próximos.
+- Notificações por email ou push. Alterações, cancelamentos e comentários aparecem só dentro do app.
 - Envio de laudo. A validação é só por autodeclaração.
 - Mapa e geolocalização.
 - Outras cidades além de Tubarão-SC.
 - Perfil público com interesses.
-- Avaliação ou denúncia de encontros.
+- Avaliação ou denúncia de encontros ou de comentários.
 - App nativo. O produto é só webapp.
 - Painel ou papel de administrador. O autor usa o app como usuário comum. Se for preciso, corrige direto no banco de dados.
 - Registro de comparecimento (check-in) no app.
@@ -72,16 +106,41 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 - **Dado** o criador editando um encontro com 6 vagas ocupadas, **quando** tenta reduzir para menos de 6 vagas, **então** a edição é recusada.
 - **Dado** um encontro editado ou cancelado pelo criador, **quando** um confirmado abre "meus encontros", **então** vê o aviso de "alterado" ou "cancelado".
 - **Dado** um usuário que não é o criador, **quando** abre um encontro, **então** vê só a ocupação, por exemplo "7 de 10 vagas", e nenhum nome.
-- **Dado** o criador, **quando** abre o próprio encontro, **então** vê o primeiro nome de cada confirmado e se ele leva acompanhante.
+- **Dado** o criador, **quando** abre o próprio encontro, **então** vê o primeiro nome e a foto (ou a inicial) de cada confirmado e se ele leva acompanhante.
 - **Dado** um usuário que criou encontros futuros e confirmou presença em outros, **quando** exclui a conta, **então** os encontros dele são cancelados, as presenças dele são liberadas e o perfil e a autodeclaração são apagados.
-- **Dado** qualquer ação que muda dados (confirmar, cancelar presença, cancelar encontro, excluir conta), **quando** o usuário aciona, **então** o app pede uma confirmação explícita antes de executar.
+- **Dado** um usuário que acabou de aceitar o termo, **quando** chega ao passo de comunidades, **então** pode marcar quantas quiser, inclusive nenhuma, e seguir.
+- **Dado** um usuário que aceitou uma versão anterior do termo, **quando** entra no app, **então** precisa aceitar a versão atual antes de ver qualquer encontro.
+- **Dado** um usuário fora de uma comunidade, **quando** entra nela, **então** passa a ver os próximos encontros dela em "Próximos" e na página da comunidade, e a contagem de membros aumenta em 1.
+- **Dado** um usuário que não é membro de uma comunidade, **quando** abre "Próximos" ou a página dela, **então** não vê os encontros dela, só o número de encontros futuros.
+- **Dado** um membro que confirmou presença num encontro da comunidade, **quando** sai da comunidade, **então** a presença continua e o encontro segue em "meus encontros".
+- **Dado** um usuário criando um encontro, **quando** abre o campo de público, **então** vê "Aberto" e só as comunidades das quais é membro, sem nada pré-marcado. Sem escolher, o cadastro é recusado.
+- **Dado** um encontro já criado, **quando** o criador o edita, **então** o público não pode ser alterado.
+- **Dado** um usuário que vê um encontro que ainda não terminou, **quando** envia um comentário de até 500 caracteres, **então** o comentário aparece no fim da lista, com o primeiro nome e a foto dele, e sem dizer se ele confirmou presença.
+- **Dado** um comentário com mais de 500 caracteres, ou vazio, **quando** o usuário tenta enviar, **então** o envio é recusado e ele vê o motivo.
+- **Dado** o criador do encontro, **quando** comenta, **então** o comentário dele aparece com o selo "organizador".
+- **Dado** o autor de um comentário ou o criador do encontro, **quando** apaga o comentário, **então** no lugar aparece "Comentário apagado" e o texto deixa de existir no banco. Qualquer outro usuário não vê a opção de apagar.
+- **Dado** um encontro que já terminou ou foi cancelado, **quando** alguém abre o encontro, **então** os comentários aparecem só para leitura e não dá para comentar.
+- **Dado** um encontro que terminou há mais de 30 dias, **quando** o job diário roda, **então** os comentários dele são apagados.
+- **Dado** um usuário que exclui a conta, **quando** a exclusão termina, **então** os comentários dele viram "Comentário apagado" e a participação dele nas comunidades é removida.
+- **Dado** qualquer ação que muda dados (confirmar, cancelar presença, cancelar encontro, entrar ou sair de comunidade, apagar comentário, excluir conta), **quando** o usuário aciona, **então** o app pede uma confirmação explícita antes de executar.
 
 ## Constraints & dependencies
 
 - **Prazo do hackathon (HackBrasil, https://hackbrasil.com/).** A entrega final é em **30/11/2026**, com uma demo funcionando e um vídeo de no máximo 3 minutos. **Depois de 30/11/2026, nenhuma alteração nem commit no repositório.**
 - **O repositório é público**, por exigência do hackathon. Nenhum dado real de usuário, segredo ou credencial pode ir para o repositório.
 - **Orçamento zero.** Só ferramentas com plano gratuito e sem domínio próprio, usando o subdomínio que a hospedagem oferece.
-- **LGPD.** A autodeclaração de autismo é **dado pessoal sensível** (saúde). Exige consentimento explícito e direito de exclusão, que já estão no escopo.
+- **LGPD.** A autodeclaração de autismo é **dado pessoal sensível** (saúde). Exige consentimento explícito e direito de exclusão, que já estão no escopo. Os comentários são texto livre e podem receber dado sensível por descuido, daí o aviso no campo e a retenção de 30 dias (minimização).
+- **Ordem de entrega** (cada fatia deixa a demo funcionando):
+  1. comunidades (as 9, entrar e sair, páginas);
+  2. público do encontro (campo, visibilidade, etiqueta, migração para "Aberto");
+  3. passo de comunidades no onboarding e a faixa para contas antigas;
+  4. termo v2 com reaceite;
+  5. comentários, com a foto também na lista de confirmados e o job de apagamento de 30 dias no mesmo card;
+  6. landing (protótipo da grade de hexágonos, depois o texto).
+
+  O termo v2 (4) entra em produção **antes** dos comentários (5): comentário sem o termo expõe nome e foto sem consentimento. O apagamento de 30 dias vai no mesmo card dos comentários, porque o termo o promete. **Linha de corte:** se faltar tempo, a landing é simplificada primeiro (só texto e FAQ, sem a grade nova), e depois o onboarding (só a faixa). As fatias 1, 2, 4 e 5 são o núcleo.
+- **Stack:** continua Postgres (Neon) e Vercel, sem serviço novo. Comentários e limite de envio ficam no Postgres. Cada operador novo de dados (MongoDB, Cloudflare, Upstash...) exigiria atualizar o termo.
+- **Observabilidade:** cada fatia já entrega os próprios eventos, alertas e painéis (`docs/agents/observability.md`).
 - **Dependência externa:** login com Google.
 - **Programa SIGMA PARK.** O projeto faz parte do programa.
 - **Acessibilidade:**
@@ -110,11 +169,12 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 
 ### Riskiest assumptions
 
-São três premissas, e qualquer uma delas, se falhar, derruba o MVP:
+São quatro premissas, e qualquer uma delas, se falhar, derruba o MVP:
 
 1. **Adesão:** o público controlado se cadastra e usa um webapp para isso.
 2. **Iniciativa:** os jovens propõem encontros, e não apenas confirmam presença nos dos outros.
 3. **Comparecimento:** quem confirma presença vai de fato ao encontro.
+4. **Conversa no app:** os usuários combinam os detalhes nos comentários, em vez de levar a conversa para o WhatsApp.
 
 ## Open questions
 
@@ -122,5 +182,7 @@ São três premissas, e qualquer uma delas, se falhar, derruba o MVP:
 |---|---|---|
 | O programa SIGMA PARK tem exigências próprias de entrega, prazo ou relatório além das do hackathon? | Autor do projeto (Gustavo) | Aberta |
 | Qual o texto do termo de consentimento LGPD e da política de privacidade, e quem responde como controlador dos dados? | Autor do projeto (Gustavo) | Resolvida: o controlador é o autor, como pessoa física. O termo v1.0 fica em `/boas-vindas` (resumo) e em `/privacidade` (texto completo). Quem aceitou outra versão aceita de novo antes de usar o app. |
+| Qual o texto do termo v2 (nome e foto visíveis, comunidades, comentários, retenção de 30 dias)? | Autor do projeto (Gustavo) | Aberta: o rascunho sai junto com a fatia 4 e passa pela revisão do autor. |
+| Qual a frase de descrição de cada uma das 9 comunidades? | Autor do projeto (Gustavo) | Aberta: o rascunho sai junto com a fatia 1. |
 | Como o autor vai colher o retorno dos organizadores no piloto (formulário, conversa)? | Autor do projeto (Gustavo) | Aberta |
 | Qual a data de início do piloto de 8 semanas? | Autor do projeto (Gustavo) | Aberta |
