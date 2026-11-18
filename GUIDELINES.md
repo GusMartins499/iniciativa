@@ -24,6 +24,7 @@ src/
     meetups/      ← criar, editar, cancelar, listar; regras de vagas e prazos
     rsvps/        ← confirmar, cancelar, acompanhante (companion)
     users/        ← perfil, autodeclaração, consentimento, exclusão de conta
+    communities/  ← as 9 comunidades fixas, entrar e sair, contagem de membros
   shared/         ← db (cliente Drizzle), auth (Better Auth), logger, utilitários
 ```
 
@@ -72,8 +73,8 @@ src/
 ## Observability instrumentation
 
 - Todo caso de uso de escrita, ao terminar com sucesso, emite um evento `info` com nome `<domínio>.<ação no passado>`:
-  `meetup.created`, `meetup.updated`, `meetup.cancelled`, `rsvp.confirmed`, `rsvp.cancelled`, `user.onboarded`, `user.signup_completed` (volta do Google em `/boas-vindas/concluir` com o aceite registrado, para conta nova ou já existente), `user.consent_renewed` (aceite de uma versão nova do termo), `user.deleted`.
-- Payload do evento: `{ event, userId, meetupId?, rsvpId?, withCompanion? }`. Os IDs vão no payload; PII nunca vai.
+  `meetup.created`, `meetup.updated`, `meetup.cancelled`, `rsvp.confirmed`, `rsvp.cancelled`, `user.onboarded`, `user.signup_completed` (volta do Google em `/boas-vindas/concluir` com o aceite registrado, para conta nova ou já existente), `user.consent_renewed` (aceite de uma versão nova do termo), `user.deleted`, `community.joined`, `community.left`.
+- Payload do evento: `{ event, userId, meetupId?, rsvpId?, withCompanion?, communitySlug? }`. Os IDs vão no payload; PII nunca vai.
 - Evento novo segue o mesmo padrão e é registrado nesta lista.
 - Evento novo que precisar de alerta ou de painel entra também no dashboard **iniciativa** do Grafana Cloud (alertas e painéis em `docs/agents/observability.md`). Painel e consulta agregam por evento e rota, nunca por `userId`.
 
@@ -154,7 +155,7 @@ src/
 
 ## Commit / branch / PR conventions
 
-- Siga o padrão [Conventional Commits](https://www.conventionalcommits.org/): `tipo(escopo): descrição no imperativo`, **em português**. O escopo é o módulo (`meetups`, `rsvps`, `users`, `shared`, `app`). Exemplo: `feat(rsvps): permite confirmar presença com acompanhante`.
+- Siga o padrão [Conventional Commits](https://www.conventionalcommits.org/): `tipo(escopo): descrição no imperativo`, **em português**. O escopo é o módulo (`meetups`, `rsvps`, `users`, `communities`, `shared`, `app`). Exemplo: `feat(rsvps): permite confirmar presença com acompanhante`.
 - Branch: `tipo/<nº-da-issue>-slug`, por exemplo `feat/12-confirmar-presenca`. Cada card tem sua própria branch.
 - O PR é escrito em português, com as seções **Contexto**, **O que mudou**, **Como testar** e `Closes #<n>`.
 - **Congelamento do hackathon:** depois de **30/11/2026** não há commit, push, merge nem alteração alguma no repositório.
@@ -182,7 +183,8 @@ Os níveis abaixo são a referência de severidade do `/chaos-engineering`.
   - alguém que não é o criador ver os nomes dos confirmados;
   - entrar no app sem autodeclaração ou sem consentimento;
   - a exclusão de conta deixar dados para trás;
-  - um encontro passar do limite de vagas.
+  - um encontro passar do limite de vagas;
+  - alguém ver quem é membro de uma comunidade (só a contagem é pública).
 - **Alto:** confirmar ou cancelar presença falhar; editar, confirmar ou cancelar depois do início do encontro.
 - **Médio / baixo:** falhas de exibição, de texto ou de layout que não afetam dados nem acesso.
 
@@ -200,5 +202,5 @@ Os níveis abaixo são a referência de severidade do `/chaos-engineering`.
 ## i18n & routes (frontend)
 
 - O app existe só em pt-BR, sem biblioteca de i18n. Os textos de tela ficam centralizados em `copy.ts` por módulo (ou por rota, quando forem só da tela).
-- As URLs ficam em português para o usuário: `/encontros`, `/encontros/novo`, `/encontros/[id]`, `/encontros/[id]/editar`, `/meus-encontros`, `/boas-vindas` (onboarding), `/conta`.
+- As URLs ficam em português para o usuário: `/encontros`, `/encontros/novo`, `/encontros/[id]`, `/encontros/[id]/editar`, `/meus-encontros`, `/comunidades`, `/comunidades/[slug]`, `/boas-vindas` (onboarding), `/conta`.
 - Datas e horários seguem o formato brasileiro (`dd/MM/yyyy`, `HH:mm`), no fuso `America/Sao_Paulo`.
