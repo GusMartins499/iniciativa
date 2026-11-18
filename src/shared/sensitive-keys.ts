@@ -9,4 +9,7 @@ export const SENSITIVE_KEYS = [
   "password",
   "declaration",
   "consent",
+  // Texto do comentário (módulo comments).
+  "body",
+  "content",
 ] as const;
