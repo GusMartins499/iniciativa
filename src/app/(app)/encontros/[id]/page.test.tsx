@@ -26,6 +26,18 @@ vi.mock("./actions", () => ({
   cancelRsvpAction: async () => ({ code: null }),
   confirmRsvpAction: async () => ({ code: null }),
 }));
+vi.mock("@/modules/comments", async () => {
+  const { commentsCopy } = await import("@/modules/comments/client");
+  return {
+    commentsCopy,
+    listComments: async () => ({ ok: true, data: { comments: [], readOnly: false } }),
+  };
+});
+vi.mock("./comment-actions", () => ({
+  createCommentAction: async () => ({ code: null }),
+  deleteCommentAction: async () => ({ code: null }),
+  refreshCommentsAction: async () => undefined,
+}));
 vi.mock("./meetup-actions", () => ({ cancelMeetupAction: async () => ({ code: null }) }));
 
 const { default: MeetupPage } = await import("./page");

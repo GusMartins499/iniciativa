@@ -76,3 +76,8 @@ export function formatDuration(start: Date, end: Date): string {
   ].filter(Boolean);
   return parts.join(" e ");
 }
+
+// "05/12/2026 15:00"
+export function formatAppDateTime(date: Date): string {
+  return formatInTimeZone(date, APP_TIME_ZONE, "dd/MM/yyyy HH:mm");
+}
