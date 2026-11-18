@@ -175,6 +175,20 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 
   - Fonte: Inter em todo o app. O nome "iniciativa" vai em Inter Bold, em minúsculas, com espaçamento entre letras levemente fechado.
   - Logo: hexágono sólido em ardósia, com a face em mel.
+  - Logo: o hexágono remete ao d20, o dado do RPG visto de frente, e não a uma colmeia. Hexágonos nunca aparecem encaixados lado a lado.
+  - Comunidades: cada uma tem um tom suave e um ícone, escolhidos no protótipo do card #81 (direção "cor e ícone por comunidade"). Aparecem no ícone ao lado do nome na lista de comunidades e no título da página da comunidade, numa faixa e num ícone no card de encontro de comunidade, e numa etiqueta com o nome acima do título na página do encontro. O encontro aberto fica neutro. O ícone é só enfeite: o nome escrito, ou o contexto da tela, continua sendo a informação. A fonte das cores é `src/app/(app)/community-theme.ts`, com teste de contraste.
+
+    | Comunidade | Fundo | Texto e ícone | Ícone (Lucide) |
+    |---|---|---|---|
+    | Ar livre | `#E3F1E4` | `#1F5130` | Trees |
+    | Academia | `#FCE7E3` | `#8A2E1C` | Dumbbell |
+    | RPG | `#EDE7F6` | `#4C2F7A` | Swords |
+    | Card games | `#E1EEF7` | `#1E4E79` | Spade |
+    | Cinema | `#F7E6EE` | `#7A2350` | Clapperboard |
+    | Música | `#FDF0D9` | `#7A4A06` | Music |
+    | Clube do livro | `#EFE8DD` | `#5A4128` | BookOpen |
+    | Corrida | `#E0F2F1` | `#0F5953` | Timer |
+    | Caminhada | `#EEF2E0` | `#4A5A14` | Footprints |
 
 ### Riskiest assumptions
 

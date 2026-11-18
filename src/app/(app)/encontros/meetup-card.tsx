@@ -2,6 +2,8 @@ import { ChevronRight, Clock, MapPin } from "lucide-react";
 import Link from "next/link";
 import { meetupsCopy as copy, type PublicMeetup } from "@/modules/meetups/client";
 import { formatHourRange } from "@/shared/time";
+import { CommunityIcon, communityStyle } from "../community-icon";
+import { communityTheme } from "../community-theme";
 import { SeatsBar } from "./seats-bar";
 
 export type MeetupCardProps = {
@@ -39,18 +41,31 @@ export function MeetupCard({
       ? { label: copy.tags.edited, className: "bg-tag text-tag-foreground" }
       : null,
   ].filter((tag) => tag !== null);
+  // Encontro de comunidade ganha a faixa na cor dela; o aberto fica neutro. A faixa é um
+  // pseudo-elemento para não empurrar o conteúdo e desalinhar dos outros cards.
+  const theme = communityTheme(meetup.communitySlug);
 
   return (
-    <div className="group relative rounded-2xl border border-border bg-surface p-4 shadow-sm hover:border-border-strong hover:shadow-md sm:p-5">
+    <div
+      style={theme ? communityStyle(theme) : undefined}
+      className={`group relative rounded-2xl border border-border bg-surface p-4 shadow-sm hover:border-border-strong hover:shadow-md sm:p-5 ${
+        theme
+          ? "before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:rounded-l-2xl before:bg-(--community-fg)"
+          : ""
+      }`}
+    >
       <div className="flex items-start justify-between gap-3">
         <p className="inline-flex items-center gap-1.5 rounded-full bg-honey-light px-2.5 py-0.5 text-sm font-semibold text-honey-light-foreground">
           <Clock aria-hidden="true" className="size-4" />
           {formatHourRange(meetup.startsAt, meetup.endsAt)}
         </p>
-        <ChevronRight
-          aria-hidden="true"
-          className="size-5 shrink-0 text-muted-foreground group-hover:text-foreground"
-        />
+        <span className="flex shrink-0 items-center gap-2">
+          <CommunityIcon slug={meetup.communitySlug} />
+          <ChevronRight
+            aria-hidden="true"
+            className="size-5 shrink-0 text-muted-foreground group-hover:text-foreground"
+          />
+        </span>
       </div>
       <h3 className="mt-2.5 text-xl leading-snug font-bold tracking-tight">
         <Link

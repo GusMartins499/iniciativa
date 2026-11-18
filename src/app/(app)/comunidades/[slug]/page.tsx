@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { communitiesCopy as copy, getCommunityBySlug } from "@/modules/communities";
 import { countUpcomingByCommunity, listUpcomingByCommunity, meetupsCopy } from "@/modules/meetups";
 import { getDb } from "@/shared/db";
+import { CommunityIcon } from "../../community-icon";
 import { MeetupDays } from "../../encontros/meetup-days";
 import { requirePageUser } from "../../require-page-user";
 import { joinCommunityAction, leaveCommunityAction } from "../actions";
@@ -36,7 +37,8 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
           <ArrowLeft aria-hidden="true" className="size-[18px]" />
           {copy.backToList}
         </Link>
-        <h1 className="mt-1 text-[2rem] leading-tight font-bold tracking-tight">
+        <h1 className="mt-1 flex items-center gap-3 text-[2rem] leading-tight font-bold tracking-tight">
+          <CommunityIcon slug={community.slug} size="md" />
           {community.name}
         </h1>
         <p className="mt-2 max-w-prose text-muted-foreground">{copy.description(community.slug)}</p>

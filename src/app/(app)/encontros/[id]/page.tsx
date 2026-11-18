@@ -6,7 +6,10 @@ import { listMemberSlugs } from "@/modules/communities";
 import { canSeeMeetup, getCreatorId, getMeetup, meetupsCopy } from "@/modules/meetups";
 import { getUserRsvp, listAttendeesForCreator } from "@/modules/rsvps";
 import { getDb } from "@/shared/db";
+import { CommunityIcon, communityStyle } from "../../community-icon";
+import { communityTheme } from "../../community-theme";
 import { requirePageUser } from "../../require-page-user";
+import { audienceTag } from "../audience";
 import { SeatsBar } from "../seats-bar";
 import { cancelRsvpAction, confirmRsvpAction } from "./actions";
 import { AttendeeList } from "./attendee-list";
@@ -51,6 +54,7 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
     </Link>
   );
   const meetup = result.data;
+  const theme = communityTheme(meetup.communitySlug);
   const isCreator = (await getCreatorId(db, id)) === currentUser.id;
   // Os nomes só são lidos depois de o servidor conferir que quem pede é o criador.
   const attendees = isCreator ? await listAttendeesForCreator(db, currentUser.id, id) : null;
@@ -68,6 +72,17 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
       <div>
         {backLink}
+        {/* Fora da lista filtrada, a página é o único lugar que diz de qual comunidade é o
+            encontro. */}
+        {theme && meetup.communitySlug ? (
+          <p
+            style={communityStyle(theme)}
+            className="mt-2 flex w-fit items-center gap-2 rounded-full bg-(--community-bg) py-1 pr-3 pl-1 font-semibold text-(--community-fg)"
+          >
+            <CommunityIcon slug={meetup.communitySlug} />
+            {audienceTag(meetup.communitySlug)}
+          </p>
+        ) : null}
         <h1 className="mt-1 text-[2rem] leading-tight font-bold tracking-tight">{meetup.title}</h1>
       </div>
       <MeetupNotices status={meetup.status} edited={meetup.editedAt !== null} />

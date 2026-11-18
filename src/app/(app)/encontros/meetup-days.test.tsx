@@ -83,6 +83,15 @@ describe("lista de encontros por dia", () => {
     expect(screen.queryByText("RPG")).not.toBeInTheDocument();
   });
 
+  it("marca o card de encontro de comunidade com a cor e o ícone dela, e o aberto não", () => {
+    render(<MeetupDays meetups={[meetup({}), meetup({ id: "m4", communitySlug: "rpg" })]} />);
+
+    const [open, rpg] = screen.getAllByRole("listitem") as [HTMLElement, HTMLElement];
+    expect(rpg.querySelector('[data-community-icon="rpg"]')).not.toBeNull();
+    expect(rpg.querySelector("[data-community-icon]")).toHaveAttribute("aria-hidden", "true");
+    expect(open.querySelector("[data-community-icon]")).toBeNull();
+  });
+
   it("cada card leva ao detalhe pelo título", () => {
     render(<MeetupDays meetups={[meetup({})]} />);
 

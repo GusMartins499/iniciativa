@@ -1,5 +1,10 @@
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import type { canSeeMeetup as CanSeeMeetup, getMeetup as GetMeetup } from "@/modules/meetups";
+import type {
+  canSeeMeetup as CanSeeMeetup,
+  getMeetup as GetMeetup,
+  PublicMeetup,
+} from "@/modules/meetups";
 
 // A regra (aberto, membro, criador ou presença) tem teste no módulo; aqui só o 404.
 const canSeeMeetup = vi.fn<typeof CanSeeMeetup>();
@@ -56,4 +61,46 @@ describe("tela /encontros/[id]", () => {
 
     await expect(MeetupPage({ params })).rejects.toThrow("NEXT_NOT_FOUND");
   });
+
+  it("mostra a comunidade do encontro, com cor e ícone, acima do título", async () => {
+    canSeeMeetup.mockResolvedValue({ visible: true, communitySlug: "rpg" });
+    getMeetup.mockResolvedValue({ ok: true, data: visibleMeetup({ communitySlug: "rpg" }) });
+
+    render(await MeetupPage({ params }));
+
+    const heading = screen.getByRole("heading", { level: 1, name: "Mesa de RPG" });
+    const community = heading.previousElementSibling;
+    expect(community).toHaveTextContent("RPG");
+    expect(community?.querySelector('[data-community-icon="rpg"]')).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
+  it("não mostra comunidade em encontro aberto", async () => {
+    canSeeMeetup.mockResolvedValue({ visible: true, communitySlug: null });
+    getMeetup.mockResolvedValue({ ok: true, data: visibleMeetup({ communitySlug: null }) });
+
+    const { container } = render(await MeetupPage({ params }));
+
+    expect(container.querySelector("[data-community-icon]")).toBeNull();
+  });
 });
+
+function visibleMeetup(overrides: Partial<PublicMeetup>): PublicMeetup {
+  return {
+    id: "00000000-0000-0000-0000-000000000001",
+    title: "Mesa de RPG",
+    address: "Rua X, 100",
+    placeDescription: null,
+    startsAt: new Date("2099-12-05T18:00:00.000Z"),
+    endsAt: new Date("2099-12-05T20:00:00.000Z"),
+    capacity: 5,
+    occupiedSeats: 1,
+    status: "active",
+    editedAt: null,
+    communitySlug: null,
+    isFull: false,
+    ...overrides,
+  };
+}

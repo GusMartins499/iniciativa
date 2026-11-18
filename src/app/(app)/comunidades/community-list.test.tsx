@@ -75,6 +75,17 @@ describe("tela de comunidades", () => {
     expect(rpg.getByText("Você participa")).toBeVisible();
   });
 
+  it("mostra em cada card o ícone da comunidade, só como enfeite", () => {
+    renderList();
+
+    const items = screen.getAllByRole("listitem");
+    COMMUNITIES.forEach((community, index) => {
+      const icon = (items[index] as HTMLElement).querySelector("[data-community-icon]");
+      expect(icon).toHaveAttribute("data-community-icon", community.slug);
+      expect(icon).toHaveAttribute("aria-hidden", "true");
+    });
+  });
+
   it("não tem violações de acessibilidade", async () => {
     const { container } = renderList();
     expect(await axe(container)).toHaveNoViolations();
