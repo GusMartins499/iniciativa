@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, count, eq, gt, inArray, isNull, lt, or } from "drizzle-orm";
 import type { CommunitySlug } from "@/modules/communities";
 import type { Database } from "@/shared/db";
 import { err, ok, type Result } from "@/shared/result";
@@ -149,4 +149,11 @@ export async function getByIds(
     .where(and(inArray(meetups.id, ids), gt(meetups.startsAt, now)))
     .orderBy(asc(meetups.startsAt));
   return rows.map(toPublic);
+}
+
+// Para o apagamento de comentários (comments): os encontros que terminaram antes do corte,
+// cancelados inclusive.
+export async function listEndedBefore(db: Database, cutoff: Date): Promise<string[]> {
+  const rows = await db.select({ id: meetups.id }).from(meetups).where(lt(meetups.endsAt, cutoff));
+  return rows.map((row) => row.id);
 }

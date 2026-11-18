@@ -1,0 +1,1 @@
+export { purgeExpiredComments } from "./purge";

@@ -7,6 +7,7 @@ const valid = {
   BETTER_AUTH_URL: "http://localhost:3000",
   GOOGLE_CLIENT_ID: "client-id-teste",
   GOOGLE_CLIENT_SECRET: "client-secret-teste",
+  CRON_SECRET: "segredo-do-cron-teste",
 };
 
 function captureError(fn: () => unknown): Error {
@@ -39,6 +40,10 @@ describe("shared/env", () => {
     expect(() => parseServerEnv({ ...valid, BETTER_AUTH_SECRET: "curto" })).toThrow(
       /BETTER_AUTH_SECRET/,
     );
+  });
+
+  it("recusa CRON_SECRET curto", () => {
+    expect(() => parseServerEnv({ ...valid, CRON_SECRET: "curto" })).toThrow(/CRON_SECRET/);
   });
 
   it("aceita o wsproxy só sem protocolo", () => {
