@@ -29,9 +29,22 @@ test("encontro de comunidade aparece só para quem participa dela", async ({ pag
 
   await page.goto("/encontros");
   await expect(page.getByText(meetupsCopy.noCommunitiesBanner)).toHaveCount(0);
-  const card = page.getByRole("link", { name: rpgTitle });
-  await expect(card).toContainText("RPG");
-  const href = await card.getAttribute("href");
+  const link = page.getByRole("link", { name: rpgTitle });
+  const card = page.getByRole("listitem").filter({ has: link });
+  await expect(card.getByRole("link", { name: "RPG", exact: true })).toHaveAttribute(
+    "href",
+    "/comunidades/rpg",
+  );
+  const href = await link.getAttribute("href");
+
+  await page.goto("/comunidades");
+  const rpgCard = page
+    .getByRole("listitem")
+    .filter({ has: page.getByRole("link", { name: "RPG", exact: true }) });
+  await expect(rpgCard.getByText(meetupsCopy.community.upcomingCount(1))).toBeVisible();
+  await rpgCard.getByRole("link", { name: communitiesCopy.seeMeetups }).click();
+  await expect(page).toHaveURL(/\/comunidades\/rpg$/);
+  await expect(page.getByRole("link", { name: rpgTitle })).toBeVisible();
 
   await page.goto("/encontros/novo");
   await expect(page.getByRole("radio", { name: "RPG" })).not.toBeChecked();

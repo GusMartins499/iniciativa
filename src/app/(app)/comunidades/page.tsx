@@ -1,4 +1,5 @@
 import { communitiesCopy as copy, listCommunities } from "@/modules/communities";
+import { countUpcomingByCommunities } from "@/modules/meetups";
 import { getDb } from "@/shared/db";
 import { requirePageUser } from "../require-page-user";
 import { joinCommunityAction, leaveCommunityAction } from "./actions";
@@ -6,7 +7,16 @@ import { CommunityList } from "./community-list";
 
 export default async function CommunitiesPage() {
   const currentUser = await requirePageUser();
-  const communities = await listCommunities(getDb(), currentUser.id);
+  const db = getDb();
+  // Duas leituras agregadas, uma por módulo: a contagem de encontros é pública, como a de membros.
+  const [summaries, upcoming] = await Promise.all([
+    listCommunities(db, currentUser.id),
+    countUpcomingByCommunities(db),
+  ]);
+  const communities = summaries.map((community) => ({
+    ...community,
+    upcomingCount: upcoming.get(community.slug) ?? 0,
+  }));
   return (
     <div className="flex flex-col gap-6">
       <div>

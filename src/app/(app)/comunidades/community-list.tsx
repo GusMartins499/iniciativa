@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { communitiesCopy as copy, type CommunitySummary } from "@/modules/communities/client";
+import { meetupsCopy } from "@/modules/meetups/client";
 import { MembershipButton, type MembershipButtonProps } from "./membership-button";
 
 type Action = MembershipButtonProps["joinAction"];
 
+// A contagem de encontros vem de meetups; a página junta as duas leituras.
+export type CommunityCard = CommunitySummary & { upcomingCount: number };
+
 export type CommunityListProps = {
-  communities: CommunitySummary[];
+  communities: CommunityCard[];
   joinActionFor: (slug: string) => Action;
   leaveActionFor: (slug: string) => Action;
 };
 
-// Só a contagem de membros: quem participa nunca chega à tela.
+// Só contagens: quem participa nunca chega à tela. Os encontros ficam para os membros,
+// então o atalho "Ver encontros" só aparece para eles.
 export function CommunityList({ communities, joinActionFor, leaveActionFor }: CommunityListProps) {
   return (
     <ul className="grid gap-4 sm:grid-cols-2">
@@ -30,7 +35,18 @@ export function CommunityList({ communities, joinActionFor, leaveActionFor }: Co
             </h2>
             <p>{copy.description(community.slug)}</p>
             <p className="text-sm text-muted-foreground">{copy.members(community.memberCount)}</p>
+            <p className="text-sm text-muted-foreground">
+              {meetupsCopy.community.upcomingCount(community.upcomingCount)}
+            </p>
             {community.isMember ? <p className="font-semibold">{copy.memberNote}</p> : null}
+            {community.isMember ? (
+              <Link
+                href={`/comunidades/${community.slug}`}
+                className="inline-flex min-h-11 w-fit items-center font-semibold underline underline-offset-4"
+              >
+                {copy.seeMeetups}
+              </Link>
+            ) : null}
           </div>
           <div className="mt-auto">
             <MembershipButton

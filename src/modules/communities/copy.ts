@@ -26,6 +26,7 @@ export const communitiesCopy = {
   description: (slug: CommunitySlug) => descriptions[slug],
   members: (count: number) => (count === 1 ? "1 pessoa participa" : `${count} pessoas participam`),
   memberNote: "Você participa desta comunidade.",
+  seeMeetups: "Ver encontros",
   backToList: "Voltar para comunidades",
   notFound: "Esta comunidade não existe.",
   joinButton: "Entrar na comunidade",
