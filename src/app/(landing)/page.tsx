@@ -14,9 +14,9 @@ type SignInPageProps = {
 
 const container = "mx-auto w-full max-w-6xl px-4";
 
-// Hexágono com ponta para cima (o formato do logo), centrado em (cx, cy).
-function hexagon(cx: number, cy: number, r: number): string {
-  return [-90, -30, 30, 90, 150, 210]
+// Polígono regular com ponta para cima, centrado em (cx, cy): o hexágono e a face do logo.
+function polygon(cx: number, cy: number, r: number, angles: number[]): string {
+  return angles
     .map((deg) => {
       const rad = (deg * Math.PI) / 180;
       return `${(cx + r * Math.cos(rad)).toFixed(1)},${(cy + r * Math.sin(rad)).toFixed(1)}`;
@@ -24,7 +24,12 @@ function hexagon(cx: number, cy: number, r: number): string {
     .join(" ");
 }
 
-// Textura do hero: contornos do hexágono da marca, grandes e cortados na borda direita.
+const hexagon = (cx: number, cy: number, r: number) =>
+  polygon(cx, cy, r, [-90, -30, 30, 90, 150, 210]);
+const triangle = (cx: number, cy: number, r: number) => polygon(cx, cy, r, [-90, 30, 150]);
+
+// Textura do hero: contornos do hexágono da marca, grandes e cortados na borda direita, com a
+// face do d20 (o triângulo do logo) no centro.
 // Só decoração (aria-hidden), em mel com pouca opacidade para não competir com o texto.
 function HeroTexture() {
   return (
@@ -39,7 +44,7 @@ function HeroTexture() {
         <polygon points={hexagon(300, 350, 190)} opacity={0.22} />
         <polygon points={hexagon(300, 350, 120)} opacity={0.14} />
       </g>
-      <polygon points={hexagon(300, 350, 46)} fill="var(--color-honey)" />
+      <polygon points={triangle(300, 350, 52)} fill="var(--color-honey)" />
     </svg>
   );
 }
