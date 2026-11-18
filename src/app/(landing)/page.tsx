@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { COMMUNITIES } from "@/modules/communities/client";
 import { hasCompletedOnboarding } from "@/modules/users";
 import { accountCopy, signInCopy } from "@/modules/users/client";
 import { getSessionUser } from "@/shared/auth";
 import { getDb } from "@/shared/db";
+import { NumberHexagon } from "@/shared/ui";
 import { landingCopy as copy } from "./copy";
 
 type SignInPageProps = {
@@ -99,23 +101,56 @@ export default async function LandingPage({ searchParams }: SignInPageProps) {
           <h2 id="how-it-works" className="text-3xl font-bold tracking-tight sm:text-4xl">
             {copy.howItWorksTitle}
           </h2>
-          <ol className="mt-12 grid gap-12 sm:grid-cols-2 sm:gap-x-10 lg:grid-cols-4 lg:gap-x-0">
-            {copy.steps.map(({ key, title, text }, index) => (
-              <li key={key} className="flex flex-col gap-4 lg:pr-8">
-                {/* Número do passo e o fio até o próximo: a ordem, à vista. */}
-                <div aria-hidden="true" className="flex items-center gap-4">
-                  <span className="grid size-12 shrink-0 place-items-center rounded-full bg-honey text-lg font-bold text-foreground tabular-nums">
-                    {index + 1}
-                  </span>
-                  {index < copy.steps.length - 1 ? (
-                    <span className="hidden h-0.5 flex-1 rounded-full bg-honey/40 lg:block" />
-                  ) : null}
-                </div>
-                <h3 className="text-xl leading-snug font-bold tracking-tight">{title}</h3>
-                <p className="max-w-[26rem] leading-relaxed text-muted-foreground">{text}</p>
+          {/* Grade de cartões (2 colunas no celular, 3 no desktop), estática. O número de cada
+              passo fica num hexágono do logo, como uma ficha sobre a borda de cima do cartão. */}
+          <ol className="mt-16 grid grid-cols-2 gap-x-3 gap-y-12 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-3">
+            {copy.steps.map(({ key, title, text }, index) => {
+              const highlight = key === "initiative";
+              return (
+                <li
+                  key={key}
+                  data-highlight={highlight ? "true" : undefined}
+                  className={`relative flex flex-col items-center gap-2 rounded-2xl px-3 pt-12 pb-6 text-center sm:px-6 ${
+                    highlight ? "bg-honey-light ring-2 ring-honey" : "bg-surface ring-1 ring-border"
+                  }`}
+                >
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2">
+                    <NumberHexagon value={index + 1} />
+                  </div>
+                  <h3
+                    className={`text-lg leading-snug font-bold tracking-tight ${
+                      highlight ? "text-honey-light-foreground" : ""
+                    }`}
+                  >
+                    {title}
+                  </h3>
+                  <p className="leading-relaxed text-muted-foreground">{text}</p>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </section>
+
+      {/* Só os nomes, da constante: a landing do visitante não lê do banco. */}
+      <section aria-labelledby="communities" className="border-t border-border py-20 sm:py-24">
+        <div className={`${container} grid gap-10 lg:grid-cols-[18rem_1fr] lg:gap-16`}>
+          <div className="flex flex-col gap-4">
+            <h2 id="communities" className="text-3xl font-bold tracking-tight sm:text-4xl">
+              {copy.communitiesTitle}
+            </h2>
+            <p className="leading-relaxed text-muted-foreground">{copy.communitiesText}</p>
+          </div>
+          <ul className="flex flex-wrap content-start gap-3">
+            {COMMUNITIES.map(({ slug, name }) => (
+              <li
+                key={slug}
+                className="rounded-full bg-tag px-4 py-2 text-lg font-semibold text-tag-foreground"
+              >
+                {name}
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
