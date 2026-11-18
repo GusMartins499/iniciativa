@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listMemberSlugs } from "@/modules/communities";
 import { canSeeMeetup, getCreatorId, getMeetup, meetupsCopy } from "@/modules/meetups";
-import { getUserRsvp, listAttendeesForCreator, rsvpsCopy } from "@/modules/rsvps";
+import { getUserRsvp, listAttendeesForCreator } from "@/modules/rsvps";
 import { getDb } from "@/shared/db";
 import { requirePageUser } from "../../require-page-user";
 import { SeatsBar } from "../seats-bar";
 import { cancelRsvpAction, confirmRsvpAction } from "./actions";
+import { AttendeeList } from "./attendee-list";
 import { CreatorActions } from "./creator-actions";
 import { cancelMeetupAction } from "./meetup-actions";
 import { MeetupFacts } from "./meetup-facts";
@@ -83,37 +84,7 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
               cancelAction={cancelRsvpAction.bind(null, id)}
             />
           ) : null}
-          {attendees?.ok ? (
-            <section
-              aria-labelledby="attendees-title"
-              className="flex flex-col gap-2 border-t border-border pt-4"
-            >
-              <h3 id="attendees-title" className="font-bold">
-                {rsvpsCopy.attendeesTitle}
-              </h3>
-              <p className="text-sm text-muted-foreground">{rsvpsCopy.attendeesHint}</p>
-              {attendees.data.length === 0 ? (
-                <p className="text-muted-foreground">{rsvpsCopy.attendeesEmpty}</p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {attendees.data.map((attendee, index) => (
-                    <li
-                      key={`${attendee.firstName}-${index}`}
-                      className="flex items-center gap-2.5"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="grid size-8 place-items-center rounded-full bg-tag text-sm font-bold text-tag-foreground"
-                      >
-                        {attendee.firstName.charAt(0).toUpperCase()}
-                      </span>
-                      {rsvpsCopy.attendee(attendee.firstName, attendee.withCompanion)}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ) : null}
+          {attendees?.ok ? <AttendeeList attendees={attendees.data} /> : null}
           {isCreator && active && !started ? (
             <section
               aria-labelledby="manage-title"

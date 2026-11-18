@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { joinCommunity, leaveCommunity } from "@/modules/communities";
 import { cancelMeetup, getMeetup } from "@/modules/meetups";
+import { user } from "@/shared/auth/schema";
 import { insertTestUser } from "@/shared/auth/test-helpers";
 import type { Database } from "@/shared/db";
 import { createTestDb } from "@/shared/db/test-db";
@@ -9,6 +10,8 @@ import { logger } from "@/shared/logger";
 import { cancelRsvp, confirmRsvp, listAttendeesForCreator } from "./rsvps";
 import { rsvps } from "./schema";
 import { AFTER_START, NOW, setupMeetup } from "./test-setup";
+
+const PHOTO = "https://lh3.googleusercontent.com/a/foto-sintetica=s96-c";
 
 let db: Database;
 
@@ -202,14 +205,23 @@ describe("rsvps.cancelRsvp", () => {
 });
 
 describe("rsvps.listAttendeesForCreator", () => {
-  it("devolve primeiro nome e acompanhante para o criador", async () => {
+  it("devolve primeiro nome, foto e acompanhante para o criador", async () => {
     const { creatorId, meetupId } = await setupMeetup(db, 10);
     const attendeeId = await insertTestUser(db, "ana", "Ana Souza");
+    await db.update(user).set({ image: PHOTO }).where(eq(user.id, attendeeId));
     await confirmRsvp(db, attendeeId, meetupId, { withCompanion: true }, NOW);
+    const otherId = await insertTestUser(db, "bia", "Bia Lima");
+    await confirmRsvp(db, otherId, meetupId, { withCompanion: false }, NOW);
 
     const r = await listAttendeesForCreator(db, creatorId, meetupId);
 
-    expect(r).toEqual({ ok: true, data: [{ firstName: "Ana", withCompanion: true }] });
+    expect(r).toEqual({
+      ok: true,
+      data: [
+        { firstName: "Ana", image: PHOTO, withCompanion: true },
+        { firstName: "Bia", image: null, withCompanion: false },
+      ],
+    });
   });
 
   it("recusa quem não é o criador", async () => {
