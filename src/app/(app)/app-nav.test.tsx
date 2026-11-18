@@ -13,22 +13,38 @@ describe("navegação principal", () => {
 
   it("marca a página atual", () => {
     render(<AppNav user={{ name: "Gustavo", image: null }} />);
-    expect(screen.getByRole("link", { name: "Encontros" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Próximos" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Meus encontros" })).not.toHaveAttribute(
       "aria-current",
     );
   });
 
-  it("mantém 'Encontros' marcado no detalhe de um encontro", () => {
+  it("mantém 'Próximos' marcado no detalhe de um encontro", () => {
     pathname.value = "/encontros/abc";
     render(<AppNav user={{ name: "Gustavo", image: null }} />);
-    expect(screen.getByRole("link", { name: "Encontros" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Próximos" })).toHaveAttribute("aria-current", "page");
   });
 
-  it("não marca 'Encontros' na tela de criar encontro", () => {
+  it("não marca 'Próximos' na tela de criar encontro", () => {
     pathname.value = "/encontros/novo";
     render(<AppNav user={{ name: "Gustavo", image: null }} />);
-    expect(screen.getByRole("link", { name: "Encontros" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Próximos" })).not.toHaveAttribute("aria-current");
+  });
+
+  it("tem 3 itens: Próximos, Meus encontros, Comunidades", () => {
+    render(<AppNav user={{ name: "Gustavo", image: null }} />);
+    const nav = screen.getByRole("navigation", { name: "Principal" });
+    const labels = Array.from(nav.querySelectorAll("a")).map((link) => link.textContent);
+    expect(labels).toEqual(["Próximos", "Meus encontros", "Comunidades"]);
+  });
+
+  it("marca 'Comunidades' na página de uma comunidade", () => {
+    pathname.value = "/comunidades/rpg";
+    render(<AppNav user={{ name: "Gustavo", image: null }} />);
+    expect(screen.getByRole("link", { name: "Comunidades" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 
   it("dá nome acessível ao botão de criar e à conta", () => {
