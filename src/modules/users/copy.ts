@@ -1,6 +1,6 @@
 // Versão do termo aceito; muda sempre que o texto do termo mudar. Quem aceitou outra
 // versão precisa aceitar de novo antes de usar o app.
-export const CONSENT_VERSION = "v1.1";
+export const CONSENT_VERSION = "v2";
 
 const controllerName = "Gustavo Martins";
 const controllerEmail = "gustavosm994@gmail.com";
@@ -9,18 +9,22 @@ export const onboardingCopy = {
   title: "Boas-vindas ao iniciativa",
   intro: "Para criar a sua conta, precisamos de duas confirmações. Sem elas, a conta não é criada.",
   outdatedConsent:
-    "O termo de consentimento mudou. Leia a nova versão e marque as duas caixas para continuar.",
+    "O termo de consentimento mudou para incluir as comunidades e os comentários. Leia a nova versão e marque as duas caixas para continuar.",
   declarationLabel:
     "Sou autista, com nível de suporte 1 ou com autonomia para participar de encontros, e tenho 18 anos ou mais.",
   consentLabel: "Li e aceito o termo de consentimento abaixo.",
-  consentTitle: "Termo de consentimento (versão 1.1)",
+  consentTitle: "Termo de consentimento (versão 2)",
   consentText: [
     "A sua autodeclaração de autismo é um dado de saúde. A lei chama isso de dado pessoal sensível (LGPD).",
     "Usamos a autodeclaração só para liberar o seu acesso ao iniciativa. Ela não aparece para outras pessoas.",
-    "Quem cria um encontro vê o seu primeiro nome e se você leva acompanhante. As outras pessoas veem só o número de vagas ocupadas.",
+    "Quem cria um encontro vê o seu primeiro nome, a sua foto e se você leva acompanhante. As outras pessoas não veem quem confirmou presença, só o número de vagas ocupadas.",
+    "Quando você escreve um comentário, o seu primeiro nome e a sua foto aparecem para todas as pessoas que veem o encontro.",
+    "Guardamos o que você escreve nos comentários. Não escreva dados pessoais ou de saúde nos comentários, como telefone, endereço ou diagnóstico.",
+    "Os comentários são apagados 30 dias depois do fim do encontro. Para medir o piloto, guardamos só a contagem de comentários de cada encontro e de quantas pessoas comentaram, sem guardar quem comentou.",
+    "Guardamos as comunidades em que você entra. As outras pessoas veem só o número de membros de cada comunidade. Ninguém vê a lista de membros.",
     "O banco de dados fica em São Paulo. O login com Google, o site, na Vercel, e o monitoramento de erros e desempenho, no Grafana Labs, podem tratar os seus dados fora do Brasil.",
     "O Grafana Labs recebe só identificadores internos, nunca o seu nome, o seu email ou a sua autodeclaração.",
-    "Você pode excluir a sua conta a qualquer momento. Isso apaga os seus dados e encerra este consentimento.",
+    'Você pode excluir a sua conta a qualquer momento. Isso apaga o seu perfil, a sua autodeclaração e a sua participação nas comunidades, troca os seus comentários por "Comentário apagado" e encerra este consentimento.',
     `Responsável pelos dados: ${controllerName}. Contato: ${controllerEmail}.`,
   ],
   privacyLink: "Ler a política de privacidade completa",
@@ -81,7 +85,7 @@ export const privacyCopy: {
   back: string;
 } = {
   title: "Política de privacidade e termo de consentimento",
-  version: "Versão 1.1",
+  version: "Versão 2",
   sections: [
     {
       title: "1. Quem é responsável pelos seus dados",
@@ -105,6 +109,8 @@ export const privacyCopy: {
         "A sua autodeclaração: que você é autista (nível de suporte 1 ou com autonomia) e que tem 18 anos ou mais.",
         "A data em que você aceitou este termo e a versão aceita.",
         "Os encontros que você cria e as presenças que você confirma, incluindo se você leva acompanhante.",
+        "As comunidades em que você entra.",
+        "Os comentários que você escreve nos encontros.",
       ],
     },
     {
@@ -120,18 +126,31 @@ export const privacyCopy: {
         "A autodeclaração serve só para liberar o seu acesso. Ela nunca aparece para outras pessoas.",
         "O nome e o email servem para você entrar no app.",
         "Os encontros e as presenças servem para o app funcionar.",
+        "As comunidades servem para mostrar a você os encontros delas.",
+        "Os comentários servem para combinar os detalhes de um encontro.",
       ],
     },
     {
       title: "6. Quem vê os seus dados",
       items: [
-        "Quem cria um encontro vê o primeiro nome de quem confirmou presença e se essa pessoa leva acompanhante.",
-        'As outras pessoas veem só quantas vagas estão ocupadas, por exemplo "7 de 10 vagas".',
+        "Quem cria um encontro vê o primeiro nome e a foto de quem confirmou presença e se essa pessoa leva acompanhante.",
+        'As outras pessoas não veem quem confirmou presença. Elas veem só quantas vagas estão ocupadas, por exemplo "7 de 10 vagas".',
+        "Quando você escreve um comentário, o seu primeiro nome e a sua foto aparecem para todas as pessoas que veem o encontro. O comentário não diz se você confirmou presença.",
+        "Ninguém vê a lista de membros de uma comunidade. Cada comunidade mostra só o número de membros.",
         "Não vendemos os seus dados e não passamos os seus dados para ninguém usar com outro objetivo.",
       ],
     },
     {
-      title: "7. Serviços que usamos",
+      title: "7. Comentários",
+      items: [
+        "Guardamos o texto dos seus comentários.",
+        "Todas as pessoas que veem o encontro podem ler os comentários dele.",
+        "Não escreva dados pessoais ou de saúde nos comentários, como telefone, endereço ou diagnóstico.",
+        'Você pode apagar o seu comentário. Quem criou o encontro pode apagar qualquer comentário do encontro. No lugar fica "Comentário apagado", e o texto é removido do banco de dados.',
+      ],
+    },
+    {
+      title: "8. Serviços que usamos",
       items: [
         "Google: para você entrar com a sua conta Google.",
         "Vercel: para o site funcionar.",
@@ -144,15 +163,17 @@ export const privacyCopy: {
       ],
     },
     {
-      title: "8. Por quanto tempo guardamos",
+      title: "9. Por quanto tempo guardamos",
       items: [
-        "Guardamos os seus dados enquanto a sua conta existir.",
+        "Guardamos os seus dados enquanto a sua conta existir, menos os comentários.",
+        "Os comentários são apagados 30 dias depois do fim do encontro.",
+        "Para medir o piloto, guardamos contagens anônimas de comentários de cada encontro: quantos comentários ele teve e quantas pessoas diferentes comentaram, sem guardar quem comentou.",
         "Os registros técnicos do site não têm o seu nome nem o seu email e são apagados sozinhos em pouco tempo.",
         "As cópias de segurança do banco de dados guardam um histórico de até 6 horas. Depois desse prazo, elas são apagadas sozinhas.",
       ],
     },
     {
-      title: "9. Os seus direitos",
+      title: "10. Os seus direitos",
       items: [
         `Você pode pedir para ver os dados que guardamos sobre você, escrevendo para ${controllerEmail}.`,
         `Você pode pedir para corrigir um dado, escrevendo para ${controllerEmail}.`,
@@ -160,24 +181,29 @@ export const privacyCopy: {
       ],
     },
     {
-      title: "10. Excluir a conta",
-      paragraphs: ["Ao excluir a conta:"],
+      title: "11. Excluir a conta",
+      paragraphs: ["Ao excluir a sua conta, o app apaga ou cancela o seguinte:"],
       items: [
         "o seu perfil, a sua autodeclaração e o seu consentimento são apagados;",
+        "a sua participação nas comunidades é apagada;",
+        'os seus comentários são apagados, e no lugar fica "Comentário apagado";',
         "os encontros futuros que você criou são cancelados;",
         "as suas presenças confirmadas são canceladas;",
         "os encontros que já aconteceram continuam no app, mas sem o seu nome.",
       ],
-      after: ["Não é possível desfazer."],
+      after: [
+        "As contagens anônimas de comentários continuam, porque não dizem quem comentou.",
+        "Não é possível desfazer.",
+      ],
     },
     {
-      title: "11. Retirar o consentimento",
+      title: "12. Retirar o consentimento",
       paragraphs: [
         "O consentimento é necessário para usar o iniciativa. Para retirar o consentimento, exclua a sua conta.",
       ],
     },
     {
-      title: "12. Mudanças neste termo",
+      title: "13. Mudanças neste termo",
       paragraphs: [
         "Se este termo mudar, o app vai pedir que você leia e aceite a nova versão antes de continuar.",
       ],

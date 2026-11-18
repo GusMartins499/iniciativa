@@ -48,6 +48,13 @@ describe("tela inicial", () => {
     }
   });
 
+  it("não diz que o app não tem conversa nem que só o criador vê o seu nome", () => {
+    for (const { answer } of landingCopy.faq) {
+      expect(answer).not.toMatch(/não tem chat/i);
+      expect(answer).not.toMatch(/só quem criou o encontro vê/i);
+    }
+  });
+
   it("tem o login com Google como ação principal", async () => {
     await renderPage();
     // Só leva aos termos: a conta nasce no "Confirmar e entrar" de /boas-vindas.

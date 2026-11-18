@@ -30,7 +30,7 @@ export const landingCopy = {
     {
       question: "Quem vê que eu vou a um encontro?",
       answer:
-        "As outras pessoas veem só quantas vagas estão ocupadas. Só quem criou o encontro vê o seu primeiro nome.",
+        "As outras pessoas veem só quantas vagas estão ocupadas. Quem criou o encontro vê o seu primeiro nome e a sua foto. Se você comentar, o seu primeiro nome e a sua foto aparecem no comentário.",
     },
     {
       question: "Posso desistir depois de confirmar?",
@@ -44,7 +44,7 @@ export const landingCopy = {
     {
       question: "E se o encontro mudar ou for cancelado?",
       answer:
-        'O aviso aparece dentro do app, em "Meus encontros". O app não tem chat nem manda notificações.',
+        'O aviso aparece dentro do app, em "Meus encontros". O app não manda notificações. Para combinar os detalhes, use os comentários do encontro.',
     },
     {
       question: "Posso apagar a minha conta?",

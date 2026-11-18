@@ -30,6 +30,15 @@ describe("shared/logger", () => {
     expect(output).not.toContain("Ana");
   });
 
+  it("mantém a versão do termo no log, para contar os aceites por versão", () => {
+    const destination = memoryDestination();
+    const logger = createLogger(destination, "info");
+
+    logger.info({ event: "user.consent_renewed", userId: "u1", consentVersion: "v2" });
+
+    expect(destination.lines.join("")).toContain('"consentVersion":"v2"');
+  });
+
   it("oculta PII aninhada e dados da autodeclaração", () => {
     const destination = memoryDestination();
     const logger = createLogger(destination, "info");

@@ -57,9 +57,9 @@ export async function completeOnboarding(
   });
 
   if (outcome === "onboarded") {
-    logger.info({ event: "user.onboarded", userId });
+    logger.info({ event: "user.onboarded", userId, consentVersion: CONSENT_VERSION });
   } else if (outcome === "renewed") {
-    logger.info({ event: "user.consent_renewed", userId });
+    logger.info({ event: "user.consent_renewed", userId, consentVersion: CONSENT_VERSION });
   }
   return ok({ userId, outcome });
 }

@@ -94,4 +94,27 @@ describe("requireOnboardedUser", () => {
 
     expect(await hasOutdatedConsent(db, userId)).toBe(false);
   });
+
+  it("leva quem aceitou o termo v1.1 ao reaceite do termo v2 antes de ver qualquer encontro", async () => {
+    await db.insert(userOnboardings).values({
+      userId,
+      declaredAutismLevel1OrAutonomous: true,
+      declaredAdult: true,
+      consentVersion: "v1.1",
+      consentedAt: new Date("2026-11-01T12:00:00Z"),
+    });
+
+    const r = await requireOnboardedUser({
+      db,
+      getSessionUser: async () => ({
+        id: userId,
+        name: "Pessoa Teste",
+        email: "pessoa-teste@exemplo.test",
+        image: null,
+      }),
+    });
+
+    expect(r).toEqual({ ok: false, error: { code: "ONBOARDING_REQUIRED" } });
+    expect(await hasOutdatedConsent(db, userId)).toBe(true);
+  });
 });
