@@ -78,6 +78,17 @@ describe("tela inicial", () => {
     expect(names).toEqual(COMMUNITIES.map((community) => community.name));
   });
 
+  it("mostra cada comunidade com a cor e o ícone dela, e o ícone só como enfeite", async () => {
+    await renderPage();
+    const section = screen.getByRole("region", { name: landingCopy.communitiesTitle });
+    const items = within(within(section).getByRole("list")).getAllByRole("listitem");
+    COMMUNITIES.forEach((community, index) => {
+      const icon = (items[index] as HTMLElement).querySelector("[data-community-icon]");
+      expect(icon).toHaveAttribute("data-community-icon", community.slug);
+      expect(icon).toHaveAttribute("aria-hidden", "true");
+    });
+  });
+
   it("não consulta o banco quando o visitante não tem sessão", async () => {
     await renderPage();
     expect(mocks.getDb).not.toHaveBeenCalled();

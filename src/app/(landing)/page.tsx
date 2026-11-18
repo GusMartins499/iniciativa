@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { CommunityTag } from "@/app/community-icon";
 import { COMMUNITIES } from "@/modules/communities/client";
 import { hasCompletedOnboarding } from "@/modules/users";
 import { accountCopy, signInCopy } from "@/modules/users/client";
@@ -148,11 +149,8 @@ export default async function LandingPage({ searchParams }: SignInPageProps) {
           </div>
           <ul className="flex flex-wrap content-start gap-3">
             {COMMUNITIES.map(({ slug, name }) => (
-              <li
-                key={slug}
-                className="rounded-full bg-tag px-4 py-2 text-lg font-semibold text-tag-foreground"
-              >
-                {name}
+              <li key={slug}>
+                <CommunityTag slug={slug} name={name} className="py-1.5 pr-4 text-lg" />
               </li>
             ))}
           </ul>
