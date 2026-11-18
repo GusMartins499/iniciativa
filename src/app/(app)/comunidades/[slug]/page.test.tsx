@@ -1,4 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+
+// Os números da lateral são frases partidas em dois spans (número grande, rótulo).
+const sentence = (text: string) => (_: string, element: Element | null) =>
+  element?.tagName === "P" && element.textContent === text;
 import { describe, expect, it, vi } from "vitest";
 import type { PublicMeetup } from "@/modules/meetups/client";
 
@@ -67,15 +71,28 @@ describe("página da comunidade", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "Corrida" })).toBeVisible();
     expect(screen.getByText("Para quem corre ou quer começar a correr.")).toBeVisible();
-    expect(screen.getByText("1 pessoa participa")).toBeVisible();
+    expect(screen.getByRole("heading", { level: 1 }).nextElementSibling?.textContent).toBe(
+      "Para quem corre ou quer começar a correr.",
+    );
+    expect(screen.getByText(sentence("1 pessoa participa"))).toBeVisible();
     expect(screen.getByRole("button", { name: "Sair da comunidade" })).toBeVisible();
   });
 
   it("mostra o nº de encontros futuros e a lista para quem participa", async () => {
     render(await CommunityPage({ params: Promise.resolve({ slug: "corrida" }) }));
 
-    expect(screen.getByText("1 encontro futuro")).toBeVisible();
+    expect(screen.getByText(sentence("1 encontro futuro"))).toBeVisible();
     expect(screen.getByRole("link", { name: /Corrida na beira-rio/ })).toBeVisible();
+  });
+
+  it("põe os encontros antes das informações da comunidade, que ficam numa lateral", async () => {
+    render(await CommunityPage({ params: Promise.resolve({ slug: "corrida" }) }));
+
+    const meetups = screen.getByRole("region", { name: "Próximos encontros" });
+    const about = screen.getByRole("complementary", { name: "Sobre a comunidade" });
+    expect(meetups.compareDocumentPosition(about) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(about).getByText(sentence("1 pessoa participa"))).toBeVisible();
+    expect(within(about).getByRole("button", { name: "Sair da comunidade" })).toBeVisible();
   });
 
   it("mostra só o nº de encontros futuros para quem não participa", async () => {
@@ -83,7 +100,7 @@ describe("página da comunidade", () => {
 
     render(await CommunityPage({ params: Promise.resolve({ slug: "rpg" }) }));
 
-    expect(screen.getByText("1 encontro futuro")).toBeVisible();
+    expect(screen.getByText(sentence("1 encontro futuro"))).toBeVisible();
     expect(screen.queryByRole("link", { name: /Corrida na beira-rio/ })).not.toBeInTheDocument();
     expect(listUpcomingByCommunity).not.toHaveBeenCalled();
   });
