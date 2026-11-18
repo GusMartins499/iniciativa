@@ -7,12 +7,14 @@ type RootLayoutShellProps = {
   children: ReactNode;
   // Navegação das páginas autenticadas; as páginas públicas mostram só a marca.
   nav?: ReactNode;
-  // "narrow" (padrão) para formulários e listas. "wide" é a tela inicial: cabeçalho e rodapé
+  // "narrow" (padrão) para formulários e listas. "app" é a área logada: cabeçalho, rodapé e
+  // conteúdo em 1024 px, para a barra caber numa linha e as telas terem lateral; cada página
+  // que é só uma coluna se limita a 768 px. "wide" é a tela inicial: cabeçalho e rodapé
   // largos, e o conteúdo ocupa a tela de ponta a ponta (cada seção define a própria largura).
-  width?: "narrow" | "wide";
+  width?: "narrow" | "app" | "wide";
 };
 
-const maxWidth = { narrow: "max-w-3xl", wide: "max-w-6xl" } as const;
+const maxWidth = { narrow: "max-w-3xl", app: "max-w-5xl", wide: "max-w-6xl" } as const;
 
 // O ano exibido segue o fuso do produto, não o do servidor (a Vercel roda em UTC).
 function currentYearInSaoPaulo() {

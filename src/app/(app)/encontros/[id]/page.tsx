@@ -65,7 +65,7 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
   else status = { kind: "open", full: meetup.isFull };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
       <div>
         {backLink}
         <h1 className="mt-1 text-[2rem] leading-tight font-bold tracking-tight">{meetup.title}</h1>

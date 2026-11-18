@@ -30,6 +30,16 @@ describe("layout raiz", () => {
     expect(screen.getByRole("main")).not.toHaveClass("max-w-3xl");
   });
 
+  it("a área logada usa 1024 px no cabeçalho e no conteúdo", () => {
+    render(
+      <RootLayoutShell width="app">
+        <p>conteúdo</p>
+      </RootLayoutShell>,
+    );
+    expect(screen.getByRole("banner")).toHaveClass("max-w-5xl");
+    expect(screen.getByRole("main")).toHaveClass("max-w-5xl");
+  });
+
   it("não tem violações de acessibilidade", async () => {
     const { container } = renderShell();
     expect(await axe(container)).toHaveNoViolations();
