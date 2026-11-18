@@ -7,7 +7,7 @@ import {
   releaseSeats,
   reserveSeats,
 } from "@/modules/meetups";
-import { getFirstNames } from "@/shared/auth";
+import { getPublicProfiles } from "@/shared/auth";
 import type { Database } from "@/shared/db";
 import { logger } from "@/shared/logger";
 import { err, ok, type Result } from "@/shared/result";
@@ -159,12 +159,14 @@ export async function getUserRsvp(
   return row ?? null;
 }
 
-// Nomes só para o criador, conferido no servidor antes de qualquer leitura.
+export type CreatorAttendee = { firstName: string; image: string | null; withCompanion: boolean };
+
+// Nomes e fotos só para o criador, conferido no servidor antes de qualquer leitura.
 export async function listAttendeesForCreator(
   db: Database,
   requesterId: string,
   meetupId: string,
-): Promise<Result<{ firstName: string; withCompanion: boolean }[], "NOT_MEETUP_CREATOR">> {
+): Promise<Result<CreatorAttendee[], "NOT_MEETUP_CREATOR">> {
   if ((await getCreatorId(db, meetupId)) !== requesterId) {
     return err("NOT_MEETUP_CREATOR");
   }
@@ -173,13 +175,14 @@ export async function listAttendeesForCreator(
     .from(rsvps)
     .where(eq(rsvps.meetupId, meetupId))
     .orderBy(asc(rsvps.createdAt));
-  const names = await getFirstNames(
+  const profiles = await getPublicProfiles(
     db,
     rows.map((row) => row.userId),
   );
   return ok(
     rows.map((row) => ({
-      firstName: names.get(row.userId) ?? "",
+      firstName: profiles.get(row.userId)?.firstName ?? "",
+      image: profiles.get(row.userId)?.image ?? null,
       withCompanion: row.withCompanion,
     })),
   );
