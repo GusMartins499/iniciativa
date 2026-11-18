@@ -45,6 +45,7 @@ src/
 - Verifique a sessão **e** a autodeclaração com consentimento aceito em toda Server Action e em toda rota protegida. Sem isso, redirecione para o onboarding.
 - Mantenha as regras de negócio só no servidor: vagas, acompanhante, prazo até o início, permissão do criador.
 - Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts`, o `vitest.config.ts` e o `playwright.config.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`), e o `process.env.NEXT_RUNTIME` do `src/instrumentation.ts`, que o Next define. Variável nova entra no schema do `env.ts` e no `.env.example` (e no README só quando o repositório for privado; ver § Infra provisioning).
+- Variável **obrigatória** nova no schema do `env.ts` (sem `.optional()` nem `.default()`) entra, no mesmo PR, também no `e2eEnv` do `playwright.config.ts` e nos objetos de env válidos de `src/shared/env.test.ts`, `src/shared/env.chaos.test.ts` e `src/shared/db/client.chaos.test.ts`, com um valor curto e legível (§ Security). Sem isso, o e2e não sobe e esses testes quebram, porque o `getServerEnv()` valida o schema inteiro. Avise no PR que a variável precisa existir na Vercel (Production e Preview) e no `.env.local` antes do merge: sem ela, o app não sobe.
 - Grave datas em **UTC** no banco (`timestamp with time zone`). Exiba e interprete as datas no fuso `America/Sao_Paulo`.
 
 **Nunca:**
