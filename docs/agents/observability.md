@@ -32,6 +32,8 @@ Dashboard **iniciativa**: requisições por minuto, taxa de erro, p95 por rota e
 contagem dos eventos de negócio a partir do Loki. As consultas agregam por evento e rota, nunca
 por `userId`. Painéis das comunidades: comentários por dia, entradas por comunidade (`communitySlug`), separando as do onboarding pelo `source`
 e encontros criados por público (`audience`), agregados por comunidade, nunca por usuário.
+Painel de aceites do termo por versão: `user.onboarded` e `user.consent_renewed` agrupados por
+`consentVersion`, para acompanhar o reaceite da v2.
 
 ## Comunidades e comentários
 
