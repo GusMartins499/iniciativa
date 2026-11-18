@@ -62,10 +62,10 @@ describe("lista de encontros por dia", () => {
         createdIds={new Set(["m2"])}
       />,
     );
-    const links = screen.getAllByRole("link");
-    expect(within(links[0] as HTMLElement).getByText("Você vai")).toBeInTheDocument();
-    expect(within(links[1] as HTMLElement).getByText("Você criou")).toBeInTheDocument();
-    expect(within(links[2] as HTMLElement).queryByText("Você vai")).not.toBeInTheDocument();
+    const cards = screen.getAllByRole("listitem");
+    expect(within(cards[0] as HTMLElement).getByText("Você vai")).toBeInTheDocument();
+    expect(within(cards[1] as HTMLElement).getByText("Você criou")).toBeInTheDocument();
+    expect(within(cards[2] as HTMLElement).queryByText("Você vai")).not.toBeInTheDocument();
   });
 
   it("mostra Lotado e Alterado", () => {
@@ -78,14 +78,54 @@ describe("lista de encontros por dia", () => {
 
   it("mostra a etiqueta do público: a comunidade ou Aberto", () => {
     render(<MeetupDays meetups={[meetup({}), meetup({ id: "m4", communitySlug: "rpg" })]} />);
-    const links = screen.getAllByRole("link");
-    expect(within(links[0] as HTMLElement).getByText("Aberto")).toBeInTheDocument();
-    expect(within(links[1] as HTMLElement).getByText("RPG")).toBeInTheDocument();
+    const cards = screen.getAllByRole("listitem");
+    expect(within(cards[0] as HTMLElement).getByText("Aberto")).toBeInTheDocument();
+    expect(within(cards[1] as HTMLElement).getByText("RPG")).toBeInTheDocument();
+  });
+
+  it("cada card leva ao detalhe pelo título", () => {
+    render(<MeetupDays meetups={[meetup({})]} />);
+
+    expect(screen.getByRole("link", { name: "Café no centro" })).toHaveAttribute(
+      "href",
+      "/encontros/m1",
+    );
+  });
+
+  it("a etiqueta da comunidade leva à página dela para quem participa; Aberto não é link", () => {
+    render(
+      <MeetupDays
+        meetups={[meetup({}), meetup({ id: "m4", communitySlug: "rpg" })]}
+        memberSlugs={new Set(["rpg"])}
+      />,
+    );
+
+    const tag = screen.getByRole("link", { name: "RPG" });
+    expect(tag).toHaveAttribute("href", "/comunidades/rpg");
+    expect(tag).toHaveClass("min-h-11");
+    expect(screen.queryByRole("link", { name: "Aberto" })).not.toBeInTheDocument();
+    expect(screen.getByText("Aberto")).toBeInTheDocument();
+  });
+
+  it("a etiqueta da comunidade não é link para quem não participa", () => {
+    render(
+      <MeetupDays
+        meetups={[meetup({ id: "m4", communitySlug: "rpg" })]}
+        memberSlugs={new Set(["cinema"])}
+      />,
+    );
+
+    expect(screen.queryByRole("link", { name: "RPG" })).not.toBeInTheDocument();
+    expect(screen.getByText("RPG")).toBeInTheDocument();
   });
 
   it("não tem violações de acessibilidade", async () => {
     const { container } = render(
-      <MeetupDays meetups={[meetup({}), nextWeek]} goingIds={new Set(["m1"])} />,
+      <MeetupDays
+        meetups={[meetup({}), nextWeek, meetup({ id: "m4", communitySlug: "rpg" })]}
+        goingIds={new Set(["m1"])}
+        memberSlugs={new Set(["rpg"])}
+      />,
     );
     expect(await axe(container)).toHaveNoViolations();
   });

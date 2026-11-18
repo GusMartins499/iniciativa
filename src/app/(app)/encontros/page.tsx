@@ -18,7 +18,7 @@ export default async function MeetupsPage() {
   const meetups = result.ok ? result.data : [];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       {memberSlugs.length === 0 ? (
         <p className="rounded-xl bg-honey-light p-4 font-semibold text-honey-light-foreground">
           {copy.noCommunitiesBanner}{" "}
@@ -38,6 +38,7 @@ export default async function MeetupsPage() {
           meetups={meetups}
           goingIds={new Set(goingIds)}
           createdIds={new Set(created.map((meetup) => meetup.id))}
+          memberSlugs={new Set(memberSlugs)}
         />
       )}
     </div>

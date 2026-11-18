@@ -26,7 +26,16 @@ export const communitiesCopy = {
   description: (slug: CommunitySlug) => descriptions[slug],
   members: (count: number) => (count === 1 ? "1 pessoa participa" : `${count} pessoas participam`),
   memberNote: "Você participa desta comunidade.",
+  seeMeetups: "Ver encontros",
+  memberBadge: "Você participa",
   backToList: "Voltar para comunidades",
+  aboutTitle: "Sobre a comunidade",
+  // Rótulos dos números da lateral da comunidade: com o número na frente, formam as
+  // mesmas frases de members e de meetupsCopy.community.upcomingCount.
+  stats: {
+    members: (count: number) => (count === 1 ? "pessoa participa" : "pessoas participam"),
+    upcoming: (count: number) => (count === 1 ? "encontro futuro" : "encontros futuros"),
+  },
   notFound: "Esta comunidade não existe.",
   joinButton: "Entrar na comunidade",
   joinDialogTitle: "Entrar na comunidade",

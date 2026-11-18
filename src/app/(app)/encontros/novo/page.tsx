@@ -10,7 +10,7 @@ export default async function NewMeetupPage() {
   const currentUser = await requirePageUser();
   const memberSlugs = await listMemberSlugs(getDb(), currentUser.id);
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <h1 className="text-2xl font-bold">{meetupsCopy.form.title}</h1>
       <MeetupForm action={createMeetupAction} audiences={audienceOptions(memberSlugs)} />
     </div>

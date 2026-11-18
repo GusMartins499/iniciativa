@@ -10,7 +10,7 @@ import { SignOutButton } from "./sign-out-button";
 export default async function AccountPage() {
   const currentUser = await requirePageUser();
   return (
-    <div className="flex flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
       <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
 
       <section

@@ -12,6 +12,7 @@ type MeetupDaysProps = {
   meetups: PublicMeetup[];
   goingIds?: ReadonlySet<string>;
   createdIds?: ReadonlySet<string>;
+  memberSlugs?: ReadonlySet<string>;
 };
 
 export function groupByDay(meetups: PublicMeetup[]): { key: string; meetups: PublicMeetup[] }[] {
@@ -25,7 +26,7 @@ export function groupByDay(meetups: PublicMeetup[]): { key: string; meetups: Pub
 
 // Linha do tempo por dia: folhinha de calendário à esquerda, encontros do dia à direita.
 // A folhinha é só visual; o leitor de tela recebe a data por extenso.
-export function MeetupDays({ meetups, goingIds, createdIds }: MeetupDaysProps) {
+export function MeetupDays({ meetups, goingIds, createdIds, memberSlugs }: MeetupDaysProps) {
   return (
     <div className="flex flex-col gap-8">
       {groupByDay(meetups).map((day) => {
@@ -69,6 +70,7 @@ export function MeetupDays({ meetups, goingIds, createdIds }: MeetupDaysProps) {
                     meetup={meetup}
                     going={goingIds?.has(meetup.id)}
                     created={createdIds?.has(meetup.id)}
+                    memberSlugs={memberSlugs}
                   />
                 </li>
               ))}

@@ -10,6 +10,7 @@ import { createMeetup } from "./create-meetup";
 import { updateMeetup } from "./manage-meetup";
 import {
   canSeeMeetup,
+  countUpcomingByCommunities,
   countUpcomingByCommunity,
   getMeetup,
   listUpcoming,
@@ -171,6 +172,22 @@ describe("meetups por comunidade", () => {
 
     expect(await countUpcomingByCommunity(db, "rpg", NOW)).toBe(2);
     expect(await countUpcomingByCommunity(db, "cinema", NOW)).toBe(0);
+  });
+
+  it("conta os encontros futuros de todas as comunidades numa consulta só, por slug", async () => {
+    await joinCommunity(db, creatorId, "cinema");
+    await create("rpg 1", "rpg");
+    await create("rpg 2", "rpg", "2026-12-06");
+    await create("passado", "rpg", "2026-11-10");
+    await create("cinema", "cinema");
+    await create("aberto", "open");
+
+    const counts = await countUpcomingByCommunities(db, NOW);
+
+    expect(counts.get("rpg")).toBe(2);
+    expect(counts.get("cinema")).toBe(1);
+    expect(counts.has("corrida")).toBe(false);
+    expect([...counts.keys()].sort()).toEqual(["cinema", "rpg"]);
   });
 
   it("lista só os encontros futuros da comunidade", async () => {

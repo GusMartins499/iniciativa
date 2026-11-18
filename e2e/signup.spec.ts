@@ -51,7 +51,7 @@ test("conta nova: aceite antes do Google, conclusão e escolha de comunidades le
 
   // Mesmo efeito de entrar pela página "Comunidades".
   await page.goto("/comunidades");
-  await expect(page.getByText(communitiesCopy.memberNote)).toHaveCount(2);
+  await expect(page.getByText(communitiesCopy.memberBadge, { exact: true })).toHaveCount(2);
 
   // Voltar ao passo e salvar de novo não duplica participações.
   await page.goto("/boas-vindas/comunidades");

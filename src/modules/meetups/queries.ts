@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt, inArray, isNull, lt, or } from "drizzle-orm";
+import { and, asc, count, eq, gt, inArray, isNotNull, isNull, lt, or } from "drizzle-orm";
 import type { CommunitySlug } from "@/modules/communities";
 import type { Database } from "@/shared/db";
 import { err, ok, type Result } from "@/shared/result";
@@ -77,6 +77,22 @@ export async function countUpcomingByCommunity(
     .from(meetups)
     .where(and(upcoming(now), eq(meetups.communitySlug, slug)));
   return row?.total ?? 0;
+}
+
+// A lista de comunidades mostra a contagem de todas: uma consulta agrupada, sem N+1.
+// Comunidade sem encontro futuro fica fora do mapa (quem lê assume 0).
+export async function countUpcomingByCommunities(
+  db: Database,
+  now: Date = new Date(),
+): Promise<Map<CommunitySlug, number>> {
+  const rows = await db
+    .select({ slug: meetups.communitySlug, total: count() })
+    .from(meetups)
+    .where(and(upcoming(now), isNotNull(meetups.communitySlug)))
+    .groupBy(meetups.communitySlug);
+  return new Map(
+    rows.flatMap((row) => (row.slug === null ? [] : [[row.slug, row.total] as const])),
+  );
 }
 
 export type MeetupViewer = {

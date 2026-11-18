@@ -11,21 +11,33 @@ export type MeetupCardProps = {
   created?: boolean;
   // Em "Meus encontros" o aviso aparece por extenso: é por ali que a pessoa fica sabendo.
   longNotices?: boolean;
+  // Comunidades de quem vê: a etiqueta da comunidade vira link para a página dela.
+  memberSlugs?: ReadonlySet<string>;
 };
 
 const tagBase = "rounded-full px-2.5 py-0.5 text-sm font-semibold";
 
-// Só dados públicos e a ocupação; o card inteiro leva ao detalhe.
+// Só dados públicos e a ocupação. O card inteiro leva ao detalhe por um link esticado no
+// título (link dentro de link não vale em HTML); a etiqueta da comunidade fica por cima dele.
 export function MeetupCard({
   meetup,
   going = false,
   created = false,
   longNotices = false,
+  memberSlugs,
 }: MeetupCardProps) {
   const cancelled = meetup.status === "cancelled";
   const edited = meetup.editedAt !== null;
-  const tags = [
-    { label: audienceTag(meetup.communitySlug), className: "bg-tag text-tag-foreground" },
+  const communityHref =
+    meetup.communitySlug !== null && memberSlugs?.has(meetup.communitySlug)
+      ? `/comunidades/${meetup.communitySlug}`
+      : null;
+  const tags: { label: string; className: string; href?: string }[] = [
+    {
+      label: audienceTag(meetup.communitySlug),
+      className: "bg-tag text-tag-foreground",
+      href: communityHref ?? undefined,
+    },
     created ? { label: copy.tags.created, className: "bg-primary text-primary-foreground" } : null,
     going && !created
       ? { label: copy.tags.going, className: "bg-primary text-primary-foreground" }
@@ -42,10 +54,7 @@ export function MeetupCard({
   ].filter((tag) => tag !== null);
 
   return (
-    <Link
-      href={`/encontros/${meetup.id}`}
-      className="group block rounded-2xl border border-border bg-surface p-4 shadow-sm hover:border-border-strong hover:shadow-md sm:p-5"
-    >
+    <div className="group relative rounded-2xl border border-border bg-surface p-4 shadow-sm hover:border-border-strong hover:shadow-md sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <p className="inline-flex items-center gap-1.5 rounded-full bg-honey-light px-2.5 py-0.5 text-sm font-semibold text-honey-light-foreground">
           <Clock aria-hidden="true" className="size-4" />
@@ -56,7 +65,14 @@ export function MeetupCard({
           className="size-5 shrink-0 text-muted-foreground group-hover:text-foreground"
         />
       </div>
-      <h3 className="mt-2.5 text-xl leading-snug font-bold tracking-tight">{meetup.title}</h3>
+      <h3 className="mt-2.5 text-xl leading-snug font-bold tracking-tight">
+        <Link
+          href={`/encontros/${meetup.id}`}
+          className="after:absolute after:inset-0 after:rounded-2xl"
+        >
+          {meetup.title}
+        </Link>
+      </h3>
       {longNotices && (cancelled || edited) ? (
         <p
           className={`mt-2 rounded-md p-2.5 font-semibold ${
@@ -76,14 +92,24 @@ export function MeetupCard({
         </div>
       )}
       {tags.length > 0 ? (
-        <p className="mt-3 flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <span key={tag.label} className={`${tagBase} ${tag.className}`}>
-              {tag.label}
-            </span>
-          ))}
+        <p className="mt-3 flex flex-wrap items-center gap-2">
+          {tags.map((tag) =>
+            tag.href ? (
+              <Link
+                key={tag.label}
+                href={tag.href}
+                className="relative z-10 inline-flex min-h-11 items-center underline underline-offset-4"
+              >
+                <span className={`${tagBase} ${tag.className}`}>{tag.label}</span>
+              </Link>
+            ) : (
+              <span key={tag.label} className={`${tagBase} ${tag.className}`}>
+                {tag.label}
+              </span>
+            ),
+          )}
         </p>
       ) : null}
-    </Link>
+    </div>
   );
 }

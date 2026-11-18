@@ -44,7 +44,9 @@ test("cria um encontro e vê na lista e no detalhe", async ({ page }) => {
   await expect(page.getByText(rsvpsCopy.creatorNote)).toBeVisible();
 
   await page.goto("/encontros");
-  await expect(page.getByRole("link", { name: title })).toContainText(meetupsCopy.tags.open);
+  await expect(
+    page.getByRole("listitem").filter({ has: page.getByRole("link", { name: title }) }),
+  ).toContainText(meetupsCopy.tags.open);
 
   await page.goto("/meus-encontros");
   await expect(

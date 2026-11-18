@@ -1,16 +1,17 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { axe } from "vitest-axe";
-import { COMMUNITIES, type CommunitySummary } from "@/modules/communities/client";
-import { CommunityList } from "./community-list";
+import { COMMUNITIES } from "@/modules/communities/client";
+import { type CommunityCard, CommunityList } from "./community-list";
 
 const noop = () => async () => ({ code: null });
 
-const communities: CommunitySummary[] = COMMUNITIES.map((community, index) => ({
+const communities: CommunityCard[] = COMMUNITIES.map((community, index) => ({
   slug: community.slug,
   name: community.name,
   memberCount: index,
   isMember: community.slug === "rpg",
+  upcomingCount: community.slug === "rpg" ? 3 : community.slug === "cinema" ? 1 : 0,
 }));
 
 function renderList() {
@@ -42,6 +43,36 @@ describe("tela de comunidades", () => {
     expect(screen.getAllByRole("button", { name: "Entrar na comunidade" })).toHaveLength(8);
     const rpg = within(screen.getAllByRole("listitem")[2] as HTMLElement);
     expect(rpg.getByRole("button", { name: "Sair da comunidade" })).toBeVisible();
+  });
+
+  it("mostra o nº de encontros futuros em todos os cards, também para quem não participa", () => {
+    renderList();
+
+    const items = screen.getAllByRole("listitem");
+    expect(within(items[2] as HTMLElement).getByText("3 encontros futuros")).toBeVisible();
+    expect(within(items[4] as HTMLElement).getByText("1 encontro futuro")).toBeVisible();
+    expect(within(items[0] as HTMLElement).getByText("0 encontros futuros")).toBeVisible();
+  });
+
+  it("mostra Ver encontros, com texto e área de toque de 44px, só onde a pessoa participa", () => {
+    renderList();
+
+    const links = screen.getAllByRole("link", { name: "Ver encontros" });
+    expect(links).toHaveLength(1);
+    const rpg = within(screen.getAllByRole("listitem")[2] as HTMLElement);
+    const link = rpg.getByRole("link", { name: "Ver encontros" });
+    expect(link).toHaveAttribute("href", "/comunidades/rpg");
+    expect(link).toHaveClass("min-h-11");
+    const cinema = within(screen.getAllByRole("listitem")[4] as HTMLElement);
+    expect(cinema.queryByRole("link", { name: "Ver encontros" })).not.toBeInTheDocument();
+  });
+
+  it("marca com um selo só os cards das comunidades de que a pessoa participa", () => {
+    renderList();
+
+    expect(screen.getAllByText("Você participa")).toHaveLength(1);
+    const rpg = within(screen.getAllByRole("listitem")[2] as HTMLElement);
+    expect(rpg.getByText("Você participa")).toBeVisible();
   });
 
   it("não tem violações de acessibilidade", async () => {
