@@ -16,6 +16,7 @@ function meetup(overrides: Partial<PublicMeetup>): PublicMeetup {
     occupiedSeats: 4,
     status: "active",
     editedAt: null,
+    communitySlug: null,
     isFull: false,
     ...overrides,
   };
@@ -73,6 +74,13 @@ describe("lista de encontros por dia", () => {
     );
     expect(screen.getByText("Lotado")).toBeInTheDocument();
     expect(screen.getByText("Alterado")).toBeInTheDocument();
+  });
+
+  it("mostra a etiqueta do público: a comunidade ou Aberto", () => {
+    render(<MeetupDays meetups={[meetup({}), meetup({ id: "m4", communitySlug: "rpg" })]} />);
+    const links = screen.getAllByRole("link");
+    expect(within(links[0] as HTMLElement).getByText("Aberto")).toBeInTheDocument();
+    expect(within(links[1] as HTMLElement).getByText("RPG")).toBeInTheDocument();
   });
 
   it("não tem violações de acessibilidade", async () => {

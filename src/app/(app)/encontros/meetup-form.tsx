@@ -17,6 +17,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/shared/ui/dialog";
+import type { AudienceOption } from "./audience";
 import type { MeetupFormState } from "./meetup-form-state";
 
 const copy = meetupsCopy.form;
@@ -29,6 +30,8 @@ export type MeetupFormProps = {
   // Na edição o acompanhante do criador não muda (fora do escopo do MVP).
   mode?: "create" | "edit";
   defaultValues?: Partial<MeetupFormValues>;
+  // Na criação, as opções do campo; na edição, só a do público atual (para leitura).
+  audiences: AudienceOption[];
 };
 
 function FieldError({ errors, name }: { errors: FieldErrors<MeetupFormValues>; name: FieldName }) {
@@ -40,7 +43,7 @@ function FieldError({ errors, name }: { errors: FieldErrors<MeetupFormValues>; n
   );
 }
 
-export function MeetupForm({ action, mode = "create", defaultValues }: MeetupFormProps) {
+export function MeetupForm({ action, mode = "create", defaultValues, audiences }: MeetupFormProps) {
   const texts = mode === "edit" ? meetupsCopy.editForm : copy;
   const [state, dispatch, pending] = useActionState(action, { code: null });
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -143,6 +146,45 @@ export function MeetupForm({ action, mode = "create", defaultValues }: MeetupFor
         />
         <FieldError errors={errors} name="capacity" />
       </div>
+      {mode === "create" ? (
+        <fieldset
+          role="radiogroup"
+          aria-labelledby="audience-legend"
+          aria-describedby={errors.audience ? "audience-hint audience-error" : "audience-hint"}
+          className="flex flex-col gap-1"
+        >
+          <legend id="audience-legend">{copy.audienceLabel}</legend>
+          <p id="audience-hint" className="text-sm text-muted-foreground">
+            {copy.audienceHint}
+          </p>
+          {audiences.map((option) => (
+            <label key={option.value} className="flex min-h-11 items-center gap-3">
+              <input
+                type="radio"
+                value={option.value}
+                {...register("audience")}
+                className="size-5 shrink-0"
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+          <FieldError errors={errors} name="audience" />
+        </fieldset>
+      ) : (
+        <div className="flex flex-col gap-1">
+          <label htmlFor="audience">{copy.audienceLabel}</label>
+          <input
+            id="audience"
+            readOnly
+            value={audiences[0]?.label ?? ""}
+            aria-describedby="audience-hint"
+            className={`${inputClass} bg-tag text-tag-foreground`}
+          />
+          <p id="audience-hint" className="text-sm text-muted-foreground">
+            {copy.audienceHint}
+          </p>
+        </div>
+      )}
       {mode === "create" ? (
         <label className="flex min-h-11 items-start gap-3">
           <input type="checkbox" {...register("withCompanion")} className="mt-1 size-5 shrink-0" />

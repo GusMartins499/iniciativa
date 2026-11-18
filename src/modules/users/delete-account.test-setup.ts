@@ -18,6 +18,7 @@ function meetupInput(day: string, capacity = 10, withCompanion = false) {
     address: "Rua X, 100",
     capacity,
     publicPlace: true,
+    audience: "open",
     withCompanion,
   };
 }

@@ -1,7 +1,17 @@
 import Link from "next/link";
-import { getCreatorId, getMeetup, meetupsCopy as copy } from "@/modules/meetups";
+import { notFound } from "next/navigation";
+import { listMemberSlugs } from "@/modules/communities";
+import {
+  canSeeMeetup,
+  getCreatorId,
+  getMeetup,
+  meetupsCopy as copy,
+  OPEN_AUDIENCE,
+} from "@/modules/meetups";
+import { getUserRsvp } from "@/modules/rsvps";
 import { getDb } from "@/shared/db";
 import { formatAppTime, toAppDateInput } from "@/shared/time";
+import { audienceTag } from "../../audience";
 import { MeetupForm } from "../../meetup-form";
 import { requirePageUser } from "../../../require-page-user";
 import { updateMeetupAction } from "./actions";
@@ -14,6 +24,16 @@ export default async function EditMeetupPage({ params }: EditMeetupPageProps) {
   const currentUser = await requirePageUser();
   const { id } = await params;
   const db = getDb();
+  const [memberSlugs, rsvp] = await Promise.all([
+    listMemberSlugs(db, currentUser.id),
+    getUserRsvp(db, currentUser.id, id),
+  ]);
+  const access = await canSeeMeetup(db, id, {
+    userId: currentUser.id,
+    memberSlugs,
+    hasRsvp: rsvp !== null,
+  });
+  if (!access.visible) notFound();
   const result = await getMeetup(db, id);
 
   let blocked: string | null = null;
@@ -35,6 +55,13 @@ export default async function EditMeetupPage({ params }: EditMeetupPageProps) {
         <MeetupForm
           mode="edit"
           action={updateMeetupAction.bind(null, id)}
+          // O público vai junto, só para leitura: o servidor recusa qualquer mudança.
+          audiences={[
+            {
+              value: result.data.communitySlug ?? OPEN_AUDIENCE,
+              label: audienceTag(result.data.communitySlug),
+            },
+          ]}
           defaultValues={{
             title: result.data.title,
             date: toAppDateInput(result.data.startsAt),
@@ -44,6 +71,7 @@ export default async function EditMeetupPage({ params }: EditMeetupPageProps) {
             placeDescription: result.data.placeDescription ?? "",
             capacity: result.data.capacity,
             publicPlace: true,
+            audience: result.data.communitySlug ?? OPEN_AUDIENCE,
           }}
         />
       )}

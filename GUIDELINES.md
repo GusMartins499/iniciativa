@@ -74,7 +74,7 @@ src/
 
 - Todo caso de uso de escrita, ao terminar com sucesso, emite um evento `info` com nome `<domínio>.<ação no passado>`:
   `meetup.created`, `meetup.updated`, `meetup.cancelled`, `rsvp.confirmed`, `rsvp.cancelled`, `user.onboarded`, `user.signup_completed` (volta do Google em `/boas-vindas/concluir` com o aceite registrado, para conta nova ou já existente), `user.consent_renewed` (aceite de uma versão nova do termo), `user.deleted`, `community.joined`, `community.left`.
-- Payload do evento: `{ event, userId, meetupId?, rsvpId?, withCompanion?, communitySlug? }`. Os IDs vão no payload; PII nunca vai.
+- Payload do evento: `{ event, userId, meetupId?, rsvpId?, withCompanion?, communitySlug?, audience? }`. O `meetup.created` leva o `audience`: `open` ou o slug da comunidade. Os IDs vão no payload; PII nunca vai.
 - Evento novo segue o mesmo padrão e é registrado nesta lista.
 - Evento novo que precisar de alerta ou de painel entra também no dashboard **iniciativa** do Grafana Cloud (alertas e painéis em `docs/agents/observability.md`). Painel e consulta agregam por evento e rota, nunca por `userId`.
 
@@ -95,7 +95,7 @@ src/
     | { ok: false; error: { code: C } };
   ```
 
-- Os códigos de erro esperado são constantes em `SCREAMING_SNAKE_CASE`, definidas por módulo: `MEETUP_FULL`, `MEETUP_STARTED`, `MEETUP_CANCELLED`, `NOT_MEETUP_CREATOR`, `CAPACITY_BELOW_OCCUPIED`, `CREATOR_CANNOT_LEAVE`, `ONBOARDING_REQUIRED`, `VALIDATION_FAILED`.
+- Os códigos de erro esperado são constantes em `SCREAMING_SNAKE_CASE`, definidas por módulo: `MEETUP_FULL`, `MEETUP_STARTED`, `MEETUP_CANCELLED`, `NOT_MEETUP_CREATOR`, `CAPACITY_BELOW_OCCUPIED`, `CREATOR_CANNOT_LEAVE`, `NOT_COMMUNITY_MEMBER`, `AUDIENCE_LOCKED`, `ONBOARDING_REQUIRED`, `VALIDATION_FAILED`.
 - Use exceção **só** para falha inesperada (banco fora do ar, bug). A Server Action captura no limite, loga com `error` e devolve uma mensagem genérica em português ("Algo deu errado. Tente de novo.").
 - Nunca use `throw` para regra de negócio. Nunca mostre stack trace ou mensagem técnica na tela.
 - Cada `code` tem um texto de tela literal e direto no `copy.ts` do módulo. Exemplo: `MEETUP_FULL` vira "Este encontro está lotado."
@@ -184,7 +184,8 @@ Os níveis abaixo são a referência de severidade do `/chaos-engineering`.
   - entrar no app sem autodeclaração ou sem consentimento;
   - a exclusão de conta deixar dados para trás;
   - um encontro passar do limite de vagas;
-  - alguém ver quem é membro de uma comunidade (só a contagem é pública).
+  - alguém ver quem é membro de uma comunidade (só a contagem é pública);
+  - quem não é membro ver, confirmar ou cancelar presença num encontro de comunidade (a regra única é o `canSeeMeetup` de `meetups`: aberto, membro, criador ou com presença confirmada).
 - **Alto:** confirmar ou cancelar presença falhar; editar, confirmar ou cancelar depois do início do encontro.
 - **Médio / baixo:** falhas de exibição, de texto ou de layout que não afetam dados nem acesso.
 

@@ -1,5 +1,12 @@
 import { and, asc, eq } from "drizzle-orm";
-import { getCreatorId, lockMeetupForUpdate, releaseSeats, reserveSeats } from "@/modules/meetups";
+import { listMemberSlugs } from "@/modules/communities";
+import {
+  canSeeMeetup,
+  getCreatorId,
+  lockMeetupForUpdate,
+  releaseSeats,
+  reserveSeats,
+} from "@/modules/meetups";
 import { getFirstNames } from "@/shared/auth";
 import type { Database } from "@/shared/db";
 import { logger } from "@/shared/logger";
@@ -24,6 +31,34 @@ function rejected<C extends string>(code: C, userId: string, meetupId: string) {
   return err(code);
 }
 
+// HIDDEN já foi logado aqui e sai do caso de uso como NOT_FOUND: encontro de comunidade
+// alheia responde igual a um inexistente, e só o log guarda o motivo.
+async function checkAccess(
+  tx: Database,
+  userId: string,
+  meetupId: string,
+): Promise<Result<void, "HIDDEN">> {
+  const [memberSlugs, rsvp] = await Promise.all([
+    listMemberSlugs(tx, userId),
+    getUserRsvp(tx, userId, meetupId),
+  ]);
+  const access = await canSeeMeetup(tx, meetupId, { userId, memberSlugs, hasRsvp: rsvp !== null });
+  // Inexistente (sem comunidade) segue para a trava, que responde NOT_FOUND.
+  if (access.visible || access.communitySlug === null) return ok(undefined);
+  logger.warn({
+    event: "rsvp.rejected",
+    userId,
+    meetupId,
+    communitySlug: access.communitySlug,
+    code: "NOT_COMMUNITY_MEMBER",
+  });
+  return err("HIDDEN");
+}
+
+function finish<C extends string>(code: C | "HIDDEN", userId: string, meetupId: string) {
+  return code === "HIDDEN" ? err("NOT_FOUND") : rejected(code, userId, meetupId);
+}
+
 // rsvpId é null para o criador, que já entra confirmado ao criar o encontro.
 export async function confirmRsvp(
   db: Database,
@@ -37,7 +72,11 @@ export async function confirmRsvp(
   const { withCompanion } = parsed.data;
 
   const result = await db.transaction(
-    async (tx): Promise<Result<{ rsvpId: string | null; created: boolean }, ConfirmError>> => {
+    async (
+      tx,
+    ): Promise<Result<{ rsvpId: string | null; created: boolean }, ConfirmError | "HIDDEN">> => {
+      const access = await checkAccess(tx, userId, meetupId);
+      if (!access.ok) return access;
       const locked = await lockMeetupForUpdate(tx, meetupId);
       if (!locked.ok) return locked;
       if (locked.data.status === "cancelled") return err("MEETUP_CANCELLED");
@@ -62,7 +101,7 @@ export async function confirmRsvp(
     },
   );
 
-  if (!result.ok) return rejected(result.error.code, userId, meetupId);
+  if (!result.ok) return finish(result.error.code, userId, meetupId);
   if (result.data.created) {
     logger.info({
       event: "rsvp.confirmed",
@@ -81,23 +120,27 @@ export async function cancelRsvp(
   meetupId: string,
   now: Date = new Date(),
 ): Promise<Result<void, CancelError>> {
-  const result = await db.transaction(async (tx): Promise<Result<string | null, CancelError>> => {
-    const locked = await lockMeetupForUpdate(tx, meetupId);
-    if (!locked.ok) return locked;
-    if (locked.data.creatorId === userId) return err("CREATOR_CANNOT_LEAVE");
-    if (locked.data.startsAt <= now) return err("MEETUP_STARTED");
+  const result = await db.transaction(
+    async (tx): Promise<Result<string | null, CancelError | "HIDDEN">> => {
+      const access = await checkAccess(tx, userId, meetupId);
+      if (!access.ok) return access;
+      const locked = await lockMeetupForUpdate(tx, meetupId);
+      if (!locked.ok) return locked;
+      if (locked.data.creatorId === userId) return err("CREATOR_CANNOT_LEAVE");
+      if (locked.data.startsAt <= now) return err("MEETUP_STARTED");
 
-    const [removed] = await tx
-      .delete(rsvps)
-      .where(and(eq(rsvps.meetupId, meetupId), eq(rsvps.userId, userId)))
-      .returning({ id: rsvps.id, withCompanion: rsvps.withCompanion });
-    // Sem RSVP: cancelar de novo não muda nada.
-    if (!removed) return ok(null);
-    await releaseSeats(tx, meetupId, seatsFor(removed.withCompanion));
-    return ok(removed.id);
-  });
+      const [removed] = await tx
+        .delete(rsvps)
+        .where(and(eq(rsvps.meetupId, meetupId), eq(rsvps.userId, userId)))
+        .returning({ id: rsvps.id, withCompanion: rsvps.withCompanion });
+      // Sem RSVP: cancelar de novo não muda nada.
+      if (!removed) return ok(null);
+      await releaseSeats(tx, meetupId, seatsFor(removed.withCompanion));
+      return ok(removed.id);
+    },
+  );
 
-  if (!result.ok) return rejected(result.error.code, userId, meetupId);
+  if (!result.ok) return finish(result.error.code, userId, meetupId);
   if (result.data) {
     logger.info({ event: "rsvp.cancelled", userId, meetupId, rsvpId: result.data });
   }

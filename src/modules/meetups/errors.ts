@@ -4,4 +4,6 @@ export type MeetupsErrorCode =
   | "NOT_FOUND"
   | "NOT_MEETUP_CREATOR"
   | "MEETUP_STARTED"
-  | "MEETUP_CANCELLED";
+  | "MEETUP_CANCELLED"
+  | "NOT_COMMUNITY_MEMBER"
+  | "AUDIENCE_LOCKED";

@@ -3,6 +3,16 @@ export { meetupsCopy } from "./copy";
 export { createMeetup } from "./create-meetup";
 export type { MeetupsErrorCode } from "./errors";
 export { cancelMeetup, updateMeetup } from "./manage-meetup";
-export { type MeetupInput, meetupInputSchema } from "./meetup-input";
-export { getByIds, getMeetup, listByCreator, listUpcoming, type PublicMeetup } from "./queries";
+export { type MeetupInput, meetupInputSchema, OPEN_AUDIENCE } from "./meetup-input";
+export {
+  canSeeMeetup,
+  countUpcomingByCommunity,
+  getByIds,
+  getMeetup,
+  listByCreator,
+  listUpcoming,
+  listUpcomingByCommunity,
+  type MeetupViewer,
+  type PublicMeetup,
+} from "./queries";
 export { getCreatorId, lockMeetupForUpdate, releaseSeats, reserveSeats } from "./seats";
