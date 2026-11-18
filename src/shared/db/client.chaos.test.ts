@@ -14,6 +14,7 @@ const env = {
   BETTER_AUTH_URL: "http://localhost:3000",
   GOOGLE_CLIENT_ID: "client-id-teste",
   GOOGLE_CLIENT_SECRET: "client-secret-teste",
+  CRON_SECRET: "segredo-do-cron-teste",
 };
 
 async function freshGetDb() {

@@ -43,6 +43,13 @@
       "when": 1795016191572,
       "tag": "0005_meetup_audience",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795020865978,
+      "tag": "0006_meetup_comments",
+      "breakpoints": true
     }
   ]
 }

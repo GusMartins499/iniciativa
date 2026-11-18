@@ -10,6 +10,7 @@ export {
   getByIds,
   getMeetup,
   listByCreator,
+  listEndedBefore,
   listUpcoming,
   listUpcomingByCommunity,
   type MeetupViewer,
