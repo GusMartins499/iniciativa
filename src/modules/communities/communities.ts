@@ -89,6 +89,39 @@ export async function joinCommunity(
   return ok(undefined);
 }
 
+// Passo de comunidades do onboarding. Um único insert em lote, numa transação: ou entram
+// todas, ou nenhuma. Repetir é idempotente pela chave primária (comunidade, usuário).
+export async function joinCommunities(
+  db: Database,
+  userId: string,
+  slugs: readonly string[],
+): Promise<Result<void, "NOT_FOUND">> {
+  const found = [...new Set(slugs)].map(findCommunity);
+  if (found.some((community) => community === null)) {
+    logger.warn({ event: "community.join_rejected", userId, code: "NOT_FOUND" });
+    return err("NOT_FOUND");
+  }
+  const chosen = found.filter((community) => community !== null);
+  if (chosen.length === 0) return ok(undefined);
+  const inserted = await db.transaction((tx) =>
+    tx
+      .insert(communityMemberships)
+      .values(chosen.map((community) => ({ communitySlug: community.slug, userId })))
+      .onConflictDoNothing()
+      .returning({ slug: communityMemberships.communitySlug }),
+  );
+  // O source separa no dashboard quem entrou pelo onboarding de quem entrou pela página.
+  for (const row of inserted) {
+    logger.info({
+      event: "community.joined",
+      userId,
+      communitySlug: row.slug,
+      source: "onboarding",
+    });
+  }
+  return ok(undefined);
+}
+
 // Sair sem participar não muda nada.
 export async function leaveCommunity(
   db: Database,
