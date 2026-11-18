@@ -1,4 +1,4 @@
-export { completeOnboarding } from "./complete-onboarding";
+export { completeOnboarding, type OnboardingOutcome } from "./complete-onboarding";
 export { deleteAccount } from "./delete-account";
 export { accountCopy, CONSENT_VERSION, onboardingCopy, privacyCopy, signInCopy } from "./copy";
 export type { UsersErrorCode } from "./errors";

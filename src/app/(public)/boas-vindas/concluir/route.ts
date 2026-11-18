@@ -5,7 +5,8 @@ import { getDb } from "@/shared/db";
 import { logger } from "@/shared/logger";
 
 // Destino do Google depois do "Confirmar e entrar", com conta nova ou já existente:
-// registra a autodeclaração aceita (idempotente) e entra no app. Sem aceite válido,
+// registra a autodeclaração aceita (idempotente) e entra no app, passando antes pela
+// escolha de comunidades quando a conta é nova. Sem aceite válido,
 // volta para os termos (quem já concluiu o cadastro é mandado de lá para o app).
 // Cada desvio fica no log com o motivo, sem dado pessoal.
 export async function GET() {
@@ -37,5 +38,7 @@ export async function GET() {
     redirect("/boas-vindas");
   }
   logger.info({ event: "user.signup_completed", userId: sessionUser.id });
-  redirect("/");
+  // Só a conta que concluiu o onboarding agora escolhe comunidades; quem já tinha
+  // conta e voltou pelo Google não refaz esse passo.
+  redirect(result.data.outcome === "onboarded" ? "/boas-vindas/comunidades" : "/");
 }

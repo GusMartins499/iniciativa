@@ -81,4 +81,18 @@ describe("users.completeOnboarding", () => {
     expect(records[0]?.consentVersion).toBe(CONSENT_VERSION);
     expect(records[0]?.consentedAt.getTime()).toBeGreaterThan(oldConsentedAt.getTime());
   });
+
+  it("diz se a conta acabou de concluir o onboarding, renovou o aceite ou já estava em dia", async () => {
+    const first = await completeOnboarding(db, userId, { declaration: true, consent: true });
+    const again = await completeOnboarding(db, userId, { declaration: true, consent: true });
+    await db
+      .update(userOnboardings)
+      .set({ consentVersion: "v0.1-provisorio" })
+      .where(eq(userOnboardings.userId, userId));
+    const renewed = await completeOnboarding(db, userId, { declaration: true, consent: true });
+
+    expect(first).toEqual({ ok: true, data: { userId, outcome: "onboarded" } });
+    expect(again).toEqual({ ok: true, data: { userId, outcome: "unchanged" } });
+    expect(renewed).toEqual({ ok: true, data: { userId, outcome: "renewed" } });
+  });
 });
