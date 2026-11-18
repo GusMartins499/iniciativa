@@ -13,6 +13,12 @@ const descriptions: Record<CommunitySlug, string> = {
   caminhada: "Para quem gosta de caminhar em grupo.",
 };
 
+// "RPG", "RPG e Cinema", "RPG, Cinema e Música".
+function joinNames(names: readonly string[]): string {
+  if (names.length <= 1) return names.join("");
+  return `${names.slice(0, -1).join(", ")} e ${names.at(-1)}`;
+}
+
 export const communitiesCopy = {
   listTitle: "Comunidades",
   listLead:
@@ -31,8 +37,19 @@ export const communitiesCopy = {
   leaveDialogDescription: (name: string) =>
     `Você vai sair de ${name}. Os encontros em que você já confirmou presença continuam em "Meus encontros".`,
   back: "Voltar",
+  onboarding: {
+    title: "Escolha suas comunidades",
+    lead: 'Marque os assuntos de que você gosta. Os encontros dessas comunidades aparecem em "Próximos". Dá para entrar e sair depois, na página "Comunidades". Ninguém vê quem participa.',
+    listLabel: "Comunidades",
+    skipButton: "Pular",
+    continueButton: "Continuar",
+    dialogTitle: "Entrar nas comunidades",
+    dialogDescription: (names: readonly string[]) =>
+      `Você vai entrar em ${joinNames(names)}. Ninguém vê quem participa, só quantas pessoas são.`,
+  },
   errors: {
     NOT_FOUND: "Esta comunidade não existe.",
+    VALIDATION_FAILED: "Escolha só comunidades da lista.",
     ONBOARDING_REQUIRED: "Conclua o seu cadastro antes de continuar.",
     UNAUTHENTICATED: "Entre com o Google antes de continuar.",
     UNEXPECTED: "Algo deu errado. Tente de novo.",

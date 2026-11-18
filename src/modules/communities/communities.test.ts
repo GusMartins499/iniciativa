@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { insertTestUser } from "@/shared/auth/test-helpers";
 import type { Database } from "@/shared/db";
@@ -5,6 +6,7 @@ import { createTestDb } from "@/shared/db/test-db";
 import { logger } from "@/shared/logger";
 import {
   getCommunityBySlug,
+  joinCommunities,
   joinCommunity,
   leaveCommunity,
   listCommunities,
@@ -103,6 +105,74 @@ describe("communities.joinCommunity", () => {
       ([payload]) => (payload as { event?: string }).event === "community.joined",
     );
     expect(events).toEqual([[{ event: "community.joined", userId, communitySlug: "cinema" }]]);
+    info.mockRestore();
+  });
+});
+
+describe("communities.joinCommunities", () => {
+  it("as marcadas viram participações, como entrar pela página Comunidades", async () => {
+    const userId = await insertTestUser(db, "user-a");
+
+    const r = await joinCommunities(db, userId, ["cinema", "rpg"]);
+
+    expect(r).toEqual({ ok: true, data: undefined });
+    expect(await listMemberSlugs(db, userId)).toEqual(["rpg", "cinema"]);
+    expect(await memberCount("cinema")).toBe(1);
+  });
+
+  it("nenhuma marcada não muda nada", async () => {
+    const userId = await insertTestUser(db, "user-a");
+
+    expect(await joinCommunities(db, userId, [])).toEqual({ ok: true, data: undefined });
+    expect(await db.select().from(communityMemberships)).toHaveLength(0);
+  });
+
+  it("salvar de novo não duplica participações", async () => {
+    const userId = await insertTestUser(db, "user-a");
+    await joinCommunity(db, userId, "rpg");
+
+    await joinCommunities(db, userId, ["rpg", "corrida"]);
+    const again = await joinCommunities(db, userId, ["rpg", "corrida", "corrida"]);
+
+    expect(again.ok).toBe(true);
+    expect(await db.select().from(communityMemberships)).toHaveLength(2);
+    expect(await memberCount("rpg")).toBe(1);
+  });
+
+  it("slug inexistente na lista recusa todas, sem gravar nenhuma", async () => {
+    const userId = await insertTestUser(db, "user-a");
+
+    const r = await joinCommunities(db, userId, ["rpg", "xadrez"]);
+
+    expect(r).toEqual({ ok: false, error: { code: "NOT_FOUND" } });
+    expect(await listMemberSlugs(db, userId)).toEqual([]);
+  });
+
+  it("é atômico: se o banco recusa uma, nenhuma entra", async () => {
+    const userId = await insertTestUser(db, "user-a");
+    // Some a linha da tabela, não da lista em código: o insert de "caminhada" viola a FK.
+    await db.delete(communities).where(eq(communities.slug, "caminhada"));
+
+    await expect(joinCommunities(db, userId, ["rpg", "caminhada"])).rejects.toThrow(
+      /insert into "community_memberships"/,
+    );
+    expect(await listMemberSlugs(db, userId)).toEqual([]);
+  });
+
+  it("emite community.joined com source onboarding, só para as que entraram agora", async () => {
+    const info = vi.spyOn(logger, "info");
+    const userId = await insertTestUser(db, "user-a");
+    await joinCommunity(db, userId, "rpg");
+    info.mockClear();
+
+    await joinCommunities(db, userId, ["rpg", "musica"]);
+
+    const events = info.mock.calls.filter(
+      ([payload]) => (payload as { event?: string }).event === "community.joined",
+    );
+    expect(events).toEqual([
+      [{ event: "community.joined", userId, communitySlug: "musica", source: "onboarding" }],
+    ]);
     info.mockRestore();
   });
 });
