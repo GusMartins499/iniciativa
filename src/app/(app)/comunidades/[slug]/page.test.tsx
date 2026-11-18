@@ -78,6 +78,16 @@ describe("página da comunidade", () => {
     expect(screen.getByRole("button", { name: "Sair da comunidade" })).toBeVisible();
   });
 
+  it("põe o ícone da comunidade no título, sem mudar o nome lido", async () => {
+    render(await CommunityPage({ params: Promise.resolve({ slug: "corrida" }) }));
+
+    const heading = screen.getByRole("heading", { level: 1, name: "Corrida" });
+    expect(heading.querySelector('[data-community-icon="corrida"]')).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
   it("mostra o nº de encontros futuros e a lista para quem participa", async () => {
     render(await CommunityPage({ params: Promise.resolve({ slug: "corrida" }) }));
 

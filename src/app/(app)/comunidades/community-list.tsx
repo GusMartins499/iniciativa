@@ -3,6 +3,7 @@ import Link from "next/link";
 import { communitiesCopy as copy, type CommunitySummary } from "@/modules/communities/client";
 import { meetupsCopy } from "@/modules/meetups/client";
 import { buttonVariants } from "@/shared/ui";
+import { CommunityIcon } from "../community-icon";
 import { MembershipButton, type MembershipButtonProps } from "./membership-button";
 
 type Action = MembershipButtonProps["joinAction"];
@@ -30,7 +31,8 @@ export function CommunityList({ communities, joinActionFor, leaveActionFor }: Co
         >
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center justify-between gap-x-2">
-              <h2 className="text-[17px] font-bold">
+              <h2 className="flex items-center gap-3 text-[17px] font-bold">
+                <CommunityIcon slug={community.slug} size="md" />
                 <Link
                   href={`/comunidades/${community.slug}`}
                   className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
