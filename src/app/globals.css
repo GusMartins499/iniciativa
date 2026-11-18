@@ -2,21 +2,21 @@
 
 /* Tokens da identidade visual (docs/product/iniciativa-mvp.md). */
 @theme {
-  --color-background: #faf7f2;
+  --color-background: #f3f4fa;
   --color-surface: #ffffff;
-  --color-border: #e9e2d6;
-  --color-border-strong: #d6ccbb;
-  --color-foreground: #1c1917;
-  --color-muted-foreground: #57534e;
-  --color-primary: #334155;
-  --color-primary-hover: #1e293b;
+  --color-border: #dcdfee;
+  --color-border-strong: #c3c8e0;
+  --color-foreground: #191c2e;
+  --color-muted-foreground: #4e5470;
+  --color-primary: #2f3d8f;
+  --color-primary-hover: #1f2a5c;
   --color-primary-foreground: #ffffff;
-  --color-tag: #f0ebe3;
-  --color-tag-foreground: #44403c;
-  --color-honey: #f59e0b;
+  --color-tag: #e4e7f6;
+  --color-tag-foreground: #2f3d8f;
+  --color-honey: #f5a524;
   --color-honey-hover: #d97706;
-  --color-honey-light: #fef3c7;
-  --color-honey-light-foreground: #92400e;
+  --color-honey-light: #fff0c7;
+  --color-honey-light-foreground: #8a4b00;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 

@@ -161,21 +161,25 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
 - **Identidade visual:**
   - Cores:
 
+    Paleta "Tinta e mel", escolhida num protótipo em 18/11/2026 para dar mais vida às telas: a cor forte fica em botões, filtros, hero e destaques, e os fundos continuam suaves.
+
     | Uso | Cor |
     |---|---|
-    | Fundo (neutro quente) | `#FAF7F2` |
+    | Fundo (azulado claro) | `#F3F4FA` |
     | Superfície | `#FFFFFF` |
-    | Borda | `#E9E2D6`, reforçada `#D6CCBB` |
-    | Texto | `#1C1917` |
-    | Texto secundário | `#57534E` |
-    | Primária (ardósia) | `#334155`, hover `#1E293B` |
-    | Etiqueta | fundo `#F0EBE3`, texto `#44403C` |
-    | Mel | `#F59E0B`, hover `#D97706` |
-    | Mel claro | fundo `#FEF3C7`, texto `#92400E` |
+    | Borda | `#DCDFEE`, reforçada `#C3C8E0` |
+    | Texto | `#191C2E` |
+    | Texto secundário | `#4E5470` |
+    | Primária (azul-tinta) | `#2F3D8F`, hover `#1F2A5C` (também o fundo do hero) |
+    | Etiqueta | fundo `#E4E7F6`, texto `#2F3D8F` |
+    | Mel | `#F5A524`, hover `#D97706` |
+    | Mel claro | fundo `#FFF0C7`, texto `#8A4B00` |
+
+    Todo par de texto e fundo passa no WCAG 2.1 AA; o teste `src/app/palette.test.ts` confere os tokens do `globals.css`.
 
   - Fonte: Inter em todo o app. O nome "iniciativa" vai em Inter Bold, em minúsculas, com espaçamento entre letras levemente fechado.
-  - Logo: hexágono sólido em ardósia, com a face em mel.
-  - Logo: o hexágono remete ao d20, o dado do RPG visto de frente, e não a uma colmeia. Hexágonos nunca aparecem encaixados lado a lado.
+  - Logo: o d20 visto de frente. Hexágono sólido em azul-tinta, com a face de cima, um triângulo, em mel.
+  - O hexágono remete ao d20, e não a uma colmeia: a face em triângulo deixa isso claro. Hexágonos nunca aparecem encaixados lado a lado.
   - Comunidades: cada uma tem um tom suave e um ícone, escolhidos no protótipo do card #81 (direção "cor e ícone por comunidade"). Aparecem no ícone ao lado do nome na lista de comunidades e no título da página da comunidade, numa faixa e num ícone no card de encontro de comunidade, e numa etiqueta com o nome acima do título na página do encontro. O encontro aberto fica neutro. O ícone é só enfeite: o nome escrito, ou o contexto da tela, continua sendo a informação. A fonte das cores é `src/app/(app)/community-theme.ts`, com teste de contraste.
 
     | Comunidade | Fundo | Texto e ícone | Ícone (Lucide) |

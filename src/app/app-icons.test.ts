@@ -15,9 +15,15 @@ const polygonsOf = (svg: string) =>
   }));
 
 describe("ícones do app", () => {
-  it("usa as mesmas cores do componente Logo", () => {
-    expect(iconSvg).toContain("#334155");
-    expect(iconSvg).toContain("#F59E0B");
+  it("usa as cores da marca: azul-tinta no hexágono e mel na face", () => {
+    expect(polygonsOf(iconSvg).map((polygon) => polygon.fill)).toEqual(["#2F3D8F", "#F5A524"]);
+  });
+
+  it("desenha o d20 visto de frente: hexágono com a face em triângulo", () => {
+    const [outline, face] = polygonsOf(iconSvg);
+
+    expect(outline?.points?.split(" ")).toHaveLength(6);
+    expect(face?.points?.split(" ")).toHaveLength(3);
   });
 
   it("desenha os mesmos polígonos do componente Logo", () => {
