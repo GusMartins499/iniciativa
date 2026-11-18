@@ -1,6 +1,8 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 // Só para conferir o resultado: código de produção nunca lê a tabela de outro módulo.
+import { communityMemberships } from "@/modules/communities/schema";
+import { joinCommunity } from "@/modules/communities";
 import { meetups } from "@/modules/meetups/schema";
 import { rsvps } from "@/modules/rsvps/schema";
 import { insertTestUser } from "@/shared/auth/test-helpers";
@@ -65,7 +67,23 @@ describe("users.deleteAccount", () => {
   it("devolve as contagens do que foi cancelado e liberado", async () => {
     const r = await deleteAccount(db, ids.userId, NOW);
 
-    expect(r).toEqual({ ok: true, data: { cancelledMeetups: 1, releasedRsvps: 1 } });
+    expect(r).toEqual({
+      ok: true,
+      data: { cancelledMeetups: 1, releasedRsvps: 1, removedMemberships: 0 },
+    });
+  });
+
+  it("remove a participação em todas as comunidades e mantém a dos outros", async () => {
+    await joinCommunity(db, ids.userId, "rpg");
+    await joinCommunity(db, ids.userId, "cinema");
+    const other = await insertTestUser(db, "stays");
+    await joinCommunity(db, other, "rpg");
+
+    const r = await deleteAccount(db, ids.userId, NOW);
+
+    expect(r.ok && r.data.removedMemberships).toBe(2);
+    const left = await db.select().from(communityMemberships);
+    expect(left.map((row) => row.userId)).toEqual([other]);
   });
 
   it("trata quem volta a entrar com Google como usuário novo, com onboarding pendente", async () => {
