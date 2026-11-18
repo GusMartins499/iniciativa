@@ -1,6 +1,8 @@
+import { CalendarDays, CircleCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { communitiesCopy as copy, type CommunitySummary } from "@/modules/communities/client";
 import { meetupsCopy } from "@/modules/meetups/client";
+import { buttonVariants } from "@/shared/ui";
 import { MembershipButton, type MembershipButtonProps } from "./membership-button";
 
 type Action = MembershipButtonProps["joinAction"];
@@ -18,37 +20,52 @@ export type CommunityListProps = {
 // então o atalho "Ver encontros" só aparece para eles.
 export function CommunityList({ communities, joinActionFor, leaveActionFor }: CommunityListProps) {
   return (
-    <ul className="grid gap-4 sm:grid-cols-2">
+    // Com 2+ colunas, todas as linhas têm a altura da mais alta: os cards ficam iguais. No
+    // celular (uma coluna) cada card tem a própria altura, sem vão vazio.
+    <ul className="grid gap-4 sm:auto-rows-fr sm:grid-cols-2 lg:grid-cols-3">
       {communities.map((community) => (
         <li
           key={community.slug}
-          className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-5"
+          className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-5"
         >
-          <div className="flex flex-col gap-1">
-            <h2 className="text-[17px] font-bold">
-              <Link
-                href={`/comunidades/${community.slug}`}
-                className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
-              >
-                {community.name}
-              </Link>
-            </h2>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-2">
+              <h2 className="text-[17px] font-bold">
+                <Link
+                  href={`/comunidades/${community.slug}`}
+                  className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
+                >
+                  {community.name}
+                </Link>
+              </h2>
+              {community.isMember ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-honey-light px-2.5 py-0.5 text-sm font-semibold text-honey-light-foreground">
+                  <CircleCheck aria-hidden="true" className="size-4" />
+                  {copy.memberBadge}
+                </span>
+              ) : null}
+            </div>
             <p>{copy.description(community.slug)}</p>
-            <p className="text-sm text-muted-foreground">{copy.members(community.memberCount)}</p>
-            <p className="text-sm text-muted-foreground">
+          </div>
+          <div className="flex flex-col gap-1.5 border-t border-border pt-3 text-sm text-muted-foreground">
+            <p className="flex items-center gap-2">
+              <Users aria-hidden="true" className="size-4 shrink-0" />
+              {copy.members(community.memberCount)}
+            </p>
+            <p className="flex items-center gap-2">
+              <CalendarDays aria-hidden="true" className="size-4 shrink-0" />
               {meetupsCopy.community.upcomingCount(community.upcomingCount)}
             </p>
-            {community.isMember ? <p className="font-semibold">{copy.memberNote}</p> : null}
+          </div>
+          <div className="mt-auto flex flex-col gap-2">
             {community.isMember ? (
               <Link
                 href={`/comunidades/${community.slug}`}
-                className="inline-flex min-h-11 w-fit items-center font-semibold underline underline-offset-4"
+                className={buttonVariants({ variant: "primary" })}
               >
                 {copy.seeMeetups}
               </Link>
             ) : null}
-          </div>
-          <div className="mt-auto">
             <MembershipButton
               name={community.name}
               isMember={community.isMember}

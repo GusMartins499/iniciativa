@@ -67,6 +67,14 @@ describe("tela de comunidades", () => {
     expect(cinema.queryByRole("link", { name: "Ver encontros" })).not.toBeInTheDocument();
   });
 
+  it("marca com um selo só os cards das comunidades de que a pessoa participa", () => {
+    renderList();
+
+    expect(screen.getAllByText("Você participa")).toHaveLength(1);
+    const rpg = within(screen.getAllByRole("listitem")[2] as HTMLElement);
+    expect(rpg.getByText("Você participa")).toBeVisible();
+  });
+
   it("não tem violações de acessibilidade", async () => {
     const { container } = renderList();
     expect(await axe(container)).toHaveNoViolations();

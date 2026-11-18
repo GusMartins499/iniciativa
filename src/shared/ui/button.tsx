@@ -2,7 +2,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "./cn";
 
-const buttonVariants = cva(
+// Exportado para link com cara de botão (navegação não é <button>).
+export const buttonVariants = cva(
   "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-4 text-base font-semibold disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
