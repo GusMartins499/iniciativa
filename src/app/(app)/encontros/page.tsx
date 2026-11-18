@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { listMemberSlugs } from "@/modules/communities";
 import { listByCreator, listUpcoming, meetupsCopy as copy } from "@/modules/meetups";
 import { listMeetupIdsByUser } from "@/modules/rsvps";
 import { getDb } from "@/shared/db";
@@ -7,8 +9,9 @@ import { MeetupDays } from "./meetup-days";
 export default async function MeetupsPage() {
   const currentUser = await requirePageUser();
   const db = getDb();
+  const memberSlugs = await listMemberSlugs(db, currentUser.id);
   const [result, goingIds, created] = await Promise.all([
-    listUpcoming(db),
+    listUpcoming(db, memberSlugs),
     listMeetupIdsByUser(db, currentUser.id),
     listByCreator(db, currentUser.id),
   ]);
@@ -16,6 +19,14 @@ export default async function MeetupsPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      {memberSlugs.length === 0 ? (
+        <p className="rounded-xl bg-honey-light p-4 font-semibold text-honey-light-foreground">
+          {copy.noCommunitiesBanner}{" "}
+          <Link href="/comunidades" className="underline">
+            {copy.noCommunitiesLink}
+          </Link>
+        </p>
+      ) : null}
       <div>
         <h1 className="text-[2rem] leading-tight font-bold tracking-tight">{copy.listTitle}</h1>
         <p className="mt-2 text-muted-foreground">{copy.listLead}</p>

@@ -1,6 +1,8 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { getCreatorId, getMeetup, meetupsCopy } from "@/modules/meetups";
+import { notFound } from "next/navigation";
+import { listMemberSlugs } from "@/modules/communities";
+import { canSeeMeetup, getCreatorId, getMeetup, meetupsCopy } from "@/modules/meetups";
 import { getUserRsvp, listAttendeesForCreator, rsvpsCopy } from "@/modules/rsvps";
 import { getDb } from "@/shared/db";
 import { requirePageUser } from "../../require-page-user";
@@ -21,7 +23,19 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
   const currentUser = await requirePageUser();
   const { id } = await params;
   const db = getDb();
+  const [memberSlugs, rsvp] = await Promise.all([
+    listMemberSlugs(db, currentUser.id),
+    getUserRsvp(db, currentUser.id, id),
+  ]);
+  const access = await canSeeMeetup(db, id, {
+    userId: currentUser.id,
+    memberSlugs,
+    hasRsvp: rsvp !== null,
+  });
+  // Encontro de comunidade alheia e encontro inexistente dão o mesmo 404.
+  if (!access.visible) notFound();
   const result = await getMeetup(db, id);
+  if (!result.ok) notFound();
 
   const backLink = (
     <Link
@@ -32,18 +46,8 @@ export default async function MeetupPage({ params }: MeetupPageProps) {
       {meetupsCopy.backToList}
     </Link>
   );
-  if (!result.ok) {
-    return (
-      <div className="flex flex-col gap-4">
-        {backLink}
-        <p>{meetupsCopy.notFound}</p>
-      </div>
-    );
-  }
-
   const meetup = result.data;
   const isCreator = (await getCreatorId(db, id)) === currentUser.id;
-  const rsvp = isCreator ? null : await getUserRsvp(db, currentUser.id, id);
   // Os nomes só são lidos depois de o servidor conferir que quem pede é o criador.
   const attendees = isCreator ? await listAttendeesForCreator(db, currentUser.id, id) : null;
 

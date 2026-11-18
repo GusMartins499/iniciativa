@@ -2,6 +2,7 @@ import { ChevronRight, Clock, MapPin } from "lucide-react";
 import Link from "next/link";
 import { meetupsCopy as copy, type PublicMeetup } from "@/modules/meetups/client";
 import { formatHourRange } from "@/shared/time";
+import { audienceTag } from "./audience";
 import { SeatsBar } from "./seats-bar";
 
 export type MeetupCardProps = {
@@ -24,6 +25,7 @@ export function MeetupCard({
   const cancelled = meetup.status === "cancelled";
   const edited = meetup.editedAt !== null;
   const tags = [
+    { label: audienceTag(meetup.communitySlug), className: "bg-tag text-tag-foreground" },
     created ? { label: copy.tags.created, className: "bg-primary text-primary-foreground" } : null,
     going && !created
       ? { label: copy.tags.going, className: "bg-primary text-primary-foreground" }
