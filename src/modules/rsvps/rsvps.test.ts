@@ -1,9 +1,11 @@
 import { eq } from "drizzle-orm";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { joinCommunity, leaveCommunity } from "@/modules/communities";
 import { cancelMeetup, getMeetup } from "@/modules/meetups";
 import { insertTestUser } from "@/shared/auth/test-helpers";
 import type { Database } from "@/shared/db";
 import { createTestDb } from "@/shared/db/test-db";
+import { logger } from "@/shared/logger";
 import { cancelRsvp, confirmRsvp, listAttendeesForCreator } from "./rsvps";
 import { rsvps } from "./schema";
 import { AFTER_START, NOW, setupMeetup } from "./test-setup";
@@ -217,5 +219,71 @@ describe("rsvps.listAttendeesForCreator", () => {
     const r = await listAttendeesForCreator(db, userB, meetupId);
 
     expect(r).toEqual({ ok: false, error: { code: "NOT_MEETUP_CREATOR" } });
+  });
+});
+
+describe("rsvps em encontro de comunidade", () => {
+  it("membro da comunidade confirma presença", async () => {
+    const { meetupId } = await setupMeetup(db, 10, "", "rpg");
+    const member = await insertTestUser(db, "member");
+    await joinCommunity(db, member, "rpg");
+
+    const r = await confirmRsvp(db, member, meetupId, { withCompanion: false }, NOW);
+
+    expect(r.ok).toBe(true);
+    expect(await occupied(meetupId)).toBe(2);
+  });
+
+  it("recusa a confirmação de quem não é membro, sem ocupar vaga, e loga warn sem PII", async () => {
+    const { meetupId } = await setupMeetup(db, 10, "", "rpg");
+    const outsider = await insertTestUser(db, "outsider");
+    const warn = vi.spyOn(logger, "warn");
+
+    const r = await confirmRsvp(db, outsider, meetupId, { withCompanion: false }, NOW);
+
+    expect(r).toEqual({ ok: false, error: { code: "NOT_FOUND" } });
+    expect(await occupied(meetupId)).toBe(1);
+    expect(warn).toHaveBeenCalledWith({
+      event: "rsvp.rejected",
+      userId: outsider,
+      meetupId,
+      communitySlug: "rpg",
+      code: "NOT_COMMUNITY_MEMBER",
+    });
+  });
+
+  it("recusa o cancelamento de quem não é membro", async () => {
+    const { meetupId } = await setupMeetup(db, 10, "", "rpg");
+    const outsider = await insertTestUser(db, "outsider");
+
+    const r = await cancelRsvp(db, outsider, meetupId, NOW);
+
+    expect(r).toEqual({ ok: false, error: { code: "NOT_FOUND" } });
+  });
+
+  it("quem saiu da comunidade depois de confirmar ainda pode cancelar a presença", async () => {
+    const { meetupId } = await setupMeetup(db, 10, "", "rpg");
+    const member = await insertTestUser(db, "member");
+    await joinCommunity(db, member, "rpg");
+    await confirmRsvp(db, member, meetupId, { withCompanion: true }, NOW);
+    await leaveCommunity(db, member, "rpg");
+
+    const r = await cancelRsvp(db, member, meetupId, NOW);
+
+    expect(r.ok).toBe(true);
+    expect(await occupied(meetupId)).toBe(1);
+  });
+
+  it("quem saiu da comunidade depois de confirmar não confirma de novo depois de cancelar", async () => {
+    const { meetupId } = await setupMeetup(db, 10, "", "rpg");
+    const member = await insertTestUser(db, "member");
+    await joinCommunity(db, member, "rpg");
+    await confirmRsvp(db, member, meetupId, { withCompanion: false }, NOW);
+    await leaveCommunity(db, member, "rpg");
+    await cancelRsvp(db, member, meetupId, NOW);
+
+    const r = await confirmRsvp(db, member, meetupId, { withCompanion: false }, NOW);
+
+    expect(r).toEqual({ ok: false, error: { code: "NOT_FOUND" } });
   });
 });
