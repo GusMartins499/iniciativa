@@ -19,6 +19,24 @@ describe("tela /conta", () => {
     await waitFor(() => expect(action).toHaveBeenCalled());
   });
 
+  it("lista a participação nas comunidades e os comentários entre as consequências", () => {
+    render(<DeleteAccountPanel action={noop} />);
+
+    const items = screen.getAllByRole("listitem").map((item) => item.textContent);
+    expect(items).toContain("Apaga a sua participação nas comunidades.");
+    expect(items).toContain('Troca os seus comentários por "Comentário apagado".');
+  });
+
+  it("o diálogo de confirmação cita as comunidades e os comentários", () => {
+    render(<DeleteAccountPanel action={noop} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Excluir minha conta" }));
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveTextContent("participação nas comunidades");
+    expect(dialog).toHaveTextContent('Troca os seus comentários por "Comentário apagado".');
+  });
+
   it("não tem violações de acessibilidade", async () => {
     const { container } = render(<DeleteAccountPanel action={noop} />);
     expect(await axe(container)).toHaveNoViolations();

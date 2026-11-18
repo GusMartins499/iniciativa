@@ -59,13 +59,15 @@ export const accountCopy = {
   deleteTitle: "Excluir conta",
   deleteConsequences: [
     "Apaga o seu perfil, a sua autodeclaração e o seu consentimento.",
+    "Apaga a sua participação nas comunidades.",
+    'Troca os seus comentários por "Comentário apagado".',
     "Cancela os encontros futuros que você criou.",
     "Cancela as suas presenças confirmadas.",
   ],
   deleteIrreversible: "Não é possível desfazer.",
   deleteButton: "Excluir minha conta",
   deleteDescription:
-    "Isto apaga o seu perfil, a sua autodeclaração e o seu consentimento, cancela os encontros futuros que você criou e as suas presenças confirmadas. Não é possível desfazer.",
+    'Isto apaga o seu perfil, a sua autodeclaração, o seu consentimento e a sua participação nas comunidades. Troca os seus comentários por "Comentário apagado". Cancela os encontros futuros que você criou e as suas presenças confirmadas. Não é possível desfazer.',
   back: "Voltar",
   deleted: "Sua conta foi excluída.",
   errors: {
