@@ -33,3 +33,20 @@ export function CommunityIcon({ slug, size = "sm" }: CommunityIconProps) {
     </span>
   );
 }
+
+type CommunityTagProps = { slug: string; name: string; className?: string };
+
+// Etiqueta com o nome escrito: aqui o nome é a informação, e o ícone, só reforço.
+export function CommunityTag({ slug, name, className = "" }: CommunityTagProps) {
+  const theme = communityTheme(slug);
+  if (!theme) return null;
+  return (
+    <span
+      style={communityStyle(theme)}
+      className={`flex w-fit items-center gap-2 rounded-full bg-(--community-bg) py-1 pr-3 pl-1 font-semibold text-(--community-fg) ${className}`}
+    >
+      <CommunityIcon slug={slug} />
+      {name}
+    </span>
+  );
+}

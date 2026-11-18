@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { communitiesCopy as copy, getCommunityBySlug } from "@/modules/communities";
 import { countUpcomingByCommunity, listUpcomingByCommunity, meetupsCopy } from "@/modules/meetups";
 import { getDb } from "@/shared/db";
-import { CommunityIcon } from "../../community-icon";
+import { CommunityIcon } from "@/app/community-icon";
 import { MeetupDays } from "../../encontros/meetup-days";
 import { requirePageUser } from "../../require-page-user";
 import { joinCommunityAction, leaveCommunityAction } from "../actions";

@@ -2,8 +2,8 @@ import { ChevronRight, Clock, MapPin } from "lucide-react";
 import Link from "next/link";
 import { meetupsCopy as copy, type PublicMeetup } from "@/modules/meetups/client";
 import { formatHourRange } from "@/shared/time";
-import { CommunityIcon, communityStyle } from "../community-icon";
-import { communityTheme } from "../community-theme";
+import { CommunityIcon, communityStyle } from "@/app/community-icon";
+import { communityTheme } from "@/app/community-theme";
 import { SeatsBar } from "./seats-bar";
 
 export type MeetupCardProps = {

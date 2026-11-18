@@ -3,7 +3,7 @@ import Link from "next/link";
 import { communitiesCopy as copy, type CommunitySummary } from "@/modules/communities/client";
 import { meetupsCopy } from "@/modules/meetups/client";
 import { buttonVariants } from "@/shared/ui";
-import { CommunityIcon } from "../community-icon";
+import { CommunityIcon } from "@/app/community-icon";
 import { MembershipButton, type MembershipButtonProps } from "./membership-button";
 
 type Action = MembershipButtonProps["joinAction"];
