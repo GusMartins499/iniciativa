@@ -6,6 +6,7 @@ export { cancelMeetup, updateMeetup } from "./manage-meetup";
 export { type MeetupInput, meetupInputSchema, OPEN_AUDIENCE } from "./meetup-input";
 export {
   canSeeMeetup,
+  countUpcomingByCommunities,
   countUpcomingByCommunity,
   getByIds,
   getMeetup,
