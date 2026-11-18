@@ -9,6 +9,16 @@ export const meetupsCopy = {
     full: "Lotado",
     edited: "Alterado",
     cancelled: "Cancelado",
+    open: "Aberto",
+  },
+  noCommunitiesBanner: "Você ainda não está em nenhuma comunidade.",
+  noCommunitiesLink: "Ver comunidades",
+  community: {
+    upcomingCount: (count: number) =>
+      count === 1 ? "1 encontro futuro" : `${count} encontros futuros`,
+    listTitle: "Próximos encontros",
+    emptyList: "Ainda não há encontros marcados nesta comunidade.",
+    membersOnly: "Os encontros desta comunidade aparecem só para quem participa dela.",
   },
   newMeetupLink: "Criar encontro",
   emptyList: "Ainda não há encontros marcados.",
@@ -47,10 +57,14 @@ export const meetupsCopy = {
     capacityLabel: "Número de vagas (contando você)",
     withCompanionLabel: "Vou levar 1 acompanhante",
     publicPlaceLabel: "Confirmo que o local é público (praça, café, biblioteca…)",
+    audienceLabel: "Público",
+    audienceOpen: "Aberto (todos)",
+    audienceHint:
+      "Encontro de comunidade aparece só para quem participa dela. O público não muda depois de publicado.",
     submit: "Publicar encontro",
     dialogTitle: "Publicar encontro",
     dialogDescription:
-      "O encontro vai aparecer para todas as pessoas do app, e você já fica com presença confirmada.",
+      "O encontro vai aparecer para o público que você escolheu, e você já fica com presença confirmada.",
     dialogConfirm: "Publicar encontro",
     dialogCancel: "Voltar",
     fieldErrors: {
@@ -62,6 +76,7 @@ export const meetupsCopy = {
       placeDescription: "A descrição pode ter até 1000 caracteres.",
       capacity: "Escolha entre 1 e 50 vagas.",
       publicPlace: "Confirme que o local é público.",
+      audience: "Escolha o público do encontro.",
     },
   },
   errors: {
@@ -72,6 +87,9 @@ export const meetupsCopy = {
     NOT_MEETUP_CREATOR: "Só quem criou o encontro pode alterá-lo.",
     MEETUP_STARTED: "Este encontro já começou.",
     MEETUP_CANCELLED: "Este encontro foi cancelado.",
+    NOT_COMMUNITY_MEMBER: "Você só pode criar encontros nas comunidades de que participa.",
+    AUDIENCE_LOCKED:
+      "O público do encontro não pode ser alterado. Para trocar, cancele este e crie outro.",
     ONBOARDING_REQUIRED: "Conclua o seu cadastro antes de criar um encontro.",
     UNAUTHENTICATED: "Entre com o Google antes de criar um encontro.",
     UNEXPECTED: "Algo deu errado. Tente de novo.",

@@ -13,6 +13,7 @@ const validInput = {
   address: "Rua X, 100",
   capacity: 10,
   publicPlace: true,
+  audience: "open",
   withCompanion: false,
 };
 

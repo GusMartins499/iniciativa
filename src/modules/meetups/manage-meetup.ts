@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import type { Database } from "@/shared/db";
 import { logger } from "@/shared/logger";
 import { err, ok, type Result } from "@/shared/result";
+import { OPEN_AUDIENCE } from "./meetup-input";
 import { meetups } from "./schema";
 import { lockMeetupForUpdate } from "./seats";
 import { validateMeetupFields } from "./validate-meetup";
@@ -12,7 +13,8 @@ type UpdateError =
   | "MEETUP_STARTED"
   | "MEETUP_CANCELLED"
   | "VALIDATION_FAILED"
-  | "CAPACITY_BELOW_OCCUPIED";
+  | "CAPACITY_BELOW_OCCUPIED"
+  | "AUDIENCE_LOCKED";
 
 type CancelError = "NOT_FOUND" | "NOT_MEETUP_CREATOR" | "MEETUP_STARTED";
 
@@ -35,6 +37,9 @@ export async function updateMeetup(
     const validated = validateMeetupFields(input, now, () => locked.data.occupiedSeats);
     if (!validated.ok) return validated;
     const { data, startsAt, endsAt } = validated.data;
+    // O público não muda depois de criado: para trocar, cancela e cria de novo.
+    const communitySlug = data.audience === OPEN_AUDIENCE ? null : data.audience;
+    if (communitySlug !== locked.data.communitySlug) return err("AUDIENCE_LOCKED");
 
     await tx
       .update(meetups)

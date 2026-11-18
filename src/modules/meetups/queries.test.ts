@@ -27,6 +27,7 @@ async function create(title: string, day: string, extra: Record<string, unknown>
       address: "Rua X, 100",
       capacity: 10,
       publicPlace: true,
+      audience: "open",
       withCompanion: false,
       ...extra,
     },
@@ -42,7 +43,7 @@ describe("meetups.listUpcoming", () => {
     await create("dia 10", "2026-12-10");
     await create("dia 5", "2026-12-05");
 
-    const r = await listUpcoming(db, NOW);
+    const r = await listUpcoming(db, [], NOW);
 
     expect(r.ok && r.data.map((m) => m.title)).toEqual(["dia 5", "dia 10"]);
   });

@@ -192,6 +192,7 @@ async function createSeedMeetup(db: Database, ids: Record<Person, string>, meetu
         placeDescription: meetup.placeDescription,
         capacity: meetup.capacity,
         publicPlace: true,
+        audience: "open",
         withCompanion: meetup.withCompanion,
       },
       now,

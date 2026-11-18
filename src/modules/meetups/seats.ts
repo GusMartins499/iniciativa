@@ -1,4 +1,5 @@
 import { and, eq, gt, sql } from "drizzle-orm";
+import type { CommunitySlug } from "@/modules/communities";
 import type { Database } from "@/shared/db";
 import { err, ok, type Result } from "@/shared/result";
 import { meetups } from "./schema";
@@ -8,6 +9,7 @@ export type LockedMeetup = {
   startsAt: Date;
   status: "active" | "cancelled";
   occupiedSeats: number;
+  communitySlug: CommunitySlug | null;
 };
 
 // Trava a linha do encontro até o fim da transação: confirmações e cancelamentos
@@ -22,6 +24,7 @@ export async function lockMeetupForUpdate(
       startsAt: meetups.startsAt,
       status: meetups.status,
       occupiedSeats: meetups.occupiedSeats,
+      communitySlug: meetups.communitySlug,
     })
     .from(meetups)
     .where(eq(meetups.id, meetupId))

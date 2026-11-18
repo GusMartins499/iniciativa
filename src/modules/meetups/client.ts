@@ -4,6 +4,7 @@ export {
   type MeetupFormValues,
   type MeetupInput,
   meetupFormSchema,
+  OPEN_AUDIENCE,
   toMeetupInput,
 } from "./meetup-input";
 export type { PublicMeetup } from "./queries";
