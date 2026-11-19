@@ -107,20 +107,21 @@ export default async function LandingPage({ searchParams }: SignInPageProps) {
           <h2 id="how-it-works" className="text-3xl font-bold tracking-tight sm:text-4xl">
             {copy.howItWorksTitle}
           </h2>
-          {/* Grade de cartões (2 colunas no celular, 3 no desktop), estática. O número de cada
-              passo fica num hexágono do logo, como uma ficha sobre a borda de cima do cartão. */}
-          <ol className="mt-16 grid grid-cols-2 gap-x-3 gap-y-12 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-3">
+          {/* Grade de cartões (1 coluna no celular, 2 no tablet, 3 no desktop), estática, com todos
+              os cartões da mesma altura (auto-rows-fr). O número de cada passo fica num hexágono do
+              logo, como uma ficha no canto de cima do cartão, e o texto alinha à esquerda. */}
+          <ol className="mt-16 grid auto-rows-fr gap-y-12 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-3">
             {copy.steps.map(({ key, title, text }, index) => {
               const highlight = key === "initiative";
               return (
                 <li
                   key={key}
                   data-highlight={highlight ? "true" : undefined}
-                  className={`relative flex flex-col items-center gap-2 rounded-2xl px-3 pt-12 pb-6 text-center sm:px-6 ${
+                  className={`relative flex flex-col gap-2 rounded-2xl px-6 pt-12 pb-6 ${
                     highlight ? "bg-honey-light ring-2 ring-honey" : "bg-surface ring-1 ring-border"
                   }`}
                 >
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2">
+                  <div className="absolute -top-8 left-6">
                     <NumberHexagon value={index + 1} />
                   </div>
                   <h3
@@ -147,10 +148,14 @@ export default async function LandingPage({ searchParams }: SignInPageProps) {
             </h2>
             <p className="leading-relaxed text-muted-foreground">{copy.communitiesText}</p>
           </div>
-          <ul className="flex flex-wrap content-start gap-3">
+          <ul className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:content-start sm:gap-3">
             {COMMUNITIES.map(({ slug, name }) => (
               <li key={slug}>
-                <CommunityTag slug={slug} name={name} className="py-1.5 pr-4 text-lg" />
+                <CommunityTag
+                  slug={slug}
+                  name={name}
+                  className="w-full py-1 pr-3 sm:w-fit sm:py-1.5 sm:pr-4 sm:text-lg"
+                />
               </li>
             ))}
           </ul>
