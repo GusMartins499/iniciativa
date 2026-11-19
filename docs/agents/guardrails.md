@@ -8,6 +8,7 @@ forbidden:
   - editar migração já aplicada em drizzle/ (criar uma nova no lugar)
   - qualquer commit, push, merge ou alteração no repositório depois de 30/11/2026 (congelamento do HackBrasil)
   - drizzle-kit push contra o banco de produção
+  - publicar ou migrar staging/produção fora do pipeline (`vercel deploy` ou `pnpm db:migrate` à mão): só o .github/workflows/deploy.yml faz isso
   - commitar .env* (exceto .env.example), porque o repositório é público
   - trocar de branch ou rodar `pnpm format` no repositório inteiro em /home/gusmartins/www/iniciativa quando outra sessão estiver trabalhando nessa pasta (usar uma git worktree própria)
 notes: repositório público; autodeclaração de autismo é dado sensível (LGPD): nunca em log, fixture ou repositório
