@@ -5,6 +5,7 @@ export const commentsCopy = {
   deleted: "Comentário apagado",
   readOnly: "Os comentários deste encontro estão fechados. Dá para ler, mas não para comentar.",
   refresh: "Atualizar comentários",
+  refreshing: "Atualizando comentários…",
   fieldLabel: "Escreva um comentário",
   privacyHint:
     "O seu primeiro nome e a sua foto aparecem para quem vê este encontro. Não escreva dados pessoais nem de saúde.",
