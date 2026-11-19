@@ -1,0 +1,92 @@
+name: Deploy
+
+# O único caminho para publicar (o deploy automático da Vercel está desligado no vercel.json).
+# Roda quando o CI de um push termina verde: staging → preview em iniciativa-tea-staging.vercel.app,
+# main → produção. A migração do banco vem antes do deploy, e erro nela interrompe tudo.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main, staging]
+
+# Um deploy por ambiente de cada vez, sem cancelar o que já está migrando o banco.
+concurrency:
+  group: deploy-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Migração e deploy (${{ github.event.workflow_run.head_branch }})
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Cada environment do GitHub guarda o DATABASE_URL do seu banco no Neon.
+    environment: ${{ github.event.workflow_run.head_branch == 'main' && 'production' || 'staging' }}
+    env:
+      PRODUCTION: ${{ github.event.workflow_run.head_branch == 'main' }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL: pnpm dlx vercel@48.8.2
+      STAGING_ALIAS: iniciativa-tea-staging.vercel.app
+      PRODUCTION_URL: https://iniciativa-tea.vercel.app
+    steps:
+      # O commit exato que passou no CI, não a ponta da branch.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Migrações são aditivas (GUIDELINES.md § Data & migrations): o código que está no ar
+      # continua funcionando com o schema novo enquanto o deploy acontece.
+      - name: Aplica as migrações
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Confere que nenhuma migração ficou pendente
+        run: pnpm db:check
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Build na Vercel
+        run: |
+          if [ "$PRODUCTION" = "true" ]; then
+            $VERCEL pull --yes --environment=production --token="$VERCEL_TOKEN"
+            $VERCEL build --prod --token="$VERCEL_TOKEN"
+          else
+            $VERCEL pull --yes --environment=preview --git-branch=staging --token="$VERCEL_TOKEN"
+            $VERCEL build --token="$VERCEL_TOKEN"
+          fi
+
+      - name: Publica
+        id: publish
+        run: |
+          if [ "$PRODUCTION" = "true" ]; then
+            url=$($VERCEL deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          else
+            url=$($VERCEL deploy --prebuilt --token="$VERCEL_TOKEN")
+            $VERCEL alias set "$url" "$STAGING_ALIAS" --token="$VERCEL_TOKEN"
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      # Só confere que o app subiu com as variáveis do ambiente. Quem barra migração
+      # faltando é o db:check acima. O preview fica atrás da proteção da Vercel, então
+      # isto só roda na produção.
+      - name: Smoke test da produção
+        if: env.PRODUCTION == 'true'
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$PRODUCTION_URL/")
+          echo "/ → $status"
+          [ "$status" = "200" ] || exit 1
