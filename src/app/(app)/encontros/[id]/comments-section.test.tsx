@@ -29,10 +29,12 @@ function renderSection(
     readOnly = false,
     createAction = noop,
     deleteAction = noop,
+    refreshAction = async () => undefined,
   }: {
     readOnly?: boolean;
     createAction?: CommentFormProps["createAction"];
     deleteAction?: CommentListProps["deleteAction"];
+    refreshAction?: () => Promise<void>;
   } = {},
 ) {
   return render(
@@ -41,7 +43,7 @@ function renderSection(
       readOnly={readOnly}
       createAction={createAction}
       deleteAction={deleteAction}
-      refreshAction={async () => undefined}
+      refreshAction={refreshAction}
     />,
   );
 }
@@ -161,6 +163,29 @@ describe("comentários do encontro", () => {
     expect(screen.getByRole("button", { name: "Atualizar comentários" })).toBeInTheDocument();
     expect(interval).not.toHaveBeenCalled();
     expect(timeout).not.toHaveBeenCalled();
+  });
+
+  it("desabilita Atualizar enquanto atualiza e anuncia o estado", async () => {
+    let finish = () => {};
+    const refreshAction = vi.fn<() => Promise<void>>(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    renderSection([comment({})], { refreshAction });
+    const button = screen.getByRole("button", { name: "Atualizar comentários" });
+
+    fireEvent.click(button);
+
+    await waitFor(() => expect(button).toBeDisabled());
+    expect(screen.getByRole("status")).toHaveTextContent("Atualizando comentários…");
+    fireEvent.click(button);
+    expect(refreshAction).toHaveBeenCalledTimes(1);
+
+    finish();
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
   it("não tem violações de acessibilidade", async () => {

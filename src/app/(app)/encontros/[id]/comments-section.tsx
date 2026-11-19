@@ -1,8 +1,8 @@
 import { commentsCopy as copy, type MeetupComments } from "@/modules/comments";
-import { Button } from "@/shared/ui";
 import type { CommentActionState } from "./comment-actions";
 import { CommentForm } from "./comment-form";
 import { CommentList } from "./comment-list";
+import { RefreshCommentsButton } from "./refresh-comments-button";
 
 type CommentsSectionProps = MeetupComments & {
   createAction: (state: CommentActionState, input: unknown) => Promise<CommentActionState>;
@@ -23,9 +23,7 @@ export function CommentsSection(props: CommentsSectionProps) {
           {copy.title}
         </h2>
         <form action={props.refreshAction}>
-          <Button type="submit" variant="secondary">
-            {copy.refresh}
-          </Button>
+          <RefreshCommentsButton />
         </form>
       </div>
       <CommentList comments={props.comments} deleteAction={props.deleteAction} />
