@@ -174,6 +174,12 @@ src/
   2. Abra um PR `staging` → `main` com o título `release: <resumo>` e a lista dos PRs incluídos.
   3. Faça o merge com **merge commit**. ❌ Nunca use squash nem rebase nesse PR: a `staging` deixaria de ser ancestral da `main`, e o próximo release viria com conflito.
   4. O merge dispara o deploy de produção. Ele só termina quando o run do Deploy está verde, os logs de erro da Vercel estão limpos e uma tela logada que depende das mudanças abre sem erro. Status 200 nas páginas públicas não prova nada: elas não tocam nas tabelas novas.
+- **Versões e changelog** (semantic-release, `release.config.mjs`): o job `release` do `deploy.yml` roda depois do deploy verde, então uma tag quer dizer "isto está no ar".
+  - Deploy da `staging` gera a pre-release `vX.Y.Z-rc.N`; deploy da `main` gera a `vX.Y.Z`, marcada como **Latest** nas GitHub Releases. A versão em produção é a release Latest. Não existe tag móvel (`latest`, `production`).
+  - A versão sai dos commits: `feat` sobe o minor, `fix` e `perf` sobem o patch, `BREAKING CHANGE` (ou `tipo!:`) sobe o major. Os outros tipos não geram versão nem aparecem nas notas. Por isso a mensagem de cada commit de card precisa seguir o Conventional Commits: é ela que vira a linha do changelog.
+  - O changelog vive **só nas GitHub Releases**, em pt-BR (Novidades, Correções, Desempenho, Mudanças incompatíveis). ❌ Não há `CHANGELOG.md` nem versão no `package.json`: o semantic-release não commita nada, porque a `main` só recebe código por PR e um commit dela que a `staging` não tem quebraria o próximo release.
+  - Depois do release da `main`, o próprio job traz o merge commit do release de volta para a `staging` (fast-forward, ou um merge `chore(release): traz a main de volta para a staging` quando a `staging` já andou). Sem isso a `staging` não enxerga a tag `vX.Y.Z` e solta outra rc da versão que já saiu. ❌ Não desfaça esse commit nem reescreva a `staging` por cima dele.
+  - ❌ Nunca crie tag nem GitHub Release à mão: o semantic-release calcula a próxima versão a partir das tags existentes.
 - O PR é escrito em português, com as seções **Contexto**, **O que mudou**, **Como testar** e `Closes #<n>`.
 - **Congelamento do hackathon:** depois de **30/11/2026** não há commit, push, merge nem alteração alguma no repositório.
 
