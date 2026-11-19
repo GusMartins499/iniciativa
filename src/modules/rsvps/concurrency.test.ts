@@ -7,17 +7,20 @@ import { user } from "@/shared/auth/schema";
 import { insertTestUser } from "@/shared/auth/test-helpers";
 import type { Database } from "@/shared/db";
 import { createNeonTestDb } from "@/shared/db/test-db";
-import { testDatabaseUrl } from "@/shared/env";
+import { routeThroughWsProxy } from "@/shared/db/ws-proxy";
+import { testDatabaseUrl, testDatabaseWsProxy } from "@/shared/env";
 import { confirmRsvp } from "./rsvps";
 import { NOW, setupMeetup } from "./test-setup";
 
-// O PGlite usa uma conexão só e não reproduz a corrida: este teste roda numa branch do Neon.
+// O PGlite usa uma conexão só e não reproduz a corrida: este teste precisa de um Postgres de
+// verdade (a branch "test" do Neon, ou no CI o Postgres do e2e atrás do wsproxy).
 describe.skipIf(!testDatabaseUrl)("rsvps.confirmRsvp com concorrência (Neon)", () => {
   const prefix = `conc-${Date.now()}-`;
   let db: Database;
   let close: () => Promise<void>;
 
   beforeAll(async () => {
+    if (testDatabaseWsProxy) routeThroughWsProxy(testDatabaseWsProxy);
     ({ db, close } = await createNeonTestDb(testDatabaseUrl ?? ""));
   });
 
