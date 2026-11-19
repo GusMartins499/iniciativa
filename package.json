@@ -16,6 +16,7 @@
     "e2e:db": "docker compose -f e2e/compose.yaml up -d --wait",
     "db:generate": "node --env-file-if-exists=.env.local node_modules/drizzle-kit/bin.cjs generate",
     "db:migrate": "node --env-file-if-exists=.env.local node_modules/drizzle-kit/bin.cjs migrate",
+    "db:check": "tsx --env-file-if-exists=.env.local scripts/check-migrations.ts",
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts"
   },
   "dependencies": {
