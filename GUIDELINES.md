@@ -44,7 +44,7 @@ src/
 - Valide toda entrada no servidor com Zod, mesmo que o formulário já tenha validado.
 - Verifique a sessão **e** a autodeclaração com consentimento aceito em toda Server Action e em toda rota protegida. Sem isso, redirecione para o onboarding.
 - Mantenha as regras de negócio só no servidor: vagas, acompanhante, prazo até o início, permissão do criador.
-- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts`, o `vitest.config.ts` e o `playwright.config.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`), e o `process.env.NEXT_RUNTIME` do `src/instrumentation.ts`, que o Next define. Variável nova entra no schema do `env.ts` e no `.env.example` (e no README só quando o repositório for privado; ver § Infra provisioning).
+- Leia variáveis de ambiente **só** por `src/shared/env.ts` (`getServerEnv()`), que valida com Zod sob demanda. ❌ Não use `process.env` fora desse arquivo; as exceções são o `drizzle.config.ts`, o `vitest.config.ts`, o `playwright.config.ts` e o `scripts/check-migrations.ts`, que rodam fora do app (o `vitest.config.ts` lê do `.env.local` só a `TEST_DATABASE_URL`), e o `process.env.NEXT_RUNTIME` do `src/instrumentation.ts`, que o Next define. Variável nova entra no schema do `env.ts` e no `.env.example` (e no README só quando o repositório for privado; ver § Infra provisioning).
 - Variável **obrigatória** nova no schema do `env.ts` (sem `.optional()` nem `.default()`) entra, no mesmo PR, também no `e2eEnv` do `playwright.config.ts` e nos objetos de env válidos de `src/shared/env.test.ts`, `src/shared/env.chaos.test.ts` e `src/shared/db/client.chaos.test.ts`, com um valor curto e legível (§ Security). Sem isso, o e2e não sobe e esses testes quebram, porque o `getServerEnv()` valida o schema inteiro. Avise no PR que a variável precisa existir na Vercel (Production e Preview) e no `.env.local` antes do merge: sem ela, o app não sobe.
 - Grave datas em **UTC** no banco (`timestamp with time zone`). Exiba e interprete as datas no fuso `America/Sao_Paulo`.
 
@@ -61,6 +61,7 @@ src/
   - **Enquanto o repositório for público:** ❌ nenhum passo de setup nem de configuração de infraestrutura vai para o `README.md` ou outro arquivo do repositório. Eles ficam só nos cards (issues). Uma variável nova entra apenas no `.env.example`.
   - **Se o repositório se tornar privado (a partir desse momento):** os passos de setup passam a ficar no `README.md`, e uma variável nova entra no `.env.example` e no README no mesmo PR.
 - Use apenas planos gratuitos e o subdomínio da Vercel. Não adicione serviço pago nem domínio próprio.
+- **Deploy só pelo pipeline** (`.github/workflows/deploy.yml`). O deploy automático da Vercel fica desligado no `vercel.json`. Quando o CI de um push termina verde, o pipeline aplica as migrações no banco do ambiente, confere que nenhuma ficou pendente (`pnpm db:check`) e só então publica. Push na `staging` vai para o banco `staging` do Neon e para o preview `iniciativa-tea-staging.vercel.app`; push na `main` vai para o banco `production` e para a produção. ❌ Nunca rode `vercel deploy` nem `pnpm db:migrate` à mão contra staging ou produção.
 
 ## Logging
 
@@ -140,6 +141,7 @@ src/
 - Nunca edite uma migração que já foi aplicada. Para corrigir, crie uma migração nova.
 - Comece sempre por mudanças aditivas. Renomear ou remover coluna é feito em passos separados: adicionar, migrar dados, depois remover.
 - A migração vai **no mesmo PR** da feature que precisa dela.
+- Quem aplica a migração em staging e em produção é o pipeline de deploy, antes de publicar o código que depende dela. Migração com erro interrompe o deploy.
 - Desenvolvimento e testes usam uma branch do Neon ou PGlite, nunca o banco de produção.
 
 ## Security & sensitive data
@@ -159,6 +161,7 @@ src/
 
 - Siga o padrão [Conventional Commits](https://www.conventionalcommits.org/): `tipo(escopo): descrição no imperativo`, **em português**. O escopo é o módulo (`meetups`, `rsvps`, `users`, `communities`, `shared`, `app`). Exemplo: `feat(rsvps): permite confirmar presença com acompanhante`.
 - Branch: `tipo/<nº-da-issue>-slug`, por exemplo `feat/12-confirmar-presenca`. Cada card tem sua própria branch.
+- Todo PR de card aponta para a `staging`. Depois de conferir o preview, um PR `staging` → `main` leva à produção.
 - O PR é escrito em português, com as seções **Contexto**, **O que mudou**, **Como testar** e `Closes #<n>`.
 - **Congelamento do hackathon:** depois de **30/11/2026** não há commit, push, merge nem alteração alguma no repositório.
 
