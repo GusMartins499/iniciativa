@@ -180,7 +180,7 @@ O isolamento social é um tema comum e recorrente em diagnósticos e terapias de
   - Fonte: Inter em todo o app. O nome "iniciativa" vai em Inter Bold, em minúsculas, com espaçamento entre letras levemente fechado.
   - Logo: o d20 visto de frente. Hexágono sólido em azul-tinta, com a face de cima, um triângulo, em mel.
   - O hexágono remete ao d20, e não a uma colmeia: a face em triângulo deixa isso claro. Hexágonos nunca aparecem encaixados lado a lado.
-  - Comunidades: cada uma tem um tom suave e um ícone, escolhidos no protótipo do card #81 (direção "cor e ícone por comunidade"). Aparecem no ícone ao lado do nome na lista de comunidades e no título da página da comunidade, numa faixa e num ícone no card de encontro de comunidade, e numa etiqueta com o nome acima do título na página do encontro. O encontro aberto fica neutro. O ícone é só enfeite: o nome escrito, ou o contexto da tela, continua sendo a informação. A fonte das cores é `src/app/(app)/community-theme.ts`, com teste de contraste.
+  - Comunidades: cada uma tem um tom suave e um ícone, escolhidos no protótipo do card #81 (direção "cor e ícone por comunidade"). Aparecem nas etiquetas de "As comunidades" da tela inicial, no ícone ao lado do nome na lista de comunidades e no título da página da comunidade, numa faixa e num ícone no card de encontro de comunidade, e numa etiqueta com o nome acima do título na página do encontro. O encontro aberto fica neutro. O ícone é só enfeite: o nome escrito, ou o contexto da tela, continua sendo a informação. A fonte das cores é `src/app/community-theme.ts`, com teste de contraste.
 
     | Comunidade | Fundo | Texto e ícone | Ícone (Lucide) |
     |---|---|---|---|

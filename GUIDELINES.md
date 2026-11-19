@@ -202,7 +202,7 @@ Os níveis abaixo são a referência de severidade do `/chaos-engineering`.
 - Alvos de toque têm no mínimo **44×44 px**.
 - A barra de navegação cabe sem rolagem horizontal de **375 px** até a largura do container, sem passar da borda do cabeçalho. Item novo na navegação vem com o e2e de largura (`e2e/communities.spec.ts`, em 375, 640 e 1280 px).
 - Linguagem de tela literal e direta, sem ironia, metáfora ou gíria.
-- A cor e o ícone de cada comunidade vêm só de `src/app/(app)/community-theme.ts` (pelo `CommunityIcon` e pelo `communityStyle`), nunca de cor solta no componente. Comunidade nova entra ali e no teste de contraste (AA, 4,5:1). A cor nunca carrega a informação sozinha: o nome escrito, ou o contexto da tela, diz qual é a comunidade. Tabela no documento de produto (§ Identidade visual).
+- A cor e o ícone de cada comunidade vêm só de `src/app/community-theme.ts` (pelo `CommunityIcon` e pelo `communityStyle`), nunca de cor solta no componente. Comunidade nova entra ali e no teste de contraste (AA, 4,5:1). A cor nunca carrega a informação sozinha: o nome escrito, ou o contexto da tela, diz qual é a comunidade. Tabela no documento de produto (§ Identidade visual).
 
 ## i18n & routes (frontend)
 
