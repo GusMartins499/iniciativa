@@ -69,6 +69,7 @@ src/
   - variáveis próprias na Vercel (Preview, branch `staging`), com `BETTER_AUTH_SECRET` e `CRON_SECRET` diferentes dos de produção;
   - `OTEL_SERVICE_NAME=iniciativa-staging`, para um erro no staging não disparar os alertas da produção.
 - O `VERCEL_TOKEN` do pipeline tem escopo do **time** da Vercel. Um token restrito ao projeto não funciona: a Vercel CLI consulta o time antes de qualquer comando e recebe 403 ("Could not retrieve Project Settings").
+- O `deploy.yml` roda por `workflow_run`, e o GitHub executa esse tipo de workflow **sempre com o arquivo da branch default (`main`)**, mesmo quando o deploy é da `staging`. Uma mudança no `deploy.yml` só vale depois do próximo release `staging` → `main`. Até lá, o deploy da `staging` roda a versão antiga. Em 19/11/2026 o job `release` do semantic-release entrou na `staging` (#98) e não gerou tag até chegar à `main`. Também por isso, no run do Deploy o `GITHUB_REF` e o `GITHUB_SHA` apontam para a `main`: a branch e o commit do deploy vêm de `github.event.workflow_run.head_branch` e `head_sha`, e o run aparece com `headBranch: main` no `gh run list`.
 
 ## Logging
 
