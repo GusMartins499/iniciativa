@@ -62,6 +62,13 @@ src/
   - **Se o repositório se tornar privado (a partir desse momento):** os passos de setup passam a ficar no `README.md`, e uma variável nova entra no `.env.example` e no README no mesmo PR.
 - Use apenas planos gratuitos e o subdomínio da Vercel. Não adicione serviço pago nem domínio próprio.
 - **Deploy só pelo pipeline** (`.github/workflows/deploy.yml`). O deploy automático da Vercel fica desligado no `vercel.json`. Quando o CI de um push termina verde, o pipeline aplica as migrações no banco do ambiente, confere que nenhuma ficou pendente (`pnpm db:check`) e só então publica. Push na `staging` vai para o banco `staging` do Neon e para o preview `iniciativa-tea-staging.vercel.app`; push na `main` vai para o banco `production` e para a produção. ❌ Nunca rode `vercel deploy` nem `pnpm db:migrate` à mão contra staging ou produção.
+- Se o deploy falhar na migração, nada é publicado e o ambiente continua no código anterior. A correção é uma migração nova, que segue o caminho normal: PR para a `staging` e depois `staging` → `main`. ❌ Nunca aplique SQL à mão para destravar o pipeline.
+- O preview da `staging` fica atrás da proteção de deploy da Vercel: só abre para quem está logado na conta da Vercel. Por isso o smoke test do pipeline (`/` responde 200) roda só na produção.
+- O staging é um ambiente separado da produção:
+  - banco próprio, a branch `staging` do Neon, criada **só com o schema**. ❌ Nunca copie dados da produção para ela: são dados pessoais e sensíveis (§ Security);
+  - variáveis próprias na Vercel (Preview, branch `staging`), com `BETTER_AUTH_SECRET` e `CRON_SECRET` diferentes dos de produção;
+  - `OTEL_SERVICE_NAME=iniciativa-staging`, para um erro no staging não disparar os alertas da produção.
+- O `VERCEL_TOKEN` do pipeline tem escopo do **time** da Vercel. Um token restrito ao projeto não funciona: a Vercel CLI consulta o time antes de qualquer comando e recebe 403 ("Could not retrieve Project Settings").
 
 ## Logging
 
@@ -161,7 +168,12 @@ src/
 
 - Siga o padrão [Conventional Commits](https://www.conventionalcommits.org/): `tipo(escopo): descrição no imperativo`, **em português**. O escopo é o módulo (`meetups`, `rsvps`, `users`, `communities`, `shared`, `app`). Exemplo: `feat(rsvps): permite confirmar presença com acompanhante`.
 - Branch: `tipo/<nº-da-issue>-slug`, por exemplo `feat/12-confirmar-presenca`. Cada card tem sua própria branch.
-- Todo PR de card aponta para a `staging`. Depois de conferir o preview, um PR `staging` → `main` leva à produção.
+- Todo PR de card aponta para a `staging`. ❌ Nenhum PR de card vai direto para a `main`, nem correção urgente: o caminho é sempre `staging` → `main`, para a `main` nunca ter código que o staging não rodou.
+- **Release para produção:**
+  1. Com os cards mergeados na `staging`, o deploy do staging termina verde e o preview é conferido logado, nas telas que os cards mudaram.
+  2. Abra um PR `staging` → `main` com o título `release: <resumo>` e a lista dos PRs incluídos.
+  3. Faça o merge com **merge commit**. ❌ Nunca use squash nem rebase nesse PR: a `staging` deixaria de ser ancestral da `main`, e o próximo release viria com conflito.
+  4. O merge dispara o deploy de produção. Ele só termina quando o run do Deploy está verde, os logs de erro da Vercel estão limpos e uma tela logada que depende das mudanças abre sem erro. Status 200 nas páginas públicas não prova nada: elas não tocam nas tabelas novas.
 - O PR é escrito em português, com as seções **Contexto**, **O que mudou**, **Como testar** e `Closes #<n>`.
 - **Congelamento do hackathon:** depois de **30/11/2026** não há commit, push, merge nem alteração alguma no repositório.
 
@@ -175,6 +187,10 @@ src/
   - idempotência do RSVP;
   - exclusão de conta.
 - Os testes de módulo rodam contra **Postgres de verdade** (PGlite em memória ou branch do Neon). Não use mock do banco.
+- O teste de concorrência de RSVP (`src/modules/rsvps/concurrency.test.ts`) precisa de várias conexões, que o PGlite não tem:
+  - no CI, roda no job `e2e`, contra o Postgres do `e2e/compose.yaml` atrás do wsproxy (`TEST_DATABASE_WS_PROXY`);
+  - localmente, roda contra a branch `test` do Neon (`TEST_DATABASE_URL` no `.env.local`), ou contra o compose do e2e com as mesmas variáveis do CI. Sem nenhuma das duas, é pulado.
+  - ❌ Nunca aponte esse teste para a branch `test` do Neon no CI: ele apaga o schema antes de rodar, e PRs em paralelo atropelariam um ao outro.
 - Telas: teste de componente com Testing Library e checagem com axe (`vitest-axe`) nos fluxos principais (onboarding, criar encontro, confirmar e cancelar presença).
 - Fluxos de ponta a ponta: Playwright em `e2e/`, contra o build de produção e um Postgres descartável (`e2e/compose.yaml`), no job `e2e` do CI em todo PR. Local: `pnpm e2e:db && pnpm e2e`. A sessão entra pelo `storageState` gravado no `e2e/global-setup.ts`; o login com o Google não é exercido.
 - Não há meta de cobertura. A regra de negócio sem teste é o que bloqueia o PR.
