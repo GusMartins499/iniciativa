@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { cn } from "@/shared/ui";
 import { type CommunityTheme, communityTheme } from "./community-theme";
 
 const sizes = {
@@ -43,7 +44,10 @@ export function CommunityTag({ slug, name, className = "" }: CommunityTagProps) 
   return (
     <span
       style={communityStyle(theme)}
-      className={`flex w-fit items-center gap-2 rounded-full bg-(--community-bg) py-1 pr-3 pl-1 font-semibold text-(--community-fg) ${className}`}
+      className={cn(
+        "flex w-fit items-center gap-2 rounded-full bg-(--community-bg) py-1 pr-3 pl-1 font-semibold text-(--community-fg)",
+        className,
+      )}
     >
       <CommunityIcon slug={slug} />
       {name}

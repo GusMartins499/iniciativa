@@ -34,8 +34,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm typecheck
-      # Sem TEST_DATABASE_URL o teste de concorrência é pulado: ele apaga o schema da
-      # branch "test" do Neon, e PRs rodando em paralelo atropelariam um ao outro.
+      # Sem TEST_DATABASE_URL o teste de concorrência é pulado aqui. Ele roda no job de e2e,
+      # contra o Postgres descartável do compose: cada execução tem um banco só seu.
       - run: pnpm test
       # O build não precisa de segredos: o env.ts só valida as variáveis quando o código as lê.
       - run: pnpm build
@@ -59,6 +59,12 @@ jobs:
       # Nenhum segredo do repositório: o playwright.config.ts gera o BETTER_AUTH_SECRET e usa
       # credenciais falsas do Google, então o job roda também em PRs de fork.
       - run: pnpm e2e:db
+      # Antes do Playwright: o teste apaga o schema, e o global-setup do e2e recria do zero.
+      - name: Teste de concorrência de RSVP
+        run: pnpm vitest run src/modules/rsvps/concurrency.test.ts
+        env:
+          TEST_DATABASE_URL: postgres://iniciativa@postgres:5432/iniciativa_e2e
+          TEST_DATABASE_WS_PROXY: localhost:5488/v1
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm e2e
 

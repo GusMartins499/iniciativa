@@ -2,6 +2,7 @@ import { z } from "zod";
 
 // Linha vazia do .env.example chega como "": vale como ausente.
 const emptyAsUndefined = (value: unknown) => (value === "" ? undefined : value);
+const LOOPBACK_WS_PROXY = /^(localhost|127\.0\.0\.1):\d+\/\S*$/;
 
 // Traces por OTLP (GUIDELINES.md § Tracing). Sem endpoint, a telemetria fica desligada.
 const telemetryEnvSchema = z.object({
@@ -23,13 +24,7 @@ const serverEnvSchema = telemetryEnvSchema.extend({
   // Só nos testes e2e: endereço do wsproxy do Neon na frente de um Postgres comum, sem protocolo.
   // A linha `DATABASE_WS_PROXY=` do .env.example chega como "": vale como ausente.
   // Só loopback: o ws-proxy.ts desliga o TLS, e a senha do banco não pode sair da máquina.
-  DATABASE_WS_PROXY: z.preprocess(
-    emptyAsUndefined,
-    z
-      .string()
-      .regex(/^(localhost|127\.0\.0\.1):\d+\/\S*$/)
-      .optional(),
-  ),
+  DATABASE_WS_PROXY: z.preprocess(emptyAsUndefined, z.string().regex(LOOPBACK_WS_PROXY).optional()),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -79,5 +74,9 @@ export function parseLogLevel(value: string | undefined) {
 
 export const logLevel = parseLogLevel(process.env.LOG_LEVEL);
 
-// Só nos testes: branch "test" do Neon para o teste de concorrência (opcional).
+// Só nos testes: banco do teste de concorrência (opcional). Localmente é a branch "test"
+// do Neon; no CI é o Postgres do e2e/compose.yaml, atrás do wsproxy (TEST_DATABASE_WS_PROXY).
 export const testDatabaseUrl = z.url().optional().parse(process.env.TEST_DATABASE_URL);
+export const testDatabaseWsProxy = z
+  .preprocess(emptyAsUndefined, z.string().regex(LOOPBACK_WS_PROXY).optional())
+  .parse(process.env.TEST_DATABASE_WS_PROXY);
